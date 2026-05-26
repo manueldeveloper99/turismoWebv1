@@ -6,8 +6,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class TurismowebApplicationTests {
 
-	@Test
+	@Test 
 	void contextLoads() {
+
+		// Prueba de contexto para verificar que la aplicación se carga correctamente
 	}
 
 }
