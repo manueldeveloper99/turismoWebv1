@@ -1,0 +1,36 @@
+package com.proyectouno.turismoweb.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "places")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Place {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    private String category; // e.g., "Mirador", "Restaurante"
+    private String address;
+    @Column(columnDefinition = "TEXT")
+    private String imageUrl;
+
+    private Double latitude;
+    private Double longitude;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "town_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
+    private Town town;
+}
