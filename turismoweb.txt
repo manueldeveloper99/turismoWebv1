@@ -1,0 +1,54 @@
+turismoweb/                          ← raíz del repo
+├── backend/                         ← mover todo lo de turismoweb/turismoweb aquí
+│   ├── src/
+│   │   ├── main/java/com/proyectouno/turismoweb/
+│   │   │   ├── TurismowebApplication.java
+│   │   │   ├── config/
+│   │   │   │   ├── SecurityConfig.java       ← CORS, JWT, OAuth
+│   │   │   │   └── CorsConfig.java
+│   │   │   ├── controller/
+│   │   │   │   ├── AuthController.java       ← POST /api/auth/google
+│   │   │   │   ├── TownController.java       ← GET /api/towns/{id}
+│   │   │   │   ├── PlaceController.java      ← GET /api/towns/{id}/places
+│   │   │   │   └── UserController.java       ← GET /api/users/me
+│   │   │   ├── model/
+│   │   │   │   ├── User.java
+│   │   │   │   ├── Town.java
+│   │   │   │   └── Place.java
+│   │   │   ├── repository/
+│   │   │   │   ├── UserRepository.java
+│   │   │   │   ├── TownRepository.java
+│   │   │   │   └── PlaceRepository.java
+│   │   │   ├── service/
+│   │   │   │   ├── AuthService.java
+│   │   │   │   ├── TownService.java
+│   │   │   │   └── PlaceService.java
+│   │   │   └── dto/
+│   │   │       ├── PlaceDTO.java
+│   │   │       └── TownDTO.java
+│   │   ├── main/resources/
+│   │   │   └── application.properties
+│   │   └── test/
+│   ├── pom.xml
+│   └── .gitignore
+│
+├── frontend/                        ← aquí va el proyecto React (aún no creado)
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── PlaceCard.jsx
+│   │   │   └── Navbar.jsx
+│   │   ├── pages/
+│   │   │   ├── LoginPage.jsx
+│   │   │   ├── PlacesPage.jsx
+│   │   │   └── ErrorPage.jsx
+│   │   ├── services/
+│   │   │   └── api.js               ← llamadas al backend
+│   │   └── App.jsx
+│   ├── package.json
+│   └── .gitignore
+│
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml                ← pipeline completo
+│
+└── README.md
