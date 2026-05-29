@@ -1,14 +1,55 @@
-import { useEffect, useState } from 'react';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import { useEffect, useState, useRef } from 'react';
+import { Container, Row, Col, Card, Badge, Button } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
 import api from '../services/api';
+
+// Helper for changing map center dynamically
+function ChangeView({ center, zoom }) {
+  const map = useMap();
+  map.setView(center, zoom);
+  return null;
+}
 
 const PlacesPage = () => {
   const { townSlug } = useParams();
   const [places, setPlaces] = useState([]);
   const [town, setTown] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [viewMode, setViewMode] = useState('mapa'); // 'lista', 'mapa'
+  const mapRef = useRef(null);
+
+  const MarkerWithPopup = ({ place, index }) => {
+    const markerRef = useRef(null);
+    const isSelected = selectedPlace?.id === place.id;
+    
+    useEffect(() => {
+      if (isSelected && markerRef.current) {
+        markerRef.current.openPopup();
+      }
+    }, [isSelected]);
+
+    return (
+      <Marker 
+        ref={markerRef}
+        position={[place.latitude, place.longitude]}
+        icon={createCustomIcon(getCategoryColor(place.category), index + 1)}
+        eventHandlers={{
+          click: () => setSelectedPlace(place),
+        }}
+      >
+        <Popup className="custom-popup" autoPan={false}>
+          <div style={{ width: '200px' }}>
+            <img src={place.imageUrl || 'https://via.placeholder.com/200'} alt={place.name} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px 8px 0 0', marginBottom: '8px' }} />
+            <h6 className="fw-bold mb-1">{place.name}</h6>
+            <span className="badge rounded-pill mb-2" style={{backgroundColor: getCategoryColor(place.category), color: '#fff'}}>{place.category}</span>
+            <p style={{ fontSize: '0.8rem', margin: 0 }} className="text-truncate">{place.description}</p>
+          </div>
+        </Popup>
+      </Marker>
+    );
+  };
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -29,52 +70,133 @@ const PlacesPage = () => {
     fetchPlaces();
   }, [townSlug]);
 
+  const getCategoryColor = (category) => {
+    if(!category) return '#6c757d';
+    const cat = category.toLowerCase();
+    if (cat.includes('mirador')) return '#cca300'; // Amarillo oscuro
+    if (cat.includes('cultural') || cat.includes('histórico') || cat.includes('museo')) return '#77dd77'; // Verde claro
+    if (cat.includes('gastronomía') || cat.includes('restaurante')) return '#ffb347'; // Naranja claro
+    if (cat.includes('parque')) return '#0d6efd'; // Azul
+    return '#6c757d'; // Default
+  };
+
+
+
+  const createCustomIcon = (color, number) => {
+    return L.divIcon({
+      className: 'custom-leaflet-icon',
+      html: `<div style="
+               background-color: ${color}; 
+               width: 30px; 
+               height: 30px; 
+               border-radius: 50% 50% 50% 0; 
+               transform: rotate(-45deg); 
+               display: flex; 
+               align-items: center; 
+               justify-content: center; 
+               border: 2px solid white; 
+               box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+             ">
+               <span style="transform: rotate(45deg); color: white; font-weight: bold; font-size: 14px;">${number}</span>
+             </div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 30],
+      popupAnchor: [0, -35]
+    });
+  };
+
+  const centerCoords = selectedPlace?.latitude 
+    ? [selectedPlace.latitude, selectedPlace.longitude] 
+    : (places.length > 0 && places[0].latitude ? [places[0].latitude, places[0].longitude] : [10, -84]);
+
   return (
-    <Container className="mt-4">
-      <h2 className="mb-4">Lugares para visitar en {town?.name || townSlug}</h2>
+    <Container className="mt-4 pb-5">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="m-0 fw-bold">Mapa de Lugares - {town?.name || townSlug}</h2>
+        <Button 
+          variant="outline-dark" 
+          className="rounded-pill d-md-none" 
+          onClick={() => setViewMode(viewMode === 'lista' ? 'mapa' : 'lista')}
+        >
+          Vista {viewMode === 'lista' ? 'Mapa' : 'Lista'}
+        </Button>
+        <div className="d-none d-md-flex bg-white rounded-pill p-1 shadow-sm" style={{ border: '1px solid #ced4da' }}>
+           <Button 
+             variant={viewMode === 'lista' ? 'primary' : 'white'} 
+             className="rounded-pill px-3 fw-bold" 
+             style={{border: 'none', color: viewMode === 'lista' ? 'white' : '#495057'}}
+             onClick={() => setViewMode('lista')}
+           >
+             Vista Lista
+           </Button>
+           <Button 
+             variant={viewMode === 'mapa' ? 'primary' : 'white'} 
+             className="rounded-pill px-3 fw-bold" 
+             style={{border: 'none', color: viewMode === 'mapa' ? 'white' : '#495057'}}
+             onClick={() => setViewMode('mapa')}
+           >
+             Vista Mapa
+           </Button>
+        </div>
+      </div>
+
       <Row>
-        <Col md={7}>
-          <Row>
-            {places.map((place) => (
-              <Col md={6} key={place.id} className="mb-4">
-                <Card 
-                  className={`h-100 shadow-sm ${selectedPlace?.id === place.id ? 'border-primary' : ''}`}
-                  style={{ cursor: place.latitude ? 'pointer' : 'default', borderWidth: selectedPlace?.id === place.id ? '2px' : '1px' }}
-                  onClick={() => place.latitude && setSelectedPlace(place)}
-                >
-                  {place.imageUrl && <Card.Img variant="top" src={place.imageUrl} style={{ height: '200px', objectFit: 'cover' }} />}
-                  <Card.Body>
-                    <Card.Title>{place.name}</Card.Title>
-                    <span className="badge bg-warning text-dark mb-2">{place.category}</span>
-                    <Card.Text>{place.description}</Card.Text>
-                    <small className="text-muted">{place.address}</small>
-                    {!place.latitude && <small className="d-block text-danger mt-2">Sin coordenadas</small>}
+        {/* Left Column: List */}
+        <Col md={viewMode === 'lista' ? 12 : 4} className={`mb-4 ${viewMode === 'mapa' ? 'd-none d-md-block' : ''}`} style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '15px' }}>
+          {places.map((place, index) => (
+            <Card 
+              key={place.id} 
+              className="mb-3 shadow-sm border-0" 
+              style={{ 
+                cursor: place.latitude ? 'pointer' : 'default', 
+                borderRadius: '12px',
+                boxShadow: selectedPlace?.id === place.id ? '0 0 0 2px #0d6efd' : '0 .125rem .25rem rgba(0,0,0,.075)'
+              }}
+              onClick={() => place.latitude && setSelectedPlace(place)}
+            >
+              <Row className="g-0">
+                <Col xs={5}>
+                  <Card.Img 
+                    src={place.imageUrl || 'https://via.placeholder.com/150'} 
+                    style={{ height: '100px', width: '100%', objectFit: 'cover', borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px' }} 
+                  />
+                </Col>
+                <Col xs={7}>
+                  <Card.Body className="p-2 d-flex flex-column justify-content-center h-100">
+                    <h6 className="fw-bold mb-1 text-truncate">{index + 1}. {place.name}</h6>
+                    <div>
+                      <span className="badge rounded-pill px-2 py-1" style={{backgroundColor: getCategoryColor(place.category), color: '#fff', fontWeight: 'normal'}}>
+                        {place.category}
+                      </span>
+                    </div>
+                    {!place.latitude && <small className="text-danger mt-1" style={{fontSize: '0.7rem'}}>Sin mapa</small>}
                   </Card.Body>
-                </Card>
-              </Col>
-            ))}
-            {places.length === 0 && <p>No hay lugares registrados aún. Accede al panel Admin para agregar.</p>}
-          </Row>
+                </Col>
+              </Row>
+            </Card>
+          ))}
+          {places.length === 0 && <p className="text-muted">No hay lugares registrados.</p>}
         </Col>
-        <Col md={5}>
-          {selectedPlace ? (
-            <div style={{ height: '80vh', width: '100%', borderRadius: '8px', overflow: 'hidden' }}>
-              <iframe
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                scrolling="no"
-                marginHeight="0"
-                marginWidth="0"
-                src={`https://maps.google.com/maps?q=${selectedPlace.latitude},${selectedPlace.longitude}&hl=es&z=14&output=embed`}
-                style={{ border: '1px solid #ccc' }}
-              ></iframe>
-            </div>
-          ) : (
-             <div className="bg-light d-flex justify-content-center align-items-center" style={{ height: '80vh', borderRadius: '8px' }}>
-                <p className="text-muted">Selecciona un lugar para ver su mapa.</p>
-             </div>
-          )}
+
+        {/* Right Column: Map */}
+        <Col md={8} className={`${viewMode === 'lista' ? 'd-none' : ''}`}>
+          <div style={{ height: '75vh', width: '100%', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 .5rem 1rem rgba(0,0,0,.15)' }}>
+            <MapContainer 
+              center={centerCoords} 
+              zoom={14} 
+              style={{ height: '100%', width: '100%' }}
+              ref={mapRef}
+            >
+              <ChangeView center={centerCoords} zoom={14} />
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              {places.filter(p => p.latitude && p.longitude).map((place, index) => (
+                <MarkerWithPopup key={place.id} place={place} index={index} />
+              ))}
+            </MapContainer>
+          </div>
         </Col>
       </Row>
     </Container>
