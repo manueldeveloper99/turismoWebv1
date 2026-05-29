@@ -11,6 +11,7 @@ function App() {
       <NavbarComponent />
       <Routes>
         <Route path="/" element={<ErrorPage message="Escanea un código QR para entrar" />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/p/:townSlug" element={<LoginPage />} />
         <Route path="/p/:townSlug/places" element={<PlacesPage />} />
         <Route path="/admin" element={<AdminPanel />} />

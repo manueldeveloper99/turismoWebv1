@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badge, Image } from 'react-bootstrap';
 import api from '../services/api';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('lugares');
@@ -14,6 +15,37 @@ const AdminPanel = () => {
   const [town, setTown] = useState({ slug: '', name: '', description: '', imageUrl: '' });
   const [place, setPlace] = useState({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '' });
   const [msg, setMsg] = useState({ text: '', type: '' });
+  const [users, setUsers] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [accessDenied, setAccessDenied] = useState(false);
+
+  useEffect(() => {
+    // Validar acceso
+    api.get('/users/me').then(res => {
+      if (res.data.role !== 'ROLE_ADMIN' || !res.data.active) {
+        setAccessDenied(true);
+      } else {
+        setCurrentUser(res.data);
+        fetchTowns();
+      }
+    }).catch(err => {
+      setAccessDenied(true);
+    });
+  }, []);
+
+  const fetchUsers = () => {
+    api.get('/admin/users').then(res => setUsers(res.data)).catch(console.error);
+  };
+
+  const fetchStats = () => {
+    api.get('/admin/stats').then(res => setStats(res.data)).catch(console.error);
+  };
+
+  useEffect(() => {
+    if (!accessDenied && activeTab === 'usuarios') fetchUsers();
+    if (!accessDenied && (activeTab === 'dashboard' || activeTab === 'estadisticas')) fetchStats();
+  }, [activeTab, accessDenied]);
 
   useEffect(() => {
     fetchTowns();
@@ -131,6 +163,18 @@ const AdminPanel = () => {
     fontWeight: activeTab === tabName ? 'bold' : 'normal',
     padding: '10px 15px'
   });
+
+  if (accessDenied) {
+    return (
+      <Container className="mt-5 text-center">
+        <Alert variant="danger">
+          <h3>⛔ Acceso Denegado</h3>
+          <p>Esta sección es exclusiva para Administradores de Turismo Local UNA.</p>
+          <Button variant="outline-danger" onClick={() => window.location.href = '/'}>Volver al Inicio</Button>
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="p-0">
@@ -267,13 +311,168 @@ const AdminPanel = () => {
             </div>
           )}
 
-          {(activeTab === 'dashboard' || activeTab === 'usuarios' || activeTab === 'estadisticas') && (
-            <div className="d-flex justify-content-center align-items-center" style={{height: '60vh'}}>
-              <div className="text-center text-muted">
-                <h1 style={{fontSize: '4rem'}}>🚧</h1>
-                <h4>Módulo en construcción</h4>
-                <p>Esta sección estará disponible en la próxima versión.</p>
-              </div>
+          {activeTab === 'dashboard' && stats && (
+            <div>
+              <h3 className="mb-4">⏱️ Dashboard</h3>
+              <Row className="mb-4">
+                <Col md={4}>
+                  <Card className="text-white bg-primary shadow-sm h-100">
+                    <Card.Body className="d-flex flex-column justify-content-center align-items-center">
+                      <h1 className="display-4 fw-bold">{stats.totalTowns}</h1>
+                      <h5>Pueblos Totales</h5>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col md={4}>
+                  <Card className="text-white bg-success shadow-sm h-100">
+                    <Card.Body className="d-flex flex-column justify-content-center align-items-center">
+                      <h1 className="display-4 fw-bold">{stats.totalPlaces}</h1>
+                      <h5>Lugares Turísticos</h5>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col md={4}>
+                  <Card className="text-white bg-warning shadow-sm h-100">
+                    <Card.Body className="d-flex flex-column justify-content-center align-items-center">
+                      <h1 className="display-4 fw-bold">{stats.totalUsers}</h1>
+                      <h5 className="text-dark">Usuarios Registrados</h5>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              </Row>
+              <h4 className="mb-3">Últimos Lugares Agregados</h4>
+              <Table hover responsive className="align-middle">
+                <thead className="bg-light">
+                  <tr>
+                    <th>Lugar</th>
+                    <th>Categoría</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.recentPlaces?.map(p => (
+                    <tr key={p.id}>
+                      <td className="fw-bold">{p.name}</td>
+                      <td><Badge bg="info">{p.category}</Badge></td>
+                    </tr>
+                  ))}
+                  {stats.recentPlaces?.length === 0 && <tr><td colSpan="2" className="text-center text-muted">Aún no hay lugares</td></tr>}
+                </tbody>
+              </Table>
+            </div>
+          )}
+
+          {activeTab === 'usuarios' && (
+            <div>
+              <h3 className="mb-4">👥 Gestión de Usuarios</h3>
+              <Table hover responsive className="align-middle">
+                <thead className="bg-light">
+                  <tr>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map(u => (
+                    <tr key={u.id}>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <Image src={u.pictureUrl || 'https://via.placeholder.com/40'} roundedCircle width={40} height={40} className="me-2" />
+                          <span className="fw-bold">{u.name}</span>
+                        </div>
+                      </td>
+                      <td>{u.email}</td>
+                      <td>
+                        <Form.Select size="sm" value={u.role} onChange={async (e) => {
+                          try {
+                            await api.put(`/admin/users/${u.id}/role`, { role: e.target.value });
+                            fetchUsers();
+                            showMessage('Rol actualizado');
+                          } catch(err) {
+                            const errorMessage = err.response?.data?.error || 'Error actualizando rol';
+                            showMessage(errorMessage, 'danger');
+                            // Volver a cargar para que el select vuelva a decir "Administrador"
+                            fetchUsers();
+                          }
+                        }} style={{width: '150px'}}>
+                          <option value="ROLE_USER">Turista</option>
+                          <option value="ROLE_ADMIN">Administrador</option>
+                        </Form.Select>
+                      </td>
+                      <td>
+                        <Form.Check 
+                          type="switch" 
+                          id={`user-active-${u.id}`} 
+                          checked={u.active} 
+                          label={u.active ? 'Activo' : 'Bloqueado'}
+                          onChange={async (e) => {
+                            try {
+                              await api.put(`/admin/users/${u.id}/status`, { active: e.target.checked });
+                              fetchUsers();
+                              showMessage(e.target.checked ? 'Usuario activado' : 'Usuario bloqueado');
+                            } catch(err) {
+                              showMessage('Error actualizando estado', 'danger');
+                            }
+                          }}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                  {users.length === 0 && <tr><td colSpan="4" className="text-center text-muted">No hay usuarios</td></tr>}
+                </tbody>
+              </Table>
+            </div>
+          )}
+
+          {activeTab === 'estadisticas' && stats && (
+            <div>
+              <h3 className="mb-4">📊 Estadísticas Globales</h3>
+              <Row>
+                <Col md={6}>
+                  <Card className="shadow-sm mb-4">
+                    <Card.Header className="bg-white fw-bold">Lugares por Categoría</Card.Header>
+                    <Card.Body style={{ height: '300px' }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie 
+                            data={Object.entries(stats.placesByCategory || {}).map(([name, value]) => ({name, value}))} 
+                            dataKey="value" 
+                            nameKey="name" 
+                            cx="50%" 
+                            cy="50%" 
+                            outerRadius={80} 
+                            fill="#8884d8" 
+                            label
+                          >
+                            {Object.entries(stats.placesByCategory || {}).map((entry, index) => {
+                              const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a28bfe'];
+                              return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+                            })}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col md={6}>
+                  <Card className="shadow-sm mb-4">
+                    <Card.Header className="bg-white fw-bold">Top Últimos Lugares Agregados</Card.Header>
+                    <Card.Body style={{ height: '300px' }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={stats.recentPlaces?.map(p => ({name: p.name, value: 1})) || []}>
+                          <XAxis dataKey="name" tick={{fontSize: 10}} interval={0} angle={-45} textAnchor="end" height={60} />
+                          <YAxis />
+                          <Tooltip />
+                          <Bar dataKey="value" fill="#82ca9d" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              </Row>
             </div>
           )}
         </Col>
@@ -333,7 +532,13 @@ const AdminPanel = () => {
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Categoría</Form.Label>
-              <Form.Control type="text" value={place.category} onChange={e => setPlace({...place, category: e.target.value})} placeholder="Mirador, Parque, Restaurante..." required />
+              <Form.Select value={place.category} onChange={e => setPlace({...place, category: e.target.value})} required>
+                <option value="">Selecciona una categoría</option>
+                <option value="Mirador">Mirador</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Gastronomía">Gastronomía</option>
+                <option value="Parque">Parque</option>
+              </Form.Select>
             </Form.Group>
             <Row>
               <Col>

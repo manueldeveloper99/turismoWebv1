@@ -11,12 +11,20 @@ const LoginPage = () => {
     try {
       const res = await api.post('/auth/google', { token: credentialResponse.credential });
       localStorage.setItem('token', credentialResponse.credential); 
-      navigate(`/p/${townSlug}/places`);
+      if (townSlug) {
+         navigate(`/p/${townSlug}/places`);
+      } else {
+         navigate('/admin');
+      }
     } catch (err) {
       console.error('Error autenticando', err);
       // Fallback para desarrollo rápido del PoC
       localStorage.setItem('token', credentialResponse.credential);
-      navigate(`/p/${townSlug}/places`);
+      if (townSlug) {
+         navigate(`/p/${townSlug}/places`);
+      } else {
+         navigate('/admin');
+      }
     }
   };
 
@@ -24,8 +32,10 @@ const LoginPage = () => {
     <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
       <Card className="text-center p-4 shadow" style={{ width: '400px' }}>
         <Card.Body>
-          <h3>Bienvenido a {townSlug}</h3>
-          <p className="text-muted">Inicia sesión para descubrir los mejores lugares turísticos del pueblo.</p>
+          <h3>{townSlug ? `Bienvenido a ${townSlug}` : 'Acceso de Administrador'}</h3>
+          <p className="text-muted">
+            {townSlug ? 'Inicia sesión para descubrir los mejores lugares turísticos del pueblo.' : 'Inicia sesión para gestionar el sistema.'}
+          </p>
           <div className="mt-4 d-flex justify-content-center">
             <GoogleLogin
               onSuccess={handleSuccess}
