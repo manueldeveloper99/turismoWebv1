@@ -23,9 +23,6 @@ const AdminPanel = () => {
   const [accessDenied, setAccessDenied] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const [showQR, setShowQR] = useState(false);
-  const [qrTown, setQrTown] = useState(null);
-
   useEffect(() => {
     // Validar acceso
     api.get('/users/me').then(res => {
@@ -244,10 +241,14 @@ const AdminPanel = () => {
                       <td><Badge bg="secondary">{t.slug}</Badge></td>
                       <td>{t.description.substring(0, 50)}...</td>
                       <td>
-                        <Button variant="outline-primary" size="sm" className="me-2" onClick={() => {
-                          setQrTown(t);
-                          setShowQR(true);
-                        }}>📱 QR</Button>
+                        <Button 
+                          variant="outline-primary" 
+                          size="sm" 
+                          className="me-2" 
+                          onClick={() => t.slug ? window.open(`/qr/${t.slug}`, '_blank') : alert('Este pueblo no tiene un slug válido')}
+                        >
+                          📱 QR
+                        </Button>
                         <Button variant="outline-secondary" size="sm" className="me-2" onClick={() => {
                           setTown(t);
                           setShowTownModal(true);
@@ -584,15 +585,6 @@ const AdminPanel = () => {
             </Form.Group>
             <Button type="submit" variant="primary" className="w-100">Guardar Lugar Turístico</Button>
           </Form>
-        </Modal.Body>
-      </Modal>
-            {/* Modal QR */}
-      <Modal show={showQR} onHide={() => setShowQR(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Código QR — {qrTown?.name}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="d-flex justify-content-center py-4">
-          {qrTown && <QRPoster townSlug={qrTown.slug} townName={qrTown.name} />}
         </Modal.Body>
       </Modal>
 
