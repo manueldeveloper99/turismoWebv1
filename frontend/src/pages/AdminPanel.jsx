@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badge, Image } from 'react-bootstrap';
 import api from '../services/api';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import QRPoster from '../components/QRPoster';
+
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('lugares');
@@ -19,6 +21,10 @@ const AdminPanel = () => {
   const [stats, setStats] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [accessDenied, setAccessDenied] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const [showQR, setShowQR] = useState(false);
+  const [qrTown, setQrTown] = useState(null);
 
   useEffect(() => {
     // Validar acceso
@@ -31,6 +37,8 @@ const AdminPanel = () => {
       }
     }).catch(err => {
       setAccessDenied(true);
+    }).finally(() => {
+      setLoading(false);
     });
   }, []);
 
@@ -46,10 +54,6 @@ const AdminPanel = () => {
     if (!accessDenied && activeTab === 'usuarios') fetchUsers();
     if (!accessDenied && (activeTab === 'dashboard' || activeTab === 'estadisticas')) fetchStats();
   }, [activeTab, accessDenied]);
-
-  useEffect(() => {
-    fetchTowns();
-  }, []);
 
   const fetchTowns = () => {
     api.get('/towns').then(res => {
@@ -164,6 +168,14 @@ const AdminPanel = () => {
     padding: '10px 15px'
   });
 
+  if (loading) {
+    return (
+      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
+        <div className="spinner-border text-primary" role="status"><span className="visually-hidden">Cargando...</span></div>
+      </Container>
+    );
+  }
+
   if (accessDenied) {
     return (
       <Container className="mt-5 text-center">
@@ -232,6 +244,10 @@ const AdminPanel = () => {
                       <td><Badge bg="secondary">{t.slug}</Badge></td>
                       <td>{t.description.substring(0, 50)}...</td>
                       <td>
+                        <Button variant="outline-primary" size="sm" className="me-2" onClick={() => {
+                          setQrTown(t);
+                          setShowQR(true);
+                        }}>📱 QR</Button>
                         <Button variant="outline-secondary" size="sm" className="me-2" onClick={() => {
                           setTown(t);
                           setShowTownModal(true);
@@ -568,6 +584,15 @@ const AdminPanel = () => {
             </Form.Group>
             <Button type="submit" variant="primary" className="w-100">Guardar Lugar Turístico</Button>
           </Form>
+        </Modal.Body>
+      </Modal>
+            {/* Modal QR */}
+      <Modal show={showQR} onHide={() => setShowQR(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Código QR — {qrTown?.name}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="d-flex justify-content-center py-4">
+          {qrTown && <QRPoster townSlug={qrTown.slug} townName={qrTown.name} />}
         </Modal.Body>
       </Modal>
 
