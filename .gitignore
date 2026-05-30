@@ -3,3 +3,7 @@
 target/
 build/
 .gradle/
+
+# H2 Database files
+backend/turismodb.mv.db
+backend/turismodb.trace.db
