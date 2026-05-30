@@ -1,5 +1,5 @@
 *.json
-
-# H2 Database files
-*.mv.db
-*.trace.db
+# Java/Maven/Gradle
+target/
+build/
+.gradle/
