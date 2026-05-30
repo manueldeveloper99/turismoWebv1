@@ -5,7 +5,6 @@ import AdminPanel from './pages/AdminPanel'
 import ErrorPage from './pages/ErrorPage'
 import LandingPage from './pages/LandingPage'
 import NavbarComponent from './components/NavbarComponent'
-import QRPage from './pages/QRPage'
 
 function App() {
   return (
@@ -14,7 +13,6 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/qr/:slug" element={<QRPage />} />
         <Route path="/p/:townSlug" element={<LoginPage />} />
         <Route path="/p/:townSlug/places" element={<PlacesPage />} />
         <Route path="/admin" element={<AdminPanel />} />
