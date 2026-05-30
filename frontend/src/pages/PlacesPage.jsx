@@ -142,8 +142,10 @@ const PlacesPage = () => {
 
       <Row>
         {/* Left Column: List */}
-        <Col md={viewMode === 'lista' ? 12 : 4} className={`mb-4 ${viewMode === 'mapa' ? 'd-none d-md-block' : ''}`} style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '15px' }}>
+        <Col md={viewMode === 'lista' ? 12 : 4} className={`mb-4 ${viewMode === 'mapa' ? 'd-none d-md-block' : ''}`} style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '15px', overflowX: 'hidden' }}>
+          <Row>
           {places.map((place, index) => (
+            <Col md={viewMode === 'lista' ? 6 : 12} lg={viewMode === 'lista' ? 4 : 12} key={place.id}>
             <Card 
               key={place.id} 
               className="mb-3 shadow-sm border-0" 
@@ -154,15 +156,15 @@ const PlacesPage = () => {
               }}
               onClick={() => place.latitude && setSelectedPlace(place)}
             >
-              <Row className="g-0">
-                <Col xs={5}>
-                  <Card.Img 
-                    src={place.imageUrl || 'https://via.placeholder.com/150'} 
-                    style={{ height: '100px', width: '100%', objectFit: 'cover', borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px' }} 
-                  />
-                </Col>
-                <Col xs={7}>
-                  <Card.Body className="p-2 d-flex flex-column justify-content-center h-100">
+              <Row className="g-0 h-100">
+                  <Col xs={4}>
+                    <Card.Img 
+                      src={place.imageUrl || 'https://via.placeholder.com/150'} 
+                      style={{ height: '100%', minHeight: '120px', width: '100%', objectFit: 'cover', borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px' }} 
+                    />
+                  </Col>
+                  <Col xs={8}>
+                    <Card.Body className="p-3 d-flex flex-column justify-content-center h-100">
                     <h6 className="fw-bold mb-1 text-truncate">{index + 1}. {place.name}</h6>
                     <div>
                       <span className="badge rounded-pill px-2 py-1" style={{backgroundColor: getCategoryColor(place.category), color: '#fff', fontWeight: 'normal'}}>
@@ -174,7 +176,9 @@ const PlacesPage = () => {
                 </Col>
               </Row>
             </Card>
+            </Col>
           ))}
+          </Row>
           {places.length === 0 && <p className="text-muted">No hay lugares registrados.</p>}
         </Col>
 

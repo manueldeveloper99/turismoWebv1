@@ -13,16 +13,6 @@ const ErrorPage = ({ message }) => {
       flexDirection: 'column',
       fontFamily: "'Segoe UI', system-ui, sans-serif"
     }}>
-      <nav style={{
-        background: '#1a56b0',
-        color: 'white',
-        padding: '14px 32px',
-        fontSize: '18px',
-        fontWeight: '600',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-      }}>
-        Turismo Local UNA
-      </nav>
 
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
         <div style={{
