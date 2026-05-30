@@ -3,6 +3,7 @@ import LoginPage from './pages/LoginPage'
 import PlacesPage from './pages/PlacesPage'
 import AdminPanel from './pages/AdminPanel'
 import ErrorPage from './pages/ErrorPage'
+import LandingPage from './pages/LandingPage'
 import NavbarComponent from './components/NavbarComponent'
 
 function App() {
@@ -10,7 +11,7 @@ function App() {
     <BrowserRouter>
       <NavbarComponent />
       <Routes>
-        <Route path="/" element={<ErrorPage message="Escanea un código QR para entrar" />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/p/:townSlug" element={<LoginPage />} />
         <Route path="/p/:townSlug/places" element={<PlacesPage />} />
