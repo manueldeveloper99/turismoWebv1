@@ -32,5 +32,6 @@ public class Place {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "town_id", nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ToString.Exclude
     private Town town;
 }
