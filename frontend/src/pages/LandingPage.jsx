@@ -78,7 +78,11 @@ const LandingPage = () => {
                     <Spinner animation="border" variant="success" />
                   ) : selectedTown ? (
                     <>
-                      <QRPoster townSlug={selectedTown.slug} townName={selectedTown.name} />
+                      <QRPoster 
+                        townSlug={selectedTown.slug} 
+                        townName={selectedTown.name} 
+                        exactUrl={`${window.location.origin}/p/${selectedTown.slug}`} 
+                      />
                       <h4 className="mt-3 fw-bold" style={{ color: '#004d40' }}>{selectedTown.name}</h4>
                     </>
                   ) : (

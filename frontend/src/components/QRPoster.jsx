@@ -1,8 +1,8 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { MapPin, Printer } from 'lucide-react';
 
-function QRPoster({ townSlug, townName }) {
-  const url = `${import.meta.env.VITE_APP_URL}/p/${townSlug}`;
+function QRPoster({ townSlug, townName, exactUrl }) {
+  const url = exactUrl || `${import.meta.env.VITE_APP_URL}/p/${townSlug}`;
 
   return (
     <div className="d-flex flex-column align-items-center p-2">
@@ -17,10 +17,10 @@ function QRPoster({ townSlug, townName }) {
           <div style={styles.qrSection}>
             <div style={styles.qrDecorator}>
               <div style={styles.qrBackground}>
-                <QRCodeSVG 
-                  value={url} 
-                  size={160} 
-                  level="H" 
+                <QRCodeSVG
+                  value={url}
+                  size={160}
+                  level="H"
                   includeMargin={true}
                 />
               </div>
@@ -37,8 +37,8 @@ function QRPoster({ townSlug, townName }) {
       </div>
 
       <div className="no-print">
-        <button 
-          className="btn btn-primary mt-4 rounded-pill px-4 d-flex align-items-center gap-2 shadow-sm fw-bold" 
+        <button
+          className="btn btn-primary mt-4 rounded-pill px-4 d-flex align-items-center gap-2 shadow-sm fw-bold"
           onClick={() => window.print()}
         >
           <Printer size={18} /> Imprimir Cartel
