@@ -29,6 +29,9 @@ public class Place {
     private Double latitude;
     private Double longitude;
 
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private Boolean active = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "town_id", nullable = false)
     @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)

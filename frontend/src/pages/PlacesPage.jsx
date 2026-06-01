@@ -55,8 +55,11 @@ const PlacesPage = () => {
     const fetchPlaces = async () => {
       try {
         const res = await api.get(`/towns/${townSlug}/places`);
-        setPlaces(res.data);
-        const placeWithCoords = res.data.find(p => p.latitude && p.longitude);
+        // Filtramos para mostrar solo los lugares que están activos
+        const activePlaces = res.data.filter(p => p.active !== false);
+        setPlaces(activePlaces);
+        
+        const placeWithCoords = activePlaces.find(p => p.latitude && p.longitude);
         if (placeWithCoords) {
           setSelectedPlace(placeWithCoords);
         }
