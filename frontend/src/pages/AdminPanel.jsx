@@ -3,16 +3,16 @@ import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badg
 import api from '../services/api';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import QRPoster from '../components/QRPoster';
-import { 
-  LayoutDashboard, 
-  Landmark, 
-  MapPin, 
-  Users, 
-  BarChart3, 
-  Pencil, 
-  Trash2, 
-  QrCode, 
-  Plus, 
+import {
+  LayoutDashboard,
+  Landmark,
+  MapPin,
+  Users,
+  BarChart3,
+  Pencil,
+  Trash2,
+  QrCode,
+  Plus,
   ShieldAlert,
 } from 'lucide-react';
 
@@ -21,12 +21,12 @@ const AdminPanel = () => {
   const [towns, setTowns] = useState([]);
   const [selectedTown, setSelectedTown] = useState(null);
   const [places, setPlaces] = useState([]);
-  
+
   const [showTownModal, setShowTownModal] = useState(false);
   const [showPlaceModal, setShowPlaceModal] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrTown, setQrTown] = useState(null);
-  
+
   const [town, setTown] = useState({ slug: '', name: '', description: '', imageUrl: '' });
   const [place, setPlace] = useState({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '', active: true });
   const [msg, setMsg] = useState({ text: '', type: '' });
@@ -68,15 +68,15 @@ const AdminPanel = () => {
 
   const fetchTowns = () => {
     return api.get('/towns').then(res => {
-        const data = res.data || [];
-        setTowns(data);
-        if(data.length > 0 && !selectedTown) {
-            setSelectedTown(data[0]);
-        }
-        return data;
+      const data = res.data || [];
+      setTowns(data);
+      if (data.length > 0 && !selectedTown) {
+        setSelectedTown(data[0]);
+      }
+      return data;
     }).catch(err => {
-        console.error("Error fetching towns", err);
-        return [];
+      console.error("Error fetching towns", err);
+      return [];
     });
   };
 
@@ -90,14 +90,14 @@ const AdminPanel = () => {
     const targetSlug = slug || selectedTown?.slug;
     if (targetSlug) {
       return api.get(`/towns/${targetSlug}/places`)
-        .then(res => { 
+        .then(res => {
           const data = res.data || [];
-          setPlaces(data); 
-          return data; 
+          setPlaces(data);
+          return data;
         })
-        .catch(err => { 
-          console.error("Error fetching places", err); 
-          return []; 
+        .catch(err => {
+          console.error("Error fetching places", err);
+          return [];
         });
     }
     return Promise.resolve([]);
@@ -127,11 +127,11 @@ const AdminPanel = () => {
         setQrTown(newTown);
         setShowQRModal(true);
       }
-      
+
       // Refrescar datos y asegurar sincronización antes de cerrar el modal de edición
       await fetchTowns();
       await fetchStats();
-      
+
       setTown({ slug: '', name: '', description: '', imageUrl: '' });
       setShowTownModal(false);
     } catch (err) {
@@ -140,16 +140,16 @@ const AdminPanel = () => {
   };
 
   const handleDeleteTown = async (id) => {
-    if(window.confirm('¿Estás seguro de eliminar este pueblo y todos sus lugares?')) {
-        try {
-            await api.delete(`/admin/towns/${id}`);
-            showMessage('Pueblo eliminado');
-            fetchTowns();
-            fetchStats();
-            if(selectedTown?.id === id) setSelectedTown(null);
-        } catch(err) {
-            showMessage('Error al eliminar el pueblo', 'danger');
-        }
+    if (window.confirm('¿Estás seguro de eliminar este pueblo y todos sus lugares?')) {
+      try {
+        await api.delete(`/admin/towns/${id}`);
+        showMessage('Pueblo eliminado');
+        fetchTowns();
+        fetchStats();
+        if (selectedTown?.id === id) setSelectedTown(null);
+      } catch (err) {
+        showMessage('Error al eliminar el pueblo', 'danger');
+      }
     }
   };
 
@@ -170,7 +170,7 @@ const AdminPanel = () => {
         town: { id: targetTownId },
         active: place.id ? place.active : true // Si es nuevo (sin id), siempre es true
       };
-      
+
       if (place.id) {
         await api.put(`/admin/places/${place.id}`, placeData);
         showMessage('Lugar actualizado exitosamente');
@@ -178,18 +178,18 @@ const AdminPanel = () => {
         await api.post('/admin/places', placeData);
         showMessage('Lugar agregado exitosamente');
       }
-      
+
       // Forzar actualización de la lista de lugares
-      const freshTowns = await fetchTowns(); 
+      const freshTowns = await fetchTowns();
       await fetchStats();
 
       const updatedTown = freshTowns.find(t => t.id === targetTownId);
-      
+
       if (updatedTown) {
-        setSelectedTown(updatedTown); 
+        setSelectedTown(updatedTown);
         fetchPlaces(updatedTown.slug); // Refrescar lugares con el slug fresquito
       }
-      
+
       // Resetear formulario
       setPlace({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '', active: true });
       setShowPlaceModal(false);
@@ -209,7 +209,7 @@ const AdminPanel = () => {
     try {
       // 2. Intentamos el endpoint de status
       await api.put(`/admin/places/${p.id}/status`, { active: newStatus });
-      fetchStats().catch(() => {});
+      fetchStats().catch(() => { });
       showMessage(`Estado de ${p.name} actualizado`);
     } catch (err) {
       // 3. Fallback: Si el endpoint /status no existe, usamos el PUT general
@@ -223,9 +223,9 @@ const AdminPanel = () => {
           townId: targetTownId,
           town: { id: targetTownId }
         };
-        
+
         await api.put(`/admin/places/${p.id}`, updateData);
-        fetchStats().catch(() => {});
+        fetchStats().catch(() => { });
         showMessage(`Estado de ${p.name} actualizado`);
       } catch (innerErr) {
         // 4. Revertimos y notificamos al usuario el fallo total
@@ -237,15 +237,15 @@ const AdminPanel = () => {
   };
 
   const handleDeletePlace = async (id) => {
-    if(window.confirm('¿Estás seguro de eliminar este lugar?')) {
-        try {
-            await api.delete(`/admin/places/${id}`);
-            showMessage('Lugar eliminado');
-            await fetchPlaces(selectedTown?.slug);
-            await fetchStats();
-        } catch(err) {
-            showMessage('Error al eliminar el lugar', 'danger');
-        }
+    if (window.confirm('¿Estás seguro de eliminar este lugar?')) {
+      try {
+        await api.delete(`/admin/places/${id}`);
+        showMessage('Lugar eliminado');
+        await fetchPlaces(selectedTown?.slug);
+        await fetchStats();
+      } catch (err) {
+        showMessage('Error al eliminar el lugar', 'danger');
+      }
     }
   };
 
@@ -318,11 +318,11 @@ const AdminPanel = () => {
         <Col md={10} className="p-4 bg-white">
           {/* Toast Notification Container */}
           <ToastContainer position="top-end" className="p-3" style={{ zIndex: 9999 }}>
-            <Toast 
+            <Toast
               key={msg.text}
-              onClose={() => setMsg({ text: '', type: '' })} 
-              show={!!msg.text} 
-              delay={3000} 
+              onClose={() => setMsg({ text: '', type: '' })}
+              show={!!msg.text}
+              delay={3000}
               autohide
               bg={msg.type === 'success' ? 'success' : 'danger'}
             >
@@ -357,16 +357,16 @@ const AdminPanel = () => {
                   {towns.map(t => (
                     <tr key={t.id}>
                       <td>
-                        <Image src={t.imageUrl || 'https://via.placeholder.com/50'} rounded width={50} height={50} style={{objectFit: 'cover'}} />
+                        <Image src={t.imageUrl || 'https://via.placeholder.com/50'} rounded width={50} height={50} style={{ objectFit: 'cover' }} />
                       </td>
                       <td className="fw-bold">{t.name}</td>
                       <td><Badge bg="secondary">{t.slug}</Badge></td>
                       <td>{t.description.substring(0, 50)}...</td>
                       <td>
-                        <Button 
-                          variant="outline-primary" 
-                          size="sm" 
-                          className="me-2" 
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          className="me-2"
                           onClick={() => { setQrTown(t); setShowQRModal(true); }}
                         >
                           <QrCode size={16} className="me-1" /> QR
@@ -392,17 +392,17 @@ const AdminPanel = () => {
                   Gestión de Lugares Turísticos {selectedTown ? `- ${selectedTown.name}` : ''}
                 </h3>
                 <Button variant="primary" className="d-flex align-items-center gap-2" onClick={() => {
-                  if(towns.length === 0) return alert('Debes crear un pueblo primero');
+                  if (towns.length === 0) return alert('Debes crear un pueblo primero');
                   setPlace({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: selectedTown?.id || towns[0].id, active: true });
                   setShowPlaceModal(true);
                 }}>
                   <Plus size={18} /> Agregar Nuevo Lugar
                 </Button>
               </div>
-              
+
               <div className="mb-4 w-25">
-                <Form.Select 
-                  value={selectedTown?.id || ''} 
+                <Form.Select
+                  value={selectedTown?.id || ''}
                   onChange={(e) => {
                     const found = towns.find(t => t.id === parseInt(e.target.value));
                     setSelectedTown(found);
@@ -427,33 +427,40 @@ const AdminPanel = () => {
                   {places.map(p => (
                     <tr key={p.id}>
                       <td>
-                        <Image src={p.imageUrl || 'https://via.placeholder.com/50'} rounded width={50} height={50} style={{objectFit: 'cover'}} />
+                        <Image src={p.imageUrl || 'https://via.placeholder.com/50'} rounded width={50} height={50} style={{ objectFit: 'cover' }} />
                       </td>
                       <td className="fw-bold">{p.name}</td>
                       <td><span className="px-3 py-1 rounded-pill" style={{ backgroundColor: '#fef3c7', color: '#92400e', fontSize: '0.75rem', fontWeight: '600' }}>{p.category}</span></td>
                       <td>{p.address}</td>
                       <td>
-                        <Form.Check 
-                          type="switch" 
-                          id={`switch-place-${p.id}`} 
-                          label={p.active ? "Activo" : "Inactivo"} 
-                          checked={p.active} 
+                        <Form.Check
+                          type="switch"
+                          id={`switch-place-${p.id}`}
+                          label={p.active ? "Activo" : "Inactivo"}
+                          checked={p.active}
                           onChange={() => handleTogglePlaceStatus(p)}
                         />
                       </td>
                       <td>
                         {p.active && (
-                          <Button 
-                            variant="outline-primary" 
-                            size="sm" 
-                            className="me-2" 
-                            onClick={() => { setQrTown({ name: p.name, slug: selectedTown.slug }); setShowQRModal(true); }}
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            className="me-2"
+                            onClick={() => {
+                              setQrTown({
+                                name: p.name,
+                                slug: selectedTown.slug,
+                                exactUrl: `${import.meta.env.VITE_APP_URL}/p/${selectedTown.slug}/places?destino=${p.id}`
+                              });
+                              setShowQRModal(true);
+                            }}
                           >
                             <QrCode size={16} className="me-1" /> QR
                           </Button>
                         )}
                         <Button variant="outline-secondary" size="sm" className="me-2" onClick={() => {
-                          setPlace({...p, townId: selectedTown.id});
+                          setPlace({ ...p, townId: selectedTown.id });
                           setShowPlaceModal(true);
                         }}><Pencil size={14} /></Button>
                         <Button variant="outline-danger" size="sm" onClick={() => handleDeletePlace(p.id)}><Trash2 size={14} /></Button>
@@ -544,29 +551,29 @@ const AdminPanel = () => {
                             await api.put(`/admin/users/${u.id}/role`, { role: e.target.value });
                             fetchUsers();
                             showMessage('Rol actualizado');
-                          } catch(err) {
+                          } catch (err) {
                             const errorMessage = err.response?.data?.error || 'Error actualizando rol';
                             showMessage(errorMessage, 'danger');
                             // Volver a cargar para que el select vuelva a decir "Administrador"
                             fetchUsers();
                           }
-                        }} style={{width: '150px'}}>
+                        }} style={{ width: '150px' }}>
                           <option value="ROLE_USER">Turista</option>
                           <option value="ROLE_ADMIN">Administrador</option>
                         </Form.Select>
                       </td>
                       <td>
-                        <Form.Check 
-                          type="switch" 
-                          id={`user-active-${u.id}`} 
-                          checked={u.active} 
+                        <Form.Check
+                          type="switch"
+                          id={`user-active-${u.id}`}
+                          checked={u.active}
                           label={u.active ? 'Activo' : 'Bloqueado'}
                           onChange={async (e) => {
                             try {
                               await api.put(`/admin/users/${u.id}/status`, { active: e.target.checked });
                               fetchUsers();
                               showMessage(e.target.checked ? 'Usuario activado' : 'Usuario bloqueado');
-                            } catch(err) {
+                            } catch (err) {
                               showMessage('Error actualizando estado', 'danger');
                             }
                           }}
@@ -590,14 +597,14 @@ const AdminPanel = () => {
                     <Card.Body style={{ height: '300px' }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
-                          <Pie 
-                            data={Object.entries(stats.placesByCategory || {}).map(([name, value]) => ({name, value}))} 
-                            dataKey="value" 
-                            nameKey="name" 
-                            cx="50%" 
-                            cy="50%" 
-                            outerRadius={80} 
-                            fill="#8884d8" 
+                          <Pie
+                            data={Object.entries(stats.placesByCategory || {}).map(([name, value]) => ({ name, value }))}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            fill="#8884d8"
                             label
                           >
                             {Object.entries(stats.placesByCategory || {}).map((entry, index) => {
@@ -617,8 +624,8 @@ const AdminPanel = () => {
                     <Card.Header className="bg-white fw-bold">Top Últimos Lugares Agregados</Card.Header>
                     <Card.Body style={{ height: '300px' }}>
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={stats.recentPlaces?.map(p => ({name: p.name, value: 1})) || []}>
-                          <XAxis dataKey="name" tick={{fontSize: 10}} interval={0} angle={-45} textAnchor="end" height={60} />
+                        <BarChart data={stats.recentPlaces?.map(p => ({ name: p.name, value: 1 })) || []}>
+                          <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-45} textAnchor="end" height={60} />
                           <YAxis />
                           <Tooltip />
                           <Bar dataKey="value" fill="#82ca9d" />
@@ -645,19 +652,19 @@ const AdminPanel = () => {
           <Form onSubmit={handleTownSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Nombre del Pueblo</Form.Label>
-              <Form.Control type="text" value={town.name} onChange={e => setTown({...town, name: e.target.value})} required />
+              <Form.Control type="text" value={town.name} onChange={e => setTown({ ...town, name: e.target.value })} required />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Ruta (Slug)</Form.Label>
-              <Form.Control type="text" value={town.slug} onChange={e => setTown({...town, slug: e.target.value})} placeholder="ej: santa-maria" required />
+              <Form.Control type="text" value={town.slug} onChange={e => setTown({ ...town, slug: e.target.value })} placeholder="ej: santa-maria" required />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Descripción</Form.Label>
-              <Form.Control as="textarea" rows={3} value={town.description} onChange={e => setTown({...town, description: e.target.value})} required />
+              <Form.Control as="textarea" rows={3} value={town.description} onChange={e => setTown({ ...town, description: e.target.value })} required />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>URL de Imagen</Form.Label>
-              <Form.Control type="url" value={town.imageUrl} onChange={e => setTown({...town, imageUrl: e.target.value})} />
+              <Form.Control type="url" value={town.imageUrl} onChange={e => setTown({ ...town, imageUrl: e.target.value })} />
             </Form.Group>
             <Button type="submit" variant="primary" className="w-100">Guardar Pueblo</Button>
           </Form>
@@ -676,18 +683,18 @@ const AdminPanel = () => {
           <Form onSubmit={handlePlaceSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Pertenece al Pueblo:</Form.Label>
-              <Form.Select value={place.townId} onChange={e => setPlace({...place, townId: e.target.value})} required>
+              <Form.Select value={place.townId} onChange={e => setPlace({ ...place, townId: e.target.value })} required>
                 <option value="">Selecciona un pueblo</option>
                 {towns.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Nombre del Lugar</Form.Label>
-              <Form.Control type="text" value={place.name} onChange={e => setPlace({...place, name: e.target.value})} required />
+              <Form.Control type="text" value={place.name} onChange={e => setPlace({ ...place, name: e.target.value })} required />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Categoría</Form.Label>
-              <Form.Select value={place.category} onChange={e => setPlace({...place, category: e.target.value})} required>
+              <Form.Select value={place.category} onChange={e => setPlace({ ...place, category: e.target.value })} required>
                 <option value="">Selecciona una categoría</option>
                 <option value="Mirador">Mirador</option>
                 <option value="Cultural">Cultural</option>
@@ -699,27 +706,27 @@ const AdminPanel = () => {
               <Col>
                 <Form.Group className="mb-3">
                   <Form.Label>Latitud</Form.Label>
-                  <Form.Control type="number" step="any" value={place.latitude} onChange={e => setPlace({...place, latitude: e.target.value})} placeholder="ej: 9.9281" required />
+                  <Form.Control type="number" step="any" value={place.latitude} onChange={e => setPlace({ ...place, latitude: e.target.value })} placeholder="ej: 9.9281" required />
                 </Form.Group>
               </Col>
               <Col>
                 <Form.Group className="mb-3">
                   <Form.Label>Longitud</Form.Label>
-                  <Form.Control type="number" step="any" value={place.longitude} onChange={e => setPlace({...place, longitude: e.target.value})} placeholder="ej: -84.0907" required />
+                  <Form.Control type="number" step="any" value={place.longitude} onChange={e => setPlace({ ...place, longitude: e.target.value })} placeholder="ej: -84.0907" required />
                 </Form.Group>
               </Col>
             </Row>
             <Form.Group className="mb-3">
               <Form.Label>Dirección Física</Form.Label>
-              <Form.Control type="text" value={place.address} onChange={e => setPlace({...place, address: e.target.value})} required />
+              <Form.Control type="text" value={place.address} onChange={e => setPlace({ ...place, address: e.target.value })} required />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Descripción</Form.Label>
-              <Form.Control as="textarea" rows={2} value={place.description} onChange={e => setPlace({...place, description: e.target.value})} required />
+              <Form.Control as="textarea" rows={2} value={place.description} onChange={e => setPlace({ ...place, description: e.target.value })} required />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>URL de Fotografía</Form.Label>
-              <Form.Control type="url" value={place.imageUrl} onChange={e => setPlace({...place, imageUrl: e.target.value})} />
+              <Form.Control type="url" value={place.imageUrl} onChange={e => setPlace({ ...place, imageUrl: e.target.value })} />
             </Form.Group>
             <Button type="submit" variant="primary" className="w-100">Guardar Lugar Turístico</Button>
           </Form>
@@ -733,7 +740,7 @@ const AdminPanel = () => {
         </Modal.Header>
         <Modal.Body className="text-center pb-4">
           {qrTown ? (
-            <QRPoster townSlug={qrTown.slug} townName={qrTown.name} />
+            <QRPoster townSlug={qrTown.slug} townName={qrTown.name} exactUrl={qrTown.exactUrl} />
           ) : (
             <div className="spinner-border text-primary" role="status"></div>
           )}
