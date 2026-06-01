@@ -228,8 +228,9 @@ const AdminPanel = () => {
         fetchStats().catch(() => {});
         showMessage(`Estado de ${p.name} actualizado`);
       } catch (innerErr) {
-        // 4. Revertimos silenciosamente solo si todo falla. No mostramos showMessage por error.
+        // 4. Revertimos y notificamos al usuario el fallo total
         setPlaces(prev => prev.map(item => item.id === p.id ? { ...item, active: originalStatus } : item));
+        showMessage(`Error crítico: No se pudo actualizar el estado de ${p.name}`, 'danger');
         console.error("Error persistente al cambiar estado:", innerErr);
       }
     }
