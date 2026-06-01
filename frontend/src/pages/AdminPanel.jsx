@@ -24,6 +24,8 @@ const AdminPanel = () => {
   
   const [showTownModal, setShowTownModal] = useState(false);
   const [showPlaceModal, setShowPlaceModal] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrTown, setQrTown] = useState(null);
   
   const [town, setTown] = useState({ slug: '', name: '', description: '', imageUrl: '' });
   const [place, setPlace] = useState({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '', active: true });
@@ -55,22 +57,26 @@ const AdminPanel = () => {
   };
 
   const fetchStats = () => {
-    api.get('/admin/stats').then(res => setStats(res.data)).catch(console.error);
+    return api.get('/admin/stats').then(res => { setStats(res.data); return res.data; }).catch(err => { console.error(err); return null; });
   };
 
   useEffect(() => {
     if (!accessDenied && activeTab === 'usuarios') fetchUsers();
-    if (!accessDenied && (activeTab === 'dashboard' || activeTab === 'estadisticas')) fetchStats();
+    if (!accessDenied && (activeTab === 'dashboard' || activeTab === 'estadisticas' || activeTab === 'pueblos')) fetchStats();
   }, [activeTab, accessDenied]);
 
   const fetchTowns = () => {
     return api.get('/towns').then(res => {
-        setTowns(res.data);
-        if(res.data.length > 0 && !selectedTown) {
-            setSelectedTown(res.data[0]);
+        const data = res.data || [];
+        setTowns(data);
+        if(data.length > 0 && !selectedTown) {
+            setSelectedTown(data[0]);
         }
-        return res.data;
-    }).catch(err => console.log(err));
+        return data;
+    }).catch(err => {
+        console.error("Error fetching towns", err);
+        return [];
+    });
   };
 
   useEffect(() => {
@@ -81,11 +87,19 @@ const AdminPanel = () => {
 
   const fetchPlaces = (slug) => {
     const targetSlug = slug || selectedTown?.slug;
-    if(targetSlug) {
-        api.get(`/towns/${targetSlug}/places`)
-         .then(res => setPlaces(res.data))
-         .catch(err => console.log(err));
+    if (targetSlug) {
+      return api.get(`/towns/${targetSlug}/places`)
+        .then(res => { 
+          const data = res.data || [];
+          setPlaces(data); 
+          return data; 
+        })
+        .catch(err => { 
+          console.error("Error fetching places", err); 
+          return []; 
+        });
     }
+    return Promise.resolve([]);
   }
 
   const showMessage = (text, type = 'success') => {
@@ -100,13 +114,20 @@ const AdminPanel = () => {
         await api.put(`/admin/towns/${town.id}`, town);
         showMessage('Pueblo actualizado exitosamente');
       } else {
-        await api.post('/admin/towns', town);
+        const res = await api.post('/admin/towns', town);
+        const newTown = res.data;
         showMessage('Pueblo agregado exitosamente');
+        // Preparamos y mostramos el QR inmediatamente con los datos de la respuesta
+        setQrTown(newTown);
+        setShowQRModal(true);
       }
+      
+      // Refrescar datos y asegurar sincronización antes de cerrar el modal de edición
+      await fetchTowns();
+      await fetchStats();
+      
       setTown({ slug: '', name: '', description: '', imageUrl: '' });
       setShowTownModal(false);
-      fetchTowns();
-      fetchStats();
     } catch (err) {
       showMessage('Error al guardar el pueblo (Asegúrate de estar autenticado)', 'danger');
     }
@@ -141,7 +162,7 @@ const AdminPanel = () => {
         longitude: parseFloat(place.longitude) || 0,
         townId: targetTownId,
         town: { id: targetTownId },
-        active: place.active ?? true
+        active: place.id ? place.active : true // Si es nuevo (sin id), siempre es true
       };
       
       if (place.id) {
@@ -153,8 +174,9 @@ const AdminPanel = () => {
       }
       
       // Forzar actualización de la lista de lugares
-      const freshTowns = await fetchTowns(); // Ahora devuelve los datos reales
-      
+      const freshTowns = await fetchTowns(); 
+      await fetchStats();
+
       const updatedTown = freshTowns.find(t => t.id === targetTownId);
       
       if (updatedTown) {
@@ -165,21 +187,43 @@ const AdminPanel = () => {
       // Resetear formulario
       setPlace({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '', active: true });
       setShowPlaceModal(false);
-      fetchStats();
     } catch (err) {
       showMessage('Error al guardar el lugar (Asegúrate de estar autenticado)', 'danger');
     }
   };
 
   const handleTogglePlaceStatus = async (p) => {
+    const originalStatus = p.active;
+    const newStatus = !originalStatus;
+    const targetTownId = p.town?.id || p.townId || selectedTown?.id;
+
+    // 1. Actualización optimista inmediata en la UI
+    setPlaces(prev => prev.map(item => item.id === p.id ? { ...item, active: newStatus } : item));
+
     try {
-      const newStatus = !p.active;
+      // 2. Intentamos el endpoint de status
       await api.put(`/admin/places/${p.id}/status`, { active: newStatus });
-      fetchPlaces();
-      fetchStats();
-      showMessage(newStatus ? 'Lugar activado' : 'Lugar desactivado');
+      fetchStats().catch(() => {});
     } catch (err) {
-      showMessage('Error al cambiar el estado del lugar', 'danger');
+      // 3. Fallback: Si el endpoint /status no existe, usamos el PUT general
+      // Enviamos el objeto EXACTO que el backend espera (incluyendo la relación town)
+      try {
+        const updateData = {
+          ...p,
+          latitude: parseFloat(p.latitude) || 0,
+          longitude: parseFloat(p.longitude) || 0,
+          active: newStatus,
+          townId: targetTownId,
+          town: { id: targetTownId }
+        };
+        
+        await api.put(`/admin/places/${p.id}`, updateData);
+        fetchStats().catch(() => {});
+      } catch (innerErr) {
+        // 4. Revertimos silenciosamente solo si todo falla. No mostramos showMessage por error.
+        setPlaces(prev => prev.map(item => item.id === p.id ? { ...item, active: originalStatus } : item));
+        console.error("Error persistente al cambiar estado:", innerErr);
+      }
     }
   };
 
@@ -188,8 +232,8 @@ const AdminPanel = () => {
         try {
             await api.delete(`/admin/places/${id}`);
             showMessage('Lugar eliminado');
-            fetchPlaces();
-            fetchStats();
+            await fetchPlaces(selectedTown?.slug);
+            await fetchStats();
         } catch(err) {
             showMessage('Error al eliminar el lugar', 'danger');
         }
@@ -297,7 +341,7 @@ const AdminPanel = () => {
                           variant="outline-primary" 
                           size="sm" 
                           className="me-2" 
-                          onClick={() => t.slug ? window.open(`/qr/${t.slug}`, '_blank') : alert('Este pueblo no tiene un slug válido')}
+                          onClick={() => { setQrTown(t); setShowQRModal(true); }}
                         >
                           <QrCode size={16} className="me-1" /> QR
                         </Button>
@@ -323,7 +367,7 @@ const AdminPanel = () => {
                 </h3>
                 <Button variant="primary" className="d-flex align-items-center gap-2" onClick={() => {
                   if(towns.length === 0) return alert('Debes crear un pueblo primero');
-                  setPlace({...place, townId: selectedTown?.id || towns[0].id});
+                  setPlace({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: selectedTown?.id || towns[0].id, active: true });
                   setShowPlaceModal(true);
                 }}>
                   <Plus size={18} /> Agregar Nuevo Lugar
@@ -372,6 +416,16 @@ const AdminPanel = () => {
                         />
                       </td>
                       <td>
+                        {p.active && (
+                          <Button 
+                            variant="outline-primary" 
+                            size="sm" 
+                            className="me-2" 
+                            onClick={() => { setQrTown({ name: p.name, slug: selectedTown.slug }); setShowQRModal(true); }}
+                          >
+                            <QrCode size={16} className="me-1" /> QR
+                          </Button>
+                        )}
                         <Button variant="outline-secondary" size="sm" className="me-2" onClick={() => {
                           setPlace({...p, townId: selectedTown.id});
                           setShowPlaceModal(true);
@@ -643,6 +697,20 @@ const AdminPanel = () => {
             </Form.Group>
             <Button type="submit" variant="primary" className="w-100">Guardar Lugar Turístico</Button>
           </Form>
+        </Modal.Body>
+      </Modal>
+
+      {/* Modal QR Poster - Generación Inmediata */}
+      <Modal show={showQRModal} onHide={() => setShowQRModal(false)} centered>
+        <Modal.Header closeButton className="border-0">
+          <Modal.Title className="fs-5">QR del Pueblo</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center pb-4">
+          {qrTown ? (
+            <QRPoster townSlug={qrTown.slug} townName={qrTown.name} />
+          ) : (
+            <div className="spinner-border text-primary" role="status"></div>
+          )}
         </Modal.Body>
       </Modal>
 
