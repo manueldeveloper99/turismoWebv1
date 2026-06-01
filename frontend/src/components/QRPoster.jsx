@@ -11,7 +11,7 @@ function QRPoster({ townSlug, townName }) {
           <div style={styles.header}>
             <MapPin size={28} style={{ color: '#ef4444', marginBottom: '8px' }} />
             <h5 style={styles.topText}>DESCUBRE LA MAGIA DE</h5>
-            <h1 style={styles.townName}>{townName.toUpperCase()}</h1>
+            <h1 style={styles.townName}>{townName?.toUpperCase()}</h1>
           </div>
 
           <div style={styles.qrSection}>
@@ -35,12 +35,15 @@ function QRPoster({ townSlug, townName }) {
           </div>
         </div>
       </div>
-      <button 
-        className="btn btn-primary mt-4 rounded-pill px-4 d-flex align-items-center gap-2 shadow-sm fw-bold" 
-        onClick={() => window.print()}
-      >
-        <Printer size={18} /> Imprimir Cartel
-      </button>
+
+      <div className="no-print">
+        <button 
+          className="btn btn-primary mt-4 rounded-pill px-4 d-flex align-items-center gap-2 shadow-sm fw-bold" 
+          onClick={() => window.print()}
+        >
+          <Printer size={18} /> Imprimir Cartel
+        </button>
+      </div>
 
       <style>{`
         @media print {
@@ -50,8 +53,9 @@ function QRPoster({ townSlug, townName }) {
             position: absolute;
             left: 50%;
             top: 50%;
-            transform: translate(-50%, -50%) scale(1.5);
+            transform: translate(-50%, -50%) scale(1.2);
           }
+          .no-print { display: none !important; }
         }
       `}</style>
     </div>
