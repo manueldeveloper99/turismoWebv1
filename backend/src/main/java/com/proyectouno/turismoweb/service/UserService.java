@@ -19,13 +19,7 @@ public class UserService {
     public User updateRole(Long id, String role) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         
-        // Evitar que el último admin se quite a sí mismo los privilegios
-        if ("ROLE_ADMIN".equals(user.getRole()) && !"ROLE_ADMIN".equals(role)) {
-            long adminCount = userRepository.countByRole("ROLE_ADMIN");
-            if (adminCount <= 1) {
-                throw new RuntimeException("No puedes degradar al único administrador del sistema.");
-            }
-        }
+        validateLastAdmin(user, role, user.getActive());
         
         user.setRole(role);
         return userRepository.save(user);
@@ -33,7 +27,21 @@ public class UserService {
 
     public User updateStatus(Long id, Boolean active) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        
+        validateLastAdmin(user, user.getRole(), active);
+
         user.setActive(active);
         return userRepository.save(user);
+    }
+
+    private void validateLastAdmin(User user, String newRole, Boolean newActiveStatus) {
+        boolean isCurrentlyAdmin = "ROLE_ADMIN".equals(user.getRole());
+        boolean willNotBeAdmin = !"ROLE_ADMIN".equals(newRole) || Boolean.FALSE.equals(newActiveStatus);
+
+        if (isCurrentlyAdmin && willNotBeAdmin) {
+            if (userRepository.countByRole("ROLE_ADMIN") <= 1) {
+                throw new RuntimeException("Operación denegada: El sistema debe tener al menos un administrador activo.");
+            }
+        }
     }
 }
