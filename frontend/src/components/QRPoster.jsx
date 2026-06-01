@@ -1,44 +1,120 @@
 import { QRCodeSVG } from 'qrcode.react';
+import { MapPin, Printer } from 'lucide-react';
 
 function QRPoster({ townSlug, townName }) {
   const url = `${import.meta.env.VITE_APP_URL}/p/${townSlug}`;
 
   return (
-    <div className="d-flex flex-column align-items-center">
-      <div style={styles.woodFrame}>
-        <div style={styles.card}>
-          <div style={styles.mountainBg}>
-            <h3 style={styles.welcome}>BIENVENIDO A</h3>
-            <h2 style={styles.townName}>{townName.toUpperCase()}</h2>
-            <p style={styles.subtitle}>
-              Escanea este código QR para descubrir<br />
-              los mejores lugares turísticos de nuestro pueblo
-            </p>
-            <div style={styles.qrBox}>
-              <QRCodeSVG value={url} size={180} level="H" includeMargin={true} />
+    <div className="d-flex flex-column align-items-center p-2">
+      <div style={styles.posterContainer} id="qr-poster">
+        <div style={styles.innerFrame}>
+          <div style={styles.header}>
+            <MapPin size={28} style={{ color: '#ef4444', marginBottom: '8px' }} />
+            <h5 style={styles.topText}>DESCUBRE LA MAGIA DE</h5>
+            <h1 style={styles.townName}>{townName.toUpperCase()}</h1>
+          </div>
+
+          <div style={styles.qrSection}>
+            <div style={styles.qrDecorator}>
+              <div style={styles.qrBackground}>
+                <QRCodeSVG 
+                  value={url} 
+                  size={160} 
+                  level="H" 
+                  includeMargin={true}
+                />
+              </div>
             </div>
-            <p style={styles.urlText}>{url}</p>
-            <p style={styles.footer}>Universidad Nacional · Programación 4</p>
+            <p style={styles.scanText}>Escanea para explorar</p>
+          </div>
+
+          <div style={styles.footer}>
+            <div style={styles.line}></div>
+            <p style={styles.urlDisplay}>{url}</p>
+            <p style={styles.brandText}>TURISMO LOCAL · UNA</p>
           </div>
         </div>
       </div>
-      <button className="btn btn-primary mt-3" onClick={() => window.print()}>
-        Imprimir cartel
+      <button 
+        className="btn btn-primary mt-4 rounded-pill px-4 d-flex align-items-center gap-2 shadow-sm fw-bold" 
+        onClick={() => window.print()}
+      >
+        <Printer size={18} /> Imprimir Cartel
       </button>
+
+      <style>{`
+        @media print {
+          body * { visibility: hidden; }
+          #qr-poster, #qr-poster * { visibility: visible; }
+          #qr-poster {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(1.5);
+          }
+        }
+      `}</style>
     </div>
   );
 }
 
 const styles = {
-  woodFrame: { background: '#c8a55a', padding: 20, borderRadius: 8, display: 'inline-block' },
-  card: { background: 'white', borderRadius: 4, width: 300, overflow: 'hidden' },
-  mountainBg: { background: 'linear-gradient(180deg, #fff 45%, #c5d8e8 100%)', padding: 24, textAlign: 'center' },
-  welcome: { color: '#1a3a5c', fontSize: 16, margin: 0 },
-  townName: { color: '#1a3a5c', fontSize: 22, margin: '4px 0 12px', fontWeight: 'bold' },
-  subtitle: { fontSize: 13, color: '#333', lineHeight: 1.5 },
-  qrBox: { border: '2px solid #c8a84b', borderRadius: 8, display: 'inline-block', padding: 8, margin: '12px 0' },
-  urlText: { fontSize: 10, color: '#555' },
-  footer: { fontSize: 11, color: '#888', marginTop: 8 },
+  posterContainer: {
+    background: '#0f172a',
+    padding: '12px',
+    borderRadius: '20px',
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
+    width: '320px',
+    color: 'white',
+    fontFamily: "'Segoe UI', system-ui, sans-serif"
+  },
+  innerFrame: {
+    border: '2px solid rgba(255,255,255,0.1)',
+    borderRadius: '16px',
+    padding: '24px 16px',
+    textAlign: 'center',
+    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
+  },
+  header: {
+    marginBottom: '15px'
+  },
+  topText: {
+    fontSize: '10px',
+    letterSpacing: '3px',
+    fontWeight: '600',
+    margin: 0,
+    color: '#94a3b8'
+  },
+  townName: {
+    fontSize: '26px',
+    fontWeight: '800',
+    margin: '8px 0 0',
+    letterSpacing: '-0.5px',
+    color: '#ffffff'
+  },
+  qrSection: {
+    margin: '25px 0'
+  },
+  qrDecorator: {
+    background: 'white',
+    padding: '14px',
+    borderRadius: '18px',
+    display: 'inline-block',
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)'
+  },
+  qrBackground: { background: 'white' },
+  scanText: {
+    fontSize: '12px',
+    marginTop: '15px',
+    fontWeight: '500',
+    color: '#cbd5e1',
+    textTransform: 'uppercase',
+    letterSpacing: '1px'
+  },
+  footer: { marginTop: '10px' },
+  line: { height: '1px', background: 'rgba(255,255,255,0.1)', margin: '15px 30px' },
+  urlDisplay: { fontSize: '9px', opacity: 0.5, wordBreak: 'break-all', marginBottom: '8px' },
+  brandText: { fontSize: '11px', fontWeight: '700', letterSpacing: '2px', color: '#64748b' }
 };
 
 export default QRPoster;
