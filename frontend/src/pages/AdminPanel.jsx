@@ -3,7 +3,18 @@ import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badg
 import api from '../services/api';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import QRPoster from '../components/QRPoster';
-
+import { 
+  LayoutDashboard, 
+  Landmark, 
+  MapPin, 
+  Users, 
+  BarChart3, 
+  Pencil, 
+  Trash2, 
+  QrCode, 
+  Plus, 
+  ShieldAlert,
+} from 'lucide-react';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('lugares');
@@ -15,7 +26,7 @@ const AdminPanel = () => {
   const [showPlaceModal, setShowPlaceModal] = useState(false);
   
   const [town, setTown] = useState({ slug: '', name: '', description: '', imageUrl: '' });
-  const [place, setPlace] = useState({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '' });
+  const [place, setPlace] = useState({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '', active: true });
   const [msg, setMsg] = useState({ text: '', type: '' });
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState(null);
@@ -53,11 +64,12 @@ const AdminPanel = () => {
   }, [activeTab, accessDenied]);
 
   const fetchTowns = () => {
-    api.get('/towns').then(res => {
+    return api.get('/towns').then(res => {
         setTowns(res.data);
         if(res.data.length > 0 && !selectedTown) {
             setSelectedTown(res.data[0]);
         }
+        return res.data;
     }).catch(err => console.log(err));
   };
 
@@ -67,9 +79,10 @@ const AdminPanel = () => {
     }
   }, [selectedTown]);
 
-  const fetchPlaces = () => {
-    if(selectedTown) {
-        api.get(`/towns/${selectedTown.slug}/places`)
+  const fetchPlaces = (slug) => {
+    const targetSlug = slug || selectedTown?.slug;
+    if(targetSlug) {
+        api.get(`/towns/${targetSlug}/places`)
          .then(res => setPlaces(res.data))
          .catch(err => console.log(err));
     }
@@ -93,6 +106,7 @@ const AdminPanel = () => {
       setTown({ slug: '', name: '', description: '', imageUrl: '' });
       setShowTownModal(false);
       fetchTowns();
+      fetchStats();
     } catch (err) {
       showMessage('Error al guardar el pueblo (Asegúrate de estar autenticado)', 'danger');
     }
@@ -104,6 +118,7 @@ const AdminPanel = () => {
             await api.delete(`/admin/towns/${id}`);
             showMessage('Pueblo eliminado');
             fetchTowns();
+            fetchStats();
             if(selectedTown?.id === id) setSelectedTown(null);
         } catch(err) {
             showMessage('Error al eliminar el pueblo', 'danger');
@@ -114,11 +129,19 @@ const AdminPanel = () => {
   const handlePlaceSubmit = async (e) => {
     e.preventDefault();
     try {
+      const targetTownId = Number(place.townId);
+      if (!targetTownId) {
+        showMessage('Debe seleccionar un pueblo válido', 'danger');
+        return;
+      }
+
       const placeData = {
         ...place,
-        latitude: parseFloat(place.latitude),
-        longitude: parseFloat(place.longitude),
-        town: { id: parseInt(place.townId) }
+        latitude: parseFloat(place.latitude) || 0,
+        longitude: parseFloat(place.longitude) || 0,
+        townId: targetTownId,
+        town: { id: targetTownId },
+        active: place.active ?? true
       };
       
       if (place.id) {
@@ -129,11 +152,34 @@ const AdminPanel = () => {
         showMessage('Lugar agregado exitosamente');
       }
       
-      setPlace({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '' });
+      // Forzar actualización de la lista de lugares
+      const freshTowns = await fetchTowns(); // Ahora devuelve los datos reales
+      
+      const updatedTown = freshTowns.find(t => t.id === targetTownId);
+      
+      if (updatedTown) {
+        setSelectedTown(updatedTown); 
+        fetchPlaces(updatedTown.slug); // Refrescar lugares con el slug fresquito
+      }
+      
+      // Resetear formulario
+      setPlace({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '', active: true });
       setShowPlaceModal(false);
-      fetchPlaces();
+      fetchStats();
     } catch (err) {
       showMessage('Error al guardar el lugar (Asegúrate de estar autenticado)', 'danger');
+    }
+  };
+
+  const handleTogglePlaceStatus = async (p) => {
+    try {
+      const newStatus = !p.active;
+      await api.put(`/admin/places/${p.id}/status`, { active: newStatus });
+      fetchPlaces();
+      fetchStats();
+      showMessage(newStatus ? 'Lugar activado' : 'Lugar desactivado');
+    } catch (err) {
+      showMessage('Error al cambiar el estado del lugar', 'danger');
     }
   };
 
@@ -143,6 +189,7 @@ const AdminPanel = () => {
             await api.delete(`/admin/places/${id}`);
             showMessage('Lugar eliminado');
             fetchPlaces();
+            fetchStats();
         } catch(err) {
             showMessage('Error al eliminar el lugar', 'danger');
         }
@@ -159,10 +206,14 @@ const AdminPanel = () => {
     cursor: 'pointer',
     borderRadius: '6px',
     marginBottom: '8px',
-    backgroundColor: activeTab === tabName ? '#d39e00' : 'transparent',
+    backgroundColor: activeTab === tabName ? '#1e293b' : 'transparent',
     color: activeTab === tabName ? 'white' : '#495057',
-    fontWeight: activeTab === tabName ? 'bold' : 'normal',
-    padding: '10px 15px'
+    fontWeight: activeTab === tabName ? '600' : '500',
+    padding: '10px 15px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    transition: 'all 0.2s ease'
   });
 
   if (loading) {
@@ -177,7 +228,8 @@ const AdminPanel = () => {
     return (
       <Container className="mt-5 text-center">
         <Alert variant="danger">
-          <h3>⛔ Acceso Denegado</h3>
+          <ShieldAlert size={48} className="mb-3 text-danger" />
+          <h3 className="fw-bold">Acceso Denegado</h3>
           <p>Esta sección es exclusiva para Administradores de Turismo Local UNA.</p>
           <Button variant="outline-danger" onClick={() => window.location.href = '/'}>Volver al Inicio</Button>
         </Alert>
@@ -192,19 +244,19 @@ const AdminPanel = () => {
         <Col md={2} style={sidebarStyle} className="p-3">
           <Nav className="flex-column mt-3">
             <Nav.Link style={navItemStyle('dashboard')} onClick={() => setActiveTab('dashboard')}>
-              ⏱️ Dashboard
+              <LayoutDashboard size={18} /> Dashboard
             </Nav.Link>
             <Nav.Link style={navItemStyle('pueblos')} onClick={() => setActiveTab('pueblos')}>
-              🏛️ Pueblos
+              <Landmark size={18} /> Pueblos
             </Nav.Link>
             <Nav.Link style={navItemStyle('lugares')} onClick={() => setActiveTab('lugares')}>
-              📍 Lugares
+              <MapPin size={18} /> Lugares
             </Nav.Link>
             <Nav.Link style={navItemStyle('usuarios')} onClick={() => setActiveTab('usuarios')}>
-              👥 Usuarios
+              <Users size={18} /> Usuarios
             </Nav.Link>
             <Nav.Link style={navItemStyle('estadisticas')} onClick={() => setActiveTab('estadisticas')}>
-              📊 Estadísticas
+              <BarChart3 size={18} /> Estadísticas
             </Nav.Link>
           </Nav>
         </Col>
@@ -217,8 +269,8 @@ const AdminPanel = () => {
             <div>
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <h3>Gestión de Pueblos</h3>
-                <Button variant="primary" onClick={() => setShowTownModal(true)}>
-                  + Agregar Nuevo Pueblo
+                <Button variant="primary" className="d-flex align-items-center gap-2" onClick={() => setShowTownModal(true)}>
+                  <Plus size={18} /> Agregar Nuevo Pueblo
                 </Button>
               </div>
               <Table hover responsive className="align-middle">
@@ -247,13 +299,13 @@ const AdminPanel = () => {
                           className="me-2" 
                           onClick={() => t.slug ? window.open(`/qr/${t.slug}`, '_blank') : alert('Este pueblo no tiene un slug válido')}
                         >
-                          📱 QR
+                          <QrCode size={16} className="me-1" /> QR
                         </Button>
                         <Button variant="outline-secondary" size="sm" className="me-2" onClick={() => {
                           setTown(t);
                           setShowTownModal(true);
-                        }}>✏️</Button>
-                        <Button variant="danger" size="sm" onClick={() => handleDeleteTown(t.id)}>🗑️</Button>
+                        }}><Pencil size={14} /></Button>
+                        <Button variant="outline-danger" size="sm" onClick={() => handleDeleteTown(t.id)}><Trash2 size={14} /></Button>
                       </td>
                     </tr>
                   ))}
@@ -269,12 +321,12 @@ const AdminPanel = () => {
                 <h3 className="m-0">
                   Gestión de Lugares Turísticos {selectedTown ? `- ${selectedTown.name}` : ''}
                 </h3>
-                <Button variant="primary" onClick={() => {
+                <Button variant="primary" className="d-flex align-items-center gap-2" onClick={() => {
                   if(towns.length === 0) return alert('Debes crear un pueblo primero');
                   setPlace({...place, townId: selectedTown?.id || towns[0].id});
                   setShowPlaceModal(true);
                 }}>
-                  + Agregar Nuevo Lugar
+                  <Plus size={18} /> Agregar Nuevo Lugar
                 </Button>
               </div>
               
@@ -308,17 +360,23 @@ const AdminPanel = () => {
                         <Image src={p.imageUrl || 'https://via.placeholder.com/50'} rounded width={50} height={50} style={{objectFit: 'cover'}} />
                       </td>
                       <td className="fw-bold">{p.name}</td>
-                      <td><Badge bg="warning" text="dark" className="rounded-pill px-3">{p.category}</Badge></td>
+                      <td><span className="px-3 py-1 rounded-pill" style={{ backgroundColor: '#fef3c7', color: '#92400e', fontSize: '0.75rem', fontWeight: '600' }}>{p.category}</span></td>
                       <td>{p.address}</td>
                       <td>
-                        <Form.Check type="switch" id={`switch-${p.id}`} label="Activo" defaultChecked />
+                        <Form.Check 
+                          type="switch" 
+                          id={`switch-place-${p.id}`} 
+                          label={p.active ? "Activo" : "Inactivo"} 
+                          checked={p.active} 
+                          onChange={() => handleTogglePlaceStatus(p)}
+                        />
                       </td>
                       <td>
-                        <Button variant="secondary" size="sm" className="me-2 text-white border-0" style={{backgroundColor: '#6c757d'}} onClick={() => {
+                        <Button variant="outline-secondary" size="sm" className="me-2" onClick={() => {
                           setPlace({...p, townId: selectedTown.id});
                           setShowPlaceModal(true);
-                        }}>✏️</Button>
-                        <Button variant="danger" size="sm" className="border-0" onClick={() => handleDeletePlace(p.id)} style={{backgroundColor: '#dc3545'}}>🗑️</Button>
+                        }}><Pencil size={14} /></Button>
+                        <Button variant="outline-danger" size="sm" onClick={() => handleDeletePlace(p.id)}><Trash2 size={14} /></Button>
                       </td>
                     </tr>
                   ))}
@@ -330,29 +388,29 @@ const AdminPanel = () => {
 
           {activeTab === 'dashboard' && stats && (
             <div>
-              <h3 className="mb-4">⏱️ Dashboard</h3>
+              <h3 className="mb-4">Dashboard de Control</h3>
               <Row className="mb-4">
                 <Col md={4}>
-                  <Card className="text-white bg-primary shadow-sm h-100">
-                    <Card.Body className="d-flex flex-column justify-content-center align-items-center">
-                      <h1 className="display-4 fw-bold">{stats.totalTowns}</h1>
-                      <h5>Pueblos Totales</h5>
+                  <Card className="border-0 shadow-sm h-100" style={{ borderLeft: '4px solid #4f46e5', backgroundColor: '#f8fafc' }}>
+                    <Card.Body className="p-4">
+                      <h6 className="text-muted text-uppercase mb-2" style={{ fontSize: '0.7rem', letterSpacing: '0.05em', fontWeight: '700' }}>Pueblos Totales</h6>
+                      <h2 className="fw-bold mb-0" style={{ color: '#1e293b' }}>{stats.totalTowns}</h2>
                     </Card.Body>
                   </Card>
                 </Col>
                 <Col md={4}>
-                  <Card className="text-white bg-success shadow-sm h-100">
-                    <Card.Body className="d-flex flex-column justify-content-center align-items-center">
-                      <h1 className="display-4 fw-bold">{stats.totalPlaces}</h1>
-                      <h5>Lugares Turísticos</h5>
+                  <Card className="border-0 shadow-sm h-100" style={{ borderLeft: '4px solid #10b981', backgroundColor: '#f8fafc' }}>
+                    <Card.Body className="p-4">
+                      <h6 className="text-muted text-uppercase mb-2" style={{ fontSize: '0.7rem', letterSpacing: '0.05em', fontWeight: '700' }}>Lugares Turísticos</h6>
+                      <h2 className="fw-bold mb-0" style={{ color: '#1e293b' }}>{stats.totalPlaces}</h2>
                     </Card.Body>
                   </Card>
                 </Col>
                 <Col md={4}>
-                  <Card className="text-white bg-warning shadow-sm h-100">
-                    <Card.Body className="d-flex flex-column justify-content-center align-items-center">
-                      <h1 className="display-4 fw-bold">{stats.totalUsers}</h1>
-                      <h5 className="text-dark">Usuarios Registrados</h5>
+                  <Card className="border-0 shadow-sm h-100" style={{ borderLeft: '4px solid #f59e0b', backgroundColor: '#f8fafc' }}>
+                    <Card.Body className="p-4">
+                      <h6 className="text-muted text-uppercase mb-2" style={{ fontSize: '0.7rem', letterSpacing: '0.05em', fontWeight: '700' }}>Usuarios Registrados</h6>
+                      <h2 className="fw-bold mb-0" style={{ color: '#1e293b' }}>{stats.totalUsers}</h2>
                     </Card.Body>
                   </Card>
                 </Col>
@@ -369,7 +427,7 @@ const AdminPanel = () => {
                   {stats.recentPlaces?.map(p => (
                     <tr key={p.id}>
                       <td className="fw-bold">{p.name}</td>
-                      <td><Badge bg="info">{p.category}</Badge></td>
+                      <td><span className="px-2 py-1 rounded text-xs" style={{ backgroundColor: '#e0f2fe', color: '#0369a1', fontSize: '0.75rem' }}>{p.category}</span></td>
                     </tr>
                   ))}
                   {stats.recentPlaces?.length === 0 && <tr><td colSpan="2" className="text-center text-muted">Aún no hay lugares</td></tr>}
@@ -380,7 +438,7 @@ const AdminPanel = () => {
 
           {activeTab === 'usuarios' && (
             <div>
-              <h3 className="mb-4">👥 Gestión de Usuarios</h3>
+              <h3 className="mb-4">Gestión de Usuarios</h3>
               <Table hover responsive className="align-middle">
                 <thead className="bg-light">
                   <tr>
@@ -444,7 +502,7 @@ const AdminPanel = () => {
 
           {activeTab === 'estadisticas' && stats && (
             <div>
-              <h3 className="mb-4">📊 Estadísticas Globales</h3>
+              <h3 className="mb-4">Análisis y Estadísticas Globales</h3>
               <Row>
                 <Col md={6}>
                   <Card className="shadow-sm mb-4">
@@ -500,7 +558,7 @@ const AdminPanel = () => {
         setShowTownModal(false);
         setTown({ slug: '', name: '', description: '', imageUrl: '' });
       }}>
-        <Modal.Header closeButton className="bg-primary text-white">
+        <Modal.Header closeButton className="border-0 pb-0">
           <Modal.Title>{town.id ? 'Editar Pueblo' : 'Agregar Nuevo Pueblo'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -529,9 +587,9 @@ const AdminPanel = () => {
       {/* Modal Lugar */}
       <Modal show={showPlaceModal} onHide={() => {
         setShowPlaceModal(false);
-        setPlace({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '' });
+        setPlace({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '', active: true });
       }}>
-        <Modal.Header closeButton className="bg-primary text-white">
+        <Modal.Header closeButton className="border-0 pb-0">
           <Modal.Title>{place.id ? 'Editar Lugar Turístico' : 'Agregar Nuevo Lugar'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
