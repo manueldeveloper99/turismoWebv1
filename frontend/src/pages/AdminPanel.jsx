@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badge, Image } from 'react-bootstrap';
+import { useState, useEffect, useRef } from 'react';
+import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badge, Image, Toast, ToastContainer } from 'react-bootstrap';
 import api from '../services/api';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import QRPoster from '../components/QRPoster';
@@ -35,6 +35,7 @@ const AdminPanel = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [accessDenied, setAccessDenied] = useState(false);
   const [loading, setLoading] = useState(true);
+  const messageTimerRef = useRef(null);
 
   useEffect(() => {
     // Validar acceso
@@ -103,8 +104,13 @@ const AdminPanel = () => {
   }
 
   const showMessage = (text, type = 'success') => {
+    // Limpiar temporizador anterior si existe para evitar conflictos
+    if (messageTimerRef.current) {
+      clearTimeout(messageTimerRef.current);
+    }
+
     setMsg({ text, type });
-    setTimeout(() => setMsg({ text: '', type: '' }), 4000);
+    messageTimerRef.current = setTimeout(() => setMsg({ text: '', type: '' }), 3000);
   };
 
   const handleTownSubmit = async (e) => {
@@ -204,6 +210,7 @@ const AdminPanel = () => {
       // 2. Intentamos el endpoint de status
       await api.put(`/admin/places/${p.id}/status`, { active: newStatus });
       fetchStats().catch(() => {});
+      showMessage(`Estado de ${p.name} actualizado`);
     } catch (err) {
       // 3. Fallback: Si el endpoint /status no existe, usamos el PUT general
       // Enviamos el objeto EXACTO que el backend espera (incluyendo la relación town)
@@ -219,6 +226,7 @@ const AdminPanel = () => {
         
         await api.put(`/admin/places/${p.id}`, updateData);
         fetchStats().catch(() => {});
+        showMessage(`Estado de ${p.name} actualizado`);
       } catch (innerErr) {
         // 4. Revertimos silenciosamente solo si todo falla. No mostramos showMessage por error.
         setPlaces(prev => prev.map(item => item.id === p.id ? { ...item, active: originalStatus } : item));
@@ -307,7 +315,24 @@ const AdminPanel = () => {
 
         {/* Main Content */}
         <Col md={10} className="p-4 bg-white">
-          {msg.text && <Alert variant={msg.type}>{msg.text}</Alert>}
+          {/* Toast Notification Container */}
+          <ToastContainer position="top-end" className="p-3" style={{ zIndex: 9999 }}>
+            <Toast 
+              key={msg.text}
+              onClose={() => setMsg({ text: '', type: '' })} 
+              show={!!msg.text} 
+              delay={3000} 
+              autohide
+              bg={msg.type === 'success' ? 'success' : 'danger'}
+            >
+              <Toast.Header closeButton={false} className="text-white" style={{ backgroundColor: 'rgba(0,0,0,0.1)', borderBottom: 'none' }}>
+                <strong className="me-auto">{msg.type === 'success' ? '✅ Éxito' : '❌ Error'}</strong>
+              </Toast.Header>
+              <Toast.Body className="text-white fw-bold">
+                {msg.text}
+              </Toast.Body>
+            </Toast>
+          </ToastContainer>
 
           {activeTab === 'pueblos' && (
             <div>
