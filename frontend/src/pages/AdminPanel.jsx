@@ -124,7 +124,10 @@ const AdminPanel = () => {
         const newTown = res.data;
         showMessage('Pueblo agregado exitosamente');
         // Preparamos y mostramos el QR inmediatamente con los datos de la respuesta
-        setQrTown(newTown);
+        setQrTown({
+          ...newTown,
+          exactUrl: `${window.location.origin}/p/${newTown.slug}`
+        });
         setShowQRModal(true);
       }
 
@@ -367,7 +370,10 @@ const AdminPanel = () => {
                           variant="outline-primary"
                           size="sm"
                           className="me-2"
-                          onClick={() => { setQrTown(t); setShowQRModal(true); }}
+                          onClick={() => { 
+                            setQrTown({ ...t, exactUrl: `${window.location.origin}/p/${t.slug}` }); 
+                            setShowQRModal(true); 
+                          }}
                         >
                           <QrCode size={16} className="me-1" /> QR
                         </Button>
@@ -451,7 +457,7 @@ const AdminPanel = () => {
                               setQrTown({
                                 name: p.name,
                                 slug: selectedTown.slug,
-                                exactUrl: `${import.meta.env.VITE_APP_URL}/p/${selectedTown.slug}/places?destino=${p.id}`
+                                exactUrl: `${window.location.origin}/p/${selectedTown.slug}/places?destino=${p.id}`
                               });
                               setShowQRModal(true);
                             }}
@@ -740,7 +746,15 @@ const AdminPanel = () => {
         </Modal.Header>
         <Modal.Body className="text-center pb-4">
           {qrTown ? (
-            <QRPoster townSlug={qrTown.slug} townName={qrTown.name} exactUrl={qrTown.exactUrl} />
+            <>
+              <QRPoster townSlug={qrTown.slug} townName={qrTown.name} exactUrl={qrTown.exactUrl} />
+              <div className="mt-3 p-2 bg-light rounded border text-break">
+                <div className="text-muted mb-1 small fw-bold text-uppercase">URL de destino (QR):</div>
+                <code className="text-primary" style={{ fontSize: '0.85rem' }}>
+                  {qrTown.exactUrl || `${window.location.origin}/p/${qrTown.slug}`}
+                </code>
+              </div>
+            </>
           ) : (
             <div className="spinner-border text-primary" role="status"></div>
           )}
