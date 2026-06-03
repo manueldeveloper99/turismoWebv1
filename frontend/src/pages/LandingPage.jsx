@@ -80,12 +80,14 @@ const LandingPage = () => {
   return (
     <Row className="m-0 flex-grow-1" style={{ overflow: 'hidden' }}>
       {/* Mitad Izquierda: Carrusel (Oculto en celulares) */}
-      <Col md={7} lg={7} className="p-0 d-none d-md-block" style={{ height: '100%', position: 'relative', overflow: 'hidden', borderTopRightRadius: '40px', borderBottomRightRadius: '40px', boxShadow: '5px 0 30px rgba(0,0,0,0.15)', zIndex: 10 }}>
-        <BackgroundCarousel inline={true} showCaptions={true} />
+      <Col md={7} lg={7} className="p-0 d-none d-md-flex flex-column" style={{ position: 'relative', overflow: 'hidden', borderTopRightRadius: '40px', borderBottomRightRadius: '40px', boxShadow: '5px 0 30px rgba(0,0,0,0.15)', zIndex: 10 }}>
+        <div style={{ flexGrow: 1, position: 'relative' }}>
+          <BackgroundCarousel inline={true} showCaptions={true} />
+        </div>
       </Col>
 
       {/* Mitad Derecha: Contenido QR Fijo */}
-      <Col md={5} lg={5} xs={12} className="p-0" style={{ backgroundColor: '#f4f6f8', height: '100%', overflowY: 'hidden', overflowX: 'hidden', position: 'relative' }}>
+      <Col md={5} lg={5} xs={12} className="p-0 d-flex flex-column" style={{ backgroundColor: '#f4f6f8', overflowY: 'hidden', overflowX: 'hidden', position: 'relative' }}>
         
         {/* Animaciones de Fauna Tica */}
         <style>{`
@@ -161,7 +163,7 @@ const LandingPage = () => {
         <BirdSilhouette className="bird-14" size={85} />
         <BirdSilhouette className="bird-15" size={40} />
 
-        <div className="d-flex flex-column align-items-center" style={{ minHeight: '100%', padding: '20px', position: 'relative', zIndex: 1 }}>
+        <div className="d-flex flex-column align-items-center" style={{ flexGrow: 1, padding: '20px', position: 'relative', zIndex: 1 }}>
           <div style={{ flexGrow: 1 }}></div>
           <div style={{ width: '100%', maxWidth: '500px', flexShrink: 0 }}>
           
