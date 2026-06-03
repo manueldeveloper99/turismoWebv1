@@ -84,8 +84,8 @@ const LandingPage = () => {
         <BackgroundCarousel inline={true} showCaptions={true} />
       </Col>
 
-      {/* Mitad Derecha: Contenido QR con Scroll */}
-      <Col md={5} lg={5} xs={12} className="p-0" style={{ backgroundColor: '#f4f6f8', height: '100vh', overflowY: 'auto', overflowX: 'hidden', position: 'relative' }}>
+      {/* Mitad Derecha: Contenido QR Fijo */}
+      <Col md={5} lg={5} xs={12} className="p-0" style={{ backgroundColor: '#f4f6f8', height: '100vh', overflowY: 'hidden', overflowX: 'hidden', position: 'relative' }}>
         
         {/* Animaciones de Fauna Tica */}
         <style>{`
@@ -134,6 +134,15 @@ const LandingPage = () => {
           .bird-13 { animation: flyFast 14s linear infinite forwards 14s; top: 75%; left: 0; }
           .bird-14 { animation: flyReverse 18s linear infinite forwards 11s; top: 85%; right: 0; }
           .bird-15 { animation: flySlowly 26s linear infinite forwards 9s; top: 60%; left: 0; }
+
+          /* Ocultar barra de scroll para el carrusel de botones */
+          .hide-scroll::-webkit-scrollbar {
+            display: none;
+          }
+          .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
         `}</style>
         
         <BirdSilhouette className="bird-1" size={80} />
@@ -161,12 +170,12 @@ const LandingPage = () => {
             <Card className="mb-4 shadow-sm" style={{ borderRadius: '20px', border: 'none' }}>
               <Card.Body className="p-3">
                 <h6 className="fw-bold mb-3 text-center" style={{ color: '#004d40' }}>Selecciona un Pueblo:</h6>
-                <div className="d-flex flex-wrap justify-content-center gap-2">
+                <div className="d-flex gap-2 hide-scroll" style={{ overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '5px' }}>
                   {towns.map(t => (
                     <button
                       key={t.id}
                       onClick={() => setSelectedTown(t)}
-                      className="btn btn-sm"
+                      className="btn btn-sm flex-shrink-0"
                       style={{
                         backgroundColor: selectedTown?.id === t.id ? '#00bfa5' : '#e9ecef',
                         color: selectedTown?.id === t.id ? 'white' : '#495057',
