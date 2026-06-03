@@ -87,8 +87,8 @@ const NavbarComponent = () => {
         ))}
 
         <Container style={{ position: 'relative', zIndex: 1 }}>
-          <Navbar.Brand href="/" style={{ fontWeight: '800', letterSpacing: '1px', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-            Turismo Web CR
+          <Navbar.Brand href="/" style={{ color: 'white', fontWeight: '800', letterSpacing: '1px', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+            Turismo Local CR
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
