@@ -69,7 +69,7 @@ const LandingPage = () => {
             <Card className="text-center p-4 shadow-lg" style={glassStyle}>
               <Card.Body>
                 <div className="mb-4">
-                  <h1 style={{ color: '#004d40', fontWeight: '900', textShadow: '0 2px 4px rgba(255,255,255,0.6)' }}>Turismo Local</h1>
+                  <h1 style={{ background: 'linear-gradient(45deg, #004d40, #00bfa5)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: '900', filter: 'drop-shadow(0 2px 4px rgba(255,255,255,0.8))', marginBottom: '5px' }}>Turismo Local CR</h1>
                   <p style={{ color: '#212529', fontWeight: '500' }}>Descubre la belleza de nuestros pueblos</p>
                 </div>
 
