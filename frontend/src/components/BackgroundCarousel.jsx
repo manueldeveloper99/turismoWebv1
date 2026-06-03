@@ -8,8 +8,17 @@ import img6 from '../assets/imagen6.png';
 import img7 from '../assets/imagen7.png';
 
 const backgroundImages = [img1, img2, img3, img4, img5, img6, img7];
+const captions = [
+  "Playas paradisíacas de arena blanca",
+  "Impresionantes volcanes y naturaleza",
+  "Selvas tropicales y gran biodiversidad",
+  "Aventura y pura vida en cada rincón",
+  "Atardeceres mágicos en el Pacífico",
+  "Cultura y tradición costarricense",
+  "Fauna exótica en su hábitat natural"
+];
 
-const BackgroundCarousel = () => {
+const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
@@ -26,7 +35,7 @@ const BackgroundCarousel = () => {
         <div
           key={index}
           style={{
-            position: 'fixed',
+            position: inline ? 'absolute' : 'fixed',
             top: 0,
             left: 0,
             width: '100%',
@@ -43,14 +52,44 @@ const BackgroundCarousel = () => {
       
       {/* Overlay oscuro para que el contenido resalte */}
       <div style={{
-        position: 'fixed',
+        position: inline ? 'absolute' : 'fixed',
         top: 0,
         left: 0,
         width: '100%',
         height: '100%',
         backgroundColor: 'rgba(0, 0, 0, 0.4)',
-        zIndex: 1
+        zIndex: 1,
+        pointerEvents: 'none'
       }} />
+
+      {/* Títulos dinámicos sobre el overlay */}
+      {showCaptions && (
+        <div style={{
+          position: inline ? 'absolute' : 'fixed',
+          bottom: '10%',
+          left: '10%',
+          right: '10%',
+          zIndex: 2,
+          color: 'white',
+          textShadow: '0 4px 12px rgba(0,0,0,0.9)'
+        }}>
+          {backgroundImages.map((_, index) => (
+            <div 
+              key={index}
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                opacity: index === currentImageIndex ? 1 : 0,
+                transition: 'opacity 1.5s ease-in-out'
+              }}
+            >
+              <h2 style={{ fontWeight: '800', fontSize: '2.5rem', marginBottom: '10px' }}>{captions[index]}</h2>
+              <h4 style={{ fontWeight: '500', color: '#00bfa5' }}>Costa Rica: ¡Pura Vida!</h4>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 };

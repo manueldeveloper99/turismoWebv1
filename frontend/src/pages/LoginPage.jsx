@@ -1,4 +1,4 @@
-import { Container, Card } from 'react-bootstrap';
+import { Container, Card, Row, Col } from 'react-bootstrap';
 import { GoogleLogin } from '@react-oauth/google';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -30,38 +30,42 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={{ position: 'relative', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-      <BackgroundCarousel />
+    <Row className="m-0" style={{ minHeight: '100vh', width: '100vw' }}>
+      {/* Mitad Izquierda: Carrusel (Oculto en celulares) */}
+      <Col md={7} lg={7} className="p-0 d-none d-md-block" style={{ position: 'relative', overflow: 'hidden' }}>
+        <BackgroundCarousel inline={true} showCaptions={true} />
+      </Col>
 
-      <Container className="d-flex justify-content-center align-items-center flex-grow-1" style={{ position: 'relative', zIndex: 2, padding: '40px 0' }}>
-        <Card className="text-center p-5 shadow-lg" style={{
-          width: '450px',
-          maxWidth: '90%',
+      {/* Mitad Derecha: Login */}
+      <Col md={5} lg={5} xs={12} className="d-flex align-items-center justify-content-center p-0" style={{ backgroundColor: '#f4f6f8' }}>
+        <Card className="text-center p-5 shadow-lg border-0" style={{
+          width: '100%',
+          maxWidth: '450px',
+          margin: '20px',
           borderRadius: '25px',
-          border: '1px solid rgba(255, 255, 255, 0.4)',
-          background: 'rgba(255, 255, 255, 0.35)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
+          background: '#ffffff'
         }}>
           <Card.Body>
-            <h3 style={{ color: '#004d40', fontWeight: '900', textShadow: '0 2px 4px rgba(255,255,255,0.6)' }}>
-              {townSlug ? `Bienvenido a ${townSlug}` : 'Acceso de Administrador'}
+            <h3 style={{ color: '#004d40', fontWeight: '900', fontSize: '2rem', marginBottom: '15px' }}>
+              {townSlug ? `Acceder a ${townSlug}` : 'Acceso Administrador'}
             </h3>
-            <p className="mb-4 mt-3" style={{ fontSize: '1.05rem', color: '#212529', fontWeight: '500', textShadow: '0 1px 2px rgba(255,255,255,0.8)' }}>
-              {townSlug ? 'Inicia sesión para descubrir los mejores lugares turísticos del pueblo.' : 'Inicia sesión para gestionar el sistema.'}
+            <p className="mb-4 mt-2 text-muted" style={{ fontSize: '1rem', fontWeight: '500' }}>
+              {townSlug ? 'Inicia sesión para descubrir lugares turísticos.' : 'Inicia sesión de forma segura para gestionar el sistema de Turismo Local CR.'}
             </p>
-            <div className="mt-4 d-flex justify-content-center">
+            <div className="mt-5 mb-3 d-flex justify-content-center">
               <GoogleLogin
                 onSuccess={handleSuccess}
                 onError={() => console.log('Login Failed')}
+                theme="filled_black"
+                shape="pill"
+                size="large"
               />
             </div>
-            <small className="d-block mt-4" style={{ color: '#212529', fontWeight: '600', textShadow: '0 1px 2px rgba(255,255,255,0.8)' }}>Solo se aceptan cuentas @gmail.com</small>
+            <small className="d-block mt-4 text-muted" style={{ fontWeight: '500' }}>Sistema exclusivo con cuentas @gmail.com</small>
           </Card.Body>
         </Card>
-      </Container>
-    </div>
+      </Col>
+    </Row>
   );
 };
 
