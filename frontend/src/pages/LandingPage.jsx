@@ -72,26 +72,26 @@ const LandingPage = () => {
         <style>{`
           @keyframes flySlowly {
             0% { transform: translate(-100px, 150px) scale(0.5); opacity: 0; }
-            10% { transform: translate(-20px, 140px) scale(0.57); opacity: 0.08; }
-            90% { transform: translate(620px, -165px) scale(1.13); opacity: 0.08; }
+            10% { transform: translate(-20px, 140px) scale(0.57); opacity: 0.15; }
+            90% { transform: translate(620px, -165px) scale(1.13); opacity: 0.15; }
             100% { transform: translate(700px, -200px) scale(1.2); opacity: 0; }
           }
           @keyframes flyReverse {
             0% { transform: translate(700px, 50px) scale(-0.6, 0.6); opacity: 0; }
-            10% { transform: translate(615px, 30px) scale(-0.65, 0.65); opacity: 0.06; }
-            90% { transform: translate(-65px, -130px) scale(-1.05, 1.05); opacity: 0.06; }
+            10% { transform: translate(615px, 30px) scale(-0.65, 0.65); opacity: 0.12; }
+            90% { transform: translate(-65px, -130px) scale(-1.05, 1.05); opacity: 0.12; }
             100% { transform: translate(-150px, -150px) scale(-1.1, 1.1); opacity: 0; }
           }
           @keyframes flyFast {
             0% { transform: translate(-100px, 200px) scale(0.3); opacity: 0; }
-            10% { transform: translate(-20px, 190px) scale(0.35); opacity: 0.05; }
-            90% { transform: translate(620px, -20px) scale(0.75); opacity: 0.05; }
+            10% { transform: translate(-20px, 190px) scale(0.35); opacity: 0.1; }
+            90% { transform: translate(620px, -20px) scale(0.75); opacity: 0.1; }
             100% { transform: translate(700px, -50px) scale(0.8); opacity: 0; }
           }
           @keyframes flyReverseFast {
             0% { transform: translate(700px, 150px) scale(-0.4, 0.4); opacity: 0; }
-            10% { transform: translate(615px, 130px) scale(-0.45, 0.45); opacity: 0.04; }
-            90% { transform: translate(-65px, -30px) scale(-0.85, 0.85); opacity: 0.04; }
+            10% { transform: translate(615px, 130px) scale(-0.45, 0.45); opacity: 0.1; }
+            90% { transform: translate(-65px, -30px) scale(-0.85, 0.85); opacity: 0.1; }
             100% { transform: translate(-150px, -50px) scale(-0.9, 0.9); opacity: 0; }
           }
           .bird {
@@ -100,16 +100,16 @@ const LandingPage = () => {
             z-index: 0;
             opacity: 0; /* Invisible before animation starts */
           }
-          .bird-1 { animation: flySlowly 28s linear infinite forwards; top: 15%; left: 0; }
-          .bird-2 { animation: flySlowly 38s linear infinite forwards 15s; top: 45%; left: 0; }
-          .bird-3 { animation: flyReverse 32s linear infinite forwards 5s; top: 25%; right: 0; }
-          .bird-4 { animation: flyReverse 45s linear infinite forwards 22s; top: 65%; right: 0; }
-          .bird-5 { animation: flyFast 18s linear infinite forwards 2s; top: 8%; left: 0; }
-          .bird-6 { animation: flyFast 22s linear infinite forwards 10s; top: 55%; left: 0; }
-          .bird-7 { animation: flyReverseFast 15s linear infinite forwards 8s; top: 18%; right: 0; }
-          .bird-8 { animation: flyReverseFast 20s linear infinite forwards 25s; top: 80%; right: 0; }
-          .bird-9 { animation: flySlowly 30s linear infinite forwards 7s; top: 35%; left: 0; }
-          .bird-10 { animation: flyReverse 35s linear infinite forwards 12s; top: 50%; right: 0; }
+          .bird-1 { animation: flySlowly 18s linear infinite forwards; top: 15%; left: 0; }
+          .bird-2 { animation: flySlowly 22s linear infinite forwards 5s; top: 45%; left: 0; }
+          .bird-3 { animation: flyReverse 20s linear infinite forwards 2s; top: 25%; right: 0; }
+          .bird-4 { animation: flyReverse 25s linear infinite forwards 8s; top: 65%; right: 0; }
+          .bird-5 { animation: flyFast 12s linear infinite forwards 1s; top: 8%; left: 0; }
+          .bird-6 { animation: flyFast 15s linear infinite forwards 6s; top: 55%; left: 0; }
+          .bird-7 { animation: flyReverseFast 10s linear infinite forwards 3s; top: 18%; right: 0; }
+          .bird-8 { animation: flyReverseFast 14s linear infinite forwards 9s; top: 80%; right: 0; }
+          .bird-9 { animation: flySlowly 24s linear infinite forwards 12s; top: 35%; left: 0; }
+          .bird-10 { animation: flyReverse 28s linear infinite forwards 15s; top: 50%; right: 0; }
         `}</style>
         
         <BirdSilhouette className="bird-1" size={80} />
