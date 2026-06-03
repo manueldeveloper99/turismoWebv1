@@ -84,7 +84,7 @@ const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
                 transition: 'opacity 1.5s ease-in-out'
               }}
             >
-              <h2 style={{ fontWeight: '800', fontSize: '2.5rem', marginBottom: '10px' }}>{captions[index]}</h2>
+              <h2 style={{ color: '#ffffff', fontWeight: '800', fontSize: '2.5rem', marginBottom: '10px' }}>{captions[index]}</h2>
               <h4 style={{ fontWeight: '500', color: '#00bfa5' }}>Costa Rica: ¡Pura Vida!</h4>
             </div>
           ))}
