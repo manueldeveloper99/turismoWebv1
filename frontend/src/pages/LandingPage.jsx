@@ -19,19 +19,19 @@ const TiktokIcon = () => (
 );
 
 const BirdSilhouette = ({ size = 40, className }) => (
-  <svg 
-    className={className}
-    xmlns="http://www.w3.org/2000/svg" 
-    width={size} 
-    height={size} 
-    viewBox="0 0 100 100" 
-    style={{ position: 'absolute', pointerEvents: 'none', zIndex: 0 }}
-  >
-    <path 
-      fill="#004d40" 
-      d="M10,60 C25,20 40,40 50,55 C60,40 75,20 90,60 C75,40 60,50 50,65 C40,50 25,40 10,60 Z" 
-    />
-  </svg>
+  <div className={`bird ${className}`}>
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width={size} 
+      height={size} 
+      viewBox="0 0 100 100" 
+    >
+      <path 
+        fill="#004d40" 
+        d="M10,60 C25,20 40,40 50,55 C60,40 75,20 90,60 C75,40 60,50 50,65 C40,50 25,40 10,60 Z" 
+      />
+    </svg>
+  </div>
 );
 
 const LandingPage = () => {
@@ -72,20 +72,26 @@ const LandingPage = () => {
         <style>{`
           @keyframes flySlowly {
             0% { transform: translate(-100px, 150px) scale(0.5); opacity: 0; }
-            10% { opacity: 0.08; }
-            90% { opacity: 0.08; }
+            10% { transform: translate(-20px, 140px) scale(0.57); opacity: 0.08; }
+            90% { transform: translate(620px, -165px) scale(1.13); opacity: 0.08; }
             100% { transform: translate(700px, -200px) scale(1.2); opacity: 0; }
           }
           @keyframes flyReverse {
-            0% { transform: translate(700px, 50px) scaleX(-1) scale(0.6); opacity: 0; }
-            10% { opacity: 0.06; }
-            90% { opacity: 0.06; }
-            100% { transform: translate(-150px, -150px) scaleX(-1) scale(1.1); opacity: 0; }
+            0% { transform: translate(700px, 50px) scale(-0.6, 0.6); opacity: 0; }
+            10% { transform: translate(615px, 30px) scale(-0.65, 0.65); opacity: 0.06; }
+            90% { transform: translate(-65px, -130px) scale(-1.05, 1.05); opacity: 0.06; }
+            100% { transform: translate(-150px, -150px) scale(-1.1, 1.1); opacity: 0; }
           }
-          .bird-1 { animation: flySlowly 28s linear infinite; top: 15%; left: 0; }
-          .bird-2 { animation: flySlowly 38s linear infinite; animation-delay: 15s; top: 45%; left: 0; }
-          .bird-3 { animation: flyReverse 32s linear infinite; animation-delay: 5s; top: 25%; right: 0; }
-          .bird-4 { animation: flyReverse 45s linear infinite; animation-delay: 22s; top: 65%; right: 0; }
+          .bird {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0; /* Invisible before animation starts */
+          }
+          .bird-1 { animation: flySlowly 28s linear infinite forwards; top: 15%; left: 0; }
+          .bird-2 { animation: flySlowly 38s linear infinite forwards 15s; top: 45%; left: 0; }
+          .bird-3 { animation: flyReverse 32s linear infinite forwards 5s; top: 25%; right: 0; }
+          .bird-4 { animation: flyReverse 45s linear infinite forwards 22s; top: 65%; right: 0; }
         `}</style>
         
         <BirdSilhouette className="bird-1" size={80} />
