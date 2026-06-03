@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import BackgroundCarousel from '../components/BackgroundCarousel';
 import api from '../services/api';
 import QRPoster from '../components/QRPoster';
+import { Facebook, Instagram, Youtube, Music } from 'lucide-react';
 
 const LandingPage = () => {
   const [towns, setTowns] = useState([]);
@@ -68,9 +69,11 @@ const LandingPage = () => {
           <Col md={towns.length > 1 ? 6 : 5}>
             <Card className="text-center p-4 shadow-lg" style={glassStyle}>
               <Card.Body>
-                <div className="mb-4">
-                  <h1 style={{ background: 'linear-gradient(45deg, #004d40, #00bfa5)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: '900', filter: 'drop-shadow(0 2px 4px rgba(255,255,255,0.8))', marginBottom: '5px' }}>Turismo Local CR</h1>
-                  <p style={{ color: '#212529', fontWeight: '500' }}>Descubre la belleza de nuestros pueblos</p>
+                <div className="mb-4 d-flex justify-content-center gap-4">
+                  <a href="#" style={{ color: '#1877F2', background: 'rgba(255,255,255,0.8)', padding: '12px', borderRadius: '50%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}><Facebook size={28} /></a>
+                  <a href="#" style={{ color: '#E4405F', background: 'rgba(255,255,255,0.8)', padding: '12px', borderRadius: '50%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}><Instagram size={28} /></a>
+                  <a href="#" style={{ color: '#000000', background: 'rgba(255,255,255,0.8)', padding: '12px', borderRadius: '50%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}><Music size={28} /></a>
+                  <a href="#" style={{ color: '#FF0000', background: 'rgba(255,255,255,0.8)', padding: '12px', borderRadius: '50%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}><Youtube size={28} /></a>
                 </div>
 
                 <div className="d-flex flex-column align-items-center mb-4">
