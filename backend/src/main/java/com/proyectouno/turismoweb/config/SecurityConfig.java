@@ -19,7 +19,7 @@ import java.util.List;
 public class SecurityConfig {
 
     @Value("${cors.allowed-origins}")
-    private String corsAllowedOrigins;
+    private String allowedOrigins;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -40,7 +40,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(corsAllowedOrigins.split(",")));
+        configuration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
