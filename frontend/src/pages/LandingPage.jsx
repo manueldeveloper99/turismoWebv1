@@ -110,6 +110,11 @@ const LandingPage = () => {
           .bird-8 { animation: flyReverseFast 14s linear infinite forwards 9s; top: 80%; right: 0; }
           .bird-9 { animation: flySlowly 24s linear infinite forwards 12s; top: 35%; left: 0; }
           .bird-10 { animation: flyReverse 28s linear infinite forwards 15s; top: 50%; right: 0; }
+          .bird-11 { animation: flySlowly 16s linear infinite forwards 4s; top: 5%; left: 0; }
+          .bird-12 { animation: flyReverseFast 12s linear infinite forwards 6s; top: 40%; right: 0; }
+          .bird-13 { animation: flyFast 14s linear infinite forwards 14s; top: 75%; left: 0; }
+          .bird-14 { animation: flyReverse 18s linear infinite forwards 11s; top: 85%; right: 0; }
+          .bird-15 { animation: flySlowly 26s linear infinite forwards 9s; top: 60%; left: 0; }
         `}</style>
         
         <BirdSilhouette className="bird-1" size={80} />
@@ -122,6 +127,11 @@ const LandingPage = () => {
         <BirdSilhouette className="bird-8" size={30} />
         <BirdSilhouette className="bird-9" size={90} />
         <BirdSilhouette className="bird-10" size={75} />
+        <BirdSilhouette className="bird-11" size={55} />
+        <BirdSilhouette className="bird-12" size={45} />
+        <BirdSilhouette className="bird-13" size={60} />
+        <BirdSilhouette className="bird-14" size={85} />
+        <BirdSilhouette className="bird-15" size={40} />
 
         <div className="d-flex flex-column align-items-center" style={{ minHeight: '100%', padding: '40px 20px', position: 'relative', zIndex: 1 }}>
           <div style={{ width: '100%', maxWidth: '500px', margin: 'auto' }}>
