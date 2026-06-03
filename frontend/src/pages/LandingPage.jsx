@@ -18,6 +18,25 @@ const TiktokIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93v7.2c0 1.63-.52 3.24-1.49 4.54-1.45 1.95-3.8 3.09-6.21 2.92-2.22-.16-4.28-1.27-5.59-3.04-1.32-1.78-1.77-4.14-1.22-6.27.53-2.09 1.9-3.88 3.79-4.81 1.9-.94 4.15-1.04 6.13-.31v4.25c-1.11-.27-2.31-.1-3.26.47-.94.57-1.55 1.57-1.68 2.65-.12 1.08.28 2.18 1.05 2.94.77.77 1.88 1.12 2.95.95 1.05-.17 1.98-.81 2.5-1.74.52-.92.68-2.01.44-3.04V.02z"/></svg>
 );
 
+const MapPinIcon = ({ size = 16, className, style }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2.5" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+    style={style}
+  >
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+    <circle cx="12" cy="10" r="3"></circle>
+  </svg>
+);
+
 const BirdSilhouette = ({ size = 40, className }) => (
   <div className={`bird ${className}`}>
     <svg 
@@ -154,10 +173,13 @@ const LandingPage = () => {
                         fontWeight: '600',
                         padding: '6px 15px',
                         border: 'none',
-                        transition: 'all 0.2s'
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
                       }}
                     >
-                      📍 {t.name}
+                      <MapPinIcon size={14} /> {t.name}
                     </button>
                   ))}
                 </div>
