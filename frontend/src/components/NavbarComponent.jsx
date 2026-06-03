@@ -45,6 +45,7 @@ const NavbarComponent = () => {
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
     boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
+    borderBottomRightRadius: '25px',
     position: 'relative',
     overflow: 'hidden',
     zIndex: 1000,
