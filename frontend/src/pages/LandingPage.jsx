@@ -82,6 +82,18 @@ const LandingPage = () => {
             90% { transform: translate(-65px, -130px) scale(-1.05, 1.05); opacity: 0.06; }
             100% { transform: translate(-150px, -150px) scale(-1.1, 1.1); opacity: 0; }
           }
+          @keyframes flyFast {
+            0% { transform: translate(-100px, 200px) scale(0.3); opacity: 0; }
+            10% { transform: translate(-20px, 190px) scale(0.35); opacity: 0.05; }
+            90% { transform: translate(620px, -20px) scale(0.75); opacity: 0.05; }
+            100% { transform: translate(700px, -50px) scale(0.8); opacity: 0; }
+          }
+          @keyframes flyReverseFast {
+            0% { transform: translate(700px, 150px) scale(-0.4, 0.4); opacity: 0; }
+            10% { transform: translate(615px, 130px) scale(-0.45, 0.45); opacity: 0.04; }
+            90% { transform: translate(-65px, -30px) scale(-0.85, 0.85); opacity: 0.04; }
+            100% { transform: translate(-150px, -50px) scale(-0.9, 0.9); opacity: 0; }
+          }
           .bird {
             position: absolute;
             pointer-events: none;
@@ -92,12 +104,24 @@ const LandingPage = () => {
           .bird-2 { animation: flySlowly 38s linear infinite forwards 15s; top: 45%; left: 0; }
           .bird-3 { animation: flyReverse 32s linear infinite forwards 5s; top: 25%; right: 0; }
           .bird-4 { animation: flyReverse 45s linear infinite forwards 22s; top: 65%; right: 0; }
+          .bird-5 { animation: flyFast 18s linear infinite forwards 2s; top: 8%; left: 0; }
+          .bird-6 { animation: flyFast 22s linear infinite forwards 10s; top: 55%; left: 0; }
+          .bird-7 { animation: flyReverseFast 15s linear infinite forwards 8s; top: 18%; right: 0; }
+          .bird-8 { animation: flyReverseFast 20s linear infinite forwards 25s; top: 80%; right: 0; }
+          .bird-9 { animation: flySlowly 30s linear infinite forwards 7s; top: 35%; left: 0; }
+          .bird-10 { animation: flyReverse 35s linear infinite forwards 12s; top: 50%; right: 0; }
         `}</style>
         
         <BirdSilhouette className="bird-1" size={80} />
         <BirdSilhouette className="bird-2" size={50} />
         <BirdSilhouette className="bird-3" size={110} />
         <BirdSilhouette className="bird-4" size={65} />
+        <BirdSilhouette className="bird-5" size={35} />
+        <BirdSilhouette className="bird-6" size={45} />
+        <BirdSilhouette className="bird-7" size={40} />
+        <BirdSilhouette className="bird-8" size={30} />
+        <BirdSilhouette className="bird-9" size={90} />
+        <BirdSilhouette className="bird-10" size={75} />
 
         <div className="d-flex flex-column align-items-center" style={{ minHeight: '100%', padding: '40px 20px', position: 'relative', zIndex: 1 }}>
           <div style={{ width: '100%', maxWidth: '500px', margin: 'auto' }}>
