@@ -78,16 +78,14 @@ const LandingPage = () => {
   };
 
   return (
-    <Row className="m-0 flex-grow-1" style={{ overflow: 'hidden' }}>
+    <Row className="m-0" style={{ height: '100vh', width: '100vw', overflow: 'hidden' }}>
       {/* Mitad Izquierda: Carrusel (Oculto en celulares) */}
-      <Col md={7} lg={7} className="p-0 d-none d-md-flex flex-column" style={{ position: 'relative', overflow: 'hidden', borderTopRightRadius: '40px', borderBottomRightRadius: '40px', boxShadow: '5px 0 30px rgba(0,0,0,0.15)', zIndex: 10 }}>
-        <div style={{ flexGrow: 1, position: 'relative' }}>
-          <BackgroundCarousel inline={true} showCaptions={true} />
-        </div>
+      <Col md={7} lg={7} className="p-0 d-none d-md-block" style={{ height: '100vh', position: 'relative', overflow: 'hidden', borderTopRightRadius: '40px', borderBottomRightRadius: '40px', boxShadow: '5px 0 30px rgba(0,0,0,0.15)', zIndex: 10 }}>
+        <BackgroundCarousel inline={true} showCaptions={true} />
       </Col>
 
-      {/* Mitad Derecha: Contenido QR Fijo */}
-      <Col md={5} lg={5} xs={12} className="p-0 d-flex flex-column" style={{ backgroundColor: '#f4f6f8', overflowY: 'hidden', overflowX: 'hidden', position: 'relative' }}>
+      {/* Mitad Derecha: Contenido QR con Scroll */}
+      <Col md={5} lg={5} xs={12} className="p-0" style={{ backgroundColor: '#f4f6f8', height: '100vh', overflowY: 'auto', overflowX: 'hidden', position: 'relative' }}>
         
         {/* Animaciones de Fauna Tica */}
         <style>{`
@@ -136,15 +134,6 @@ const LandingPage = () => {
           .bird-13 { animation: flyFast 14s linear infinite forwards 14s; top: 75%; left: 0; }
           .bird-14 { animation: flyReverse 18s linear infinite forwards 11s; top: 85%; right: 0; }
           .bird-15 { animation: flySlowly 26s linear infinite forwards 9s; top: 60%; left: 0; }
-
-          /* Ocultar barra de scroll para el carrusel de botones */
-          .hide-scroll::-webkit-scrollbar {
-            display: none;
-          }
-          .hide-scroll {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
         `}</style>
         
         <BirdSilhouette className="bird-1" size={80} />
@@ -163,21 +152,21 @@ const LandingPage = () => {
         <BirdSilhouette className="bird-14" size={85} />
         <BirdSilhouette className="bird-15" size={40} />
 
-        <div className="d-flex flex-column align-items-center" style={{ flexGrow: 1, padding: '20px', position: 'relative', zIndex: 1 }}>
+        <div className="d-flex flex-column align-items-center" style={{ minHeight: '100%', padding: '40px 20px', position: 'relative', zIndex: 1 }}>
           <div style={{ flexGrow: 1 }}></div>
           <div style={{ width: '100%', maxWidth: '500px', flexShrink: 0 }}>
           
           {/* Selección de pueblos (estilo píldoras) */}
           {towns.length > 1 && (
-            <Card className="mb-3 shadow-sm" style={{ borderRadius: '20px', border: 'none' }}>
+            <Card className="mb-4 shadow-sm" style={{ borderRadius: '20px', border: 'none' }}>
               <Card.Body className="p-3">
                 <h6 className="fw-bold mb-3 text-center" style={{ color: '#004d40' }}>Selecciona un Pueblo:</h6>
-                <div className="d-flex gap-2 hide-scroll" style={{ overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '5px' }}>
+                <div className="d-flex flex-wrap justify-content-center gap-2">
                   {towns.map(t => (
                     <button
                       key={t.id}
                       onClick={() => setSelectedTown(t)}
-                      className="btn btn-sm flex-shrink-0"
+                      className="btn btn-sm"
                       style={{
                         backgroundColor: selectedTown?.id === t.id ? '#00bfa5' : '#e9ecef',
                         color: selectedTown?.id === t.id ? 'white' : '#495057',
@@ -200,17 +189,17 @@ const LandingPage = () => {
           )}
 
           {/* Tarjeta principal del QR */}
-          <Card className="text-center p-3 shadow-lg" style={glassStyle}>
+          <Card className="text-center p-4 shadow-lg" style={glassStyle}>
             <Card.Body>
               {/* Redes sociales */}
-              <div className="mb-3 d-flex justify-content-center gap-3">
-                <a href="#" style={{ color: '#1877F2', background: '#f4f6f8', padding: '10px', borderRadius: '50%', transition: 'transform 0.2s' }}><FacebookIcon /></a>
-                <a href="#" style={{ color: '#E4405F', background: '#f4f6f8', padding: '10px', borderRadius: '50%', transition: 'transform 0.2s' }}><InstagramIcon /></a>
-                <a href="#" style={{ color: '#000000', background: '#f4f6f8', padding: '10px', borderRadius: '50%', transition: 'transform 0.2s' }}><TiktokIcon /></a>
-                <a href="#" style={{ color: '#FF0000', background: '#f4f6f8', padding: '10px', borderRadius: '50%', transition: 'transform 0.2s' }}><YoutubeIcon /></a>
+              <div className="mb-4 d-flex justify-content-center gap-4">
+                <a href="#" style={{ color: '#1877F2', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><FacebookIcon /></a>
+                <a href="#" style={{ color: '#E4405F', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><InstagramIcon /></a>
+                <a href="#" style={{ color: '#000000', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><TiktokIcon /></a>
+                <a href="#" style={{ color: '#FF0000', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><YoutubeIcon /></a>
               </div>
 
-              <div className="d-flex flex-column align-items-center mb-3">
+              <div className="d-flex flex-column align-items-center mb-4">
                 {loading ? (
                   <Spinner animation="border" variant="success" />
                 ) : selectedTown ? (
@@ -220,21 +209,21 @@ const LandingPage = () => {
                       townName={selectedTown.name} 
                       exactUrl={`${window.location.origin}/p/${selectedTown.slug}`} 
                     />
-                    <h4 className="mt-2 fw-bold" style={{ color: '#004d40' }}>{selectedTown.name}</h4>
+                    <h4 className="mt-3 fw-bold" style={{ color: '#004d40' }}>{selectedTown.name}</h4>
                   </>
                 ) : (
-                  <div className="p-4 border border-dashed rounded text-muted">
+                  <div className="p-5 border border-dashed rounded text-muted">
                     No hay pueblos registrados
                   </div>
                 )}
               </div>
               
-              <p className="mb-3 text-muted" style={{ fontSize: '0.9rem', fontWeight: '500' }}>
+              <p className="mb-4 text-muted" style={{ fontSize: '0.95rem', fontWeight: '500' }}>
                 Escanea el código QR físico ubicado en el pueblo para ver sus lugares turísticos.
               </p>
 
               <style>{`.admin-lock:hover { color: #00bfa5 !important; }`}</style>
-              <div className="mt-2 text-end">
+              <div className="mt-3 text-end">
                 <Link to="/login" style={{ color: '#dee2e6' }} title="Acceso Administrativo">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="admin-lock" style={{ transition: 'color 0.2s' }}>
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
