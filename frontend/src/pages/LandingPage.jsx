@@ -66,7 +66,7 @@ const LandingPage = () => {
       </Col>
 
       {/* Mitad Derecha: Contenido QR con Scroll */}
-      <Col md={5} lg={5} xs={12} className="p-0" style={{ backgroundColor: '#f4f6f8', height: '100vh', overflowY: 'auto', position: 'relative' }}>
+      <Col md={5} lg={5} xs={12} className="p-0" style={{ backgroundColor: '#f4f6f8', height: '100vh', overflowY: 'auto', overflowX: 'hidden', position: 'relative' }}>
         
         {/* Animaciones de Fauna Tica */}
         <style>{`
