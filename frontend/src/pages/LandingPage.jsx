@@ -153,7 +153,8 @@ const LandingPage = () => {
         <BirdSilhouette className="bird-15" size={40} />
 
         <div className="d-flex flex-column align-items-center" style={{ minHeight: '100%', padding: '40px 20px', position: 'relative', zIndex: 1 }}>
-          <div style={{ width: '100%', maxWidth: '500px', margin: 'auto' }}>
+          <div style={{ flexGrow: 1 }}></div>
+          <div style={{ width: '100%', maxWidth: '500px', flexShrink: 0 }}>
           
           {/* Selección de pueblos (estilo píldoras) */}
           {towns.length > 1 && (
@@ -233,6 +234,7 @@ const LandingPage = () => {
             </Card.Body>
           </Card>
           </div>
+          <div style={{ flexGrow: 1 }}></div>
         </div>
       </Col>
     </Row>
