@@ -78,7 +78,7 @@ const LandingPage = () => {
   };
 
   return (
-    <Row className="m-0" style={{ height: 'calc(100vh - 76px)', overflow: 'hidden' }}>
+    <Row className="m-0 flex-grow-1" style={{ overflow: 'hidden' }}>
       {/* Mitad Izquierda: Carrusel (Oculto en celulares) */}
       <Col md={7} lg={7} className="p-0 d-none d-md-block" style={{ height: '100%', position: 'relative', overflow: 'hidden', borderTopRightRadius: '40px', borderBottomRightRadius: '40px', boxShadow: '5px 0 30px rgba(0,0,0,0.15)', zIndex: 10 }}>
         <BackgroundCarousel inline={true} showCaptions={true} />
