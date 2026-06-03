@@ -18,6 +18,22 @@ const TiktokIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93v7.2c0 1.63-.52 3.24-1.49 4.54-1.45 1.95-3.8 3.09-6.21 2.92-2.22-.16-4.28-1.27-5.59-3.04-1.32-1.78-1.77-4.14-1.22-6.27.53-2.09 1.9-3.88 3.79-4.81 1.9-.94 4.15-1.04 6.13-.31v4.25c-1.11-.27-2.31-.1-3.26.47-.94.57-1.55 1.57-1.68 2.65-.12 1.08.28 2.18 1.05 2.94.77.77 1.88 1.12 2.95.95 1.05-.17 1.98-.81 2.5-1.74.52-.92.68-2.01.44-3.04V.02z"/></svg>
 );
 
+const BirdSilhouette = ({ size = 40, className }) => (
+  <svg 
+    className={className}
+    xmlns="http://www.w3.org/2000/svg" 
+    width={size} 
+    height={size} 
+    viewBox="0 0 100 100" 
+    style={{ position: 'absolute', pointerEvents: 'none', zIndex: 0 }}
+  >
+    <path 
+      fill="#004d40" 
+      d="M10,60 C25,20 40,40 50,55 C60,40 75,20 90,60 C75,40 60,50 50,65 C40,50 25,40 10,60 Z" 
+    />
+  </svg>
+);
+
 const LandingPage = () => {
   const [towns, setTowns] = useState([]);
   const [selectedTown, setSelectedTown] = useState(null);
@@ -50,8 +66,34 @@ const LandingPage = () => {
       </Col>
 
       {/* Mitad Derecha: Contenido QR con Scroll */}
-      <Col md={5} lg={5} xs={12} className="p-0" style={{ backgroundColor: '#f4f6f8', height: '100vh', overflowY: 'auto' }}>
-        <div className="d-flex flex-column align-items-center" style={{ minHeight: '100%', padding: '40px 20px' }}>
+      <Col md={5} lg={5} xs={12} className="p-0" style={{ backgroundColor: '#f4f6f8', height: '100vh', overflowY: 'auto', position: 'relative' }}>
+        
+        {/* Animaciones de Fauna Tica */}
+        <style>{`
+          @keyframes flySlowly {
+            0% { transform: translate(-100px, 150px) scale(0.5); opacity: 0; }
+            10% { opacity: 0.08; }
+            90% { opacity: 0.08; }
+            100% { transform: translate(700px, -200px) scale(1.2); opacity: 0; }
+          }
+          @keyframes flyReverse {
+            0% { transform: translate(700px, 50px) scaleX(-1) scale(0.6); opacity: 0; }
+            10% { opacity: 0.06; }
+            90% { opacity: 0.06; }
+            100% { transform: translate(-150px, -150px) scaleX(-1) scale(1.1); opacity: 0; }
+          }
+          .bird-1 { animation: flySlowly 28s linear infinite; top: 15%; left: 0; }
+          .bird-2 { animation: flySlowly 38s linear infinite; animation-delay: 15s; top: 45%; left: 0; }
+          .bird-3 { animation: flyReverse 32s linear infinite; animation-delay: 5s; top: 25%; right: 0; }
+          .bird-4 { animation: flyReverse 45s linear infinite; animation-delay: 22s; top: 65%; right: 0; }
+        `}</style>
+        
+        <BirdSilhouette className="bird-1" size={80} />
+        <BirdSilhouette className="bird-2" size={50} />
+        <BirdSilhouette className="bird-3" size={110} />
+        <BirdSilhouette className="bird-4" size={65} />
+
+        <div className="d-flex flex-column align-items-center" style={{ minHeight: '100%', padding: '40px 20px', position: 'relative', zIndex: 1 }}>
           <div style={{ width: '100%', maxWidth: '500px', margin: 'auto' }}>
           
           {/* Selección de pueblos (estilo píldoras) */}
