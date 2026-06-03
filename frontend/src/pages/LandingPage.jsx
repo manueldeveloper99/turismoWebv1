@@ -37,91 +37,95 @@ const LandingPage = () => {
 
   const glassStyle = {
     borderRadius: '25px',
-    border: '1px solid rgba(255, 255, 255, 0.4)',
-    background: 'rgba(255, 255, 255, 0.35)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
-    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
+    background: '#ffffff',
+    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08)',
+    border: 'none'
   };
 
   return (
-    <div style={{ position: 'relative', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-      <BackgroundCarousel />
+    <Row className="m-0" style={{ minHeight: '100vh', width: '100vw' }}>
+      {/* Mitad Izquierda: Carrusel (Oculto en celulares) */}
+      <Col md={7} lg={7} className="p-0 d-none d-md-block" style={{ position: 'relative', overflow: 'hidden' }}>
+        <BackgroundCarousel inline={true} showCaptions={true} />
+      </Col>
 
-      <Container fluid className="py-5 flex-grow-1 d-flex align-items-center" style={{ position: 'relative', zIndex: 2 }}>
-        <Row className="w-100 justify-content-center">
-          {/* Sidebar de selección de pueblos */}
+      {/* Mitad Derecha: Contenido QR */}
+      <Col md={5} lg={5} xs={12} className="d-flex flex-column align-items-center justify-content-center p-0" style={{ backgroundColor: '#f4f6f8' }}>
+        <div style={{ width: '100%', maxWidth: '500px', padding: '20px' }}>
+          
+          {/* Selección de pueblos (estilo píldoras) */}
           {towns.length > 1 && (
-            <Col md={3} className="mb-4">
-              <Card style={{ ...glassStyle, maxHeight: '70vh', overflowY: 'auto' }} className="p-3">
-                <h5 className="text-center fw-bold mb-3" style={{ color: '#004d40' }}>Seleccionar Pueblo</h5>
-                <ListGroup variant="flush" style={{ background: 'transparent' }}>
+            <Card className="mb-4 shadow-sm" style={{ borderRadius: '20px', border: 'none' }}>
+              <Card.Body className="p-3">
+                <h6 className="fw-bold mb-3 text-center" style={{ color: '#004d40' }}>Selecciona un Pueblo:</h6>
+                <div className="d-flex flex-wrap justify-content-center gap-2">
                   {towns.map(t => (
-                    <ListGroup.Item 
+                    <button
                       key={t.id}
                       onClick={() => setSelectedTown(t)}
-                      style={{ 
-                        cursor: 'pointer',
-                        background: selectedTown?.id === t.id ? 'rgba(0, 77, 64, 0.2)' : 'transparent',
-                        color: '#004d40',
-                        fontWeight: selectedTown?.id === t.id ? 'bold' : 'normal',
+                      className="btn btn-sm"
+                      style={{
+                        backgroundColor: selectedTown?.id === t.id ? '#00bfa5' : '#e9ecef',
+                        color: selectedTown?.id === t.id ? 'white' : '#495057',
+                        borderRadius: '20px',
+                        fontWeight: '600',
+                        padding: '6px 15px',
                         border: 'none',
-                        borderRadius: '10px',
-                        marginBottom: '5px'
+                        transition: 'all 0.2s'
                       }}
                     >
                       📍 {t.name}
-                    </ListGroup.Item>
+                    </button>
                   ))}
-                </ListGroup>
-              </Card>
-            </Col>
-          )}
-
-          <Col md={towns.length > 1 ? 6 : 5}>
-            <Card className="text-center p-4 shadow-lg" style={glassStyle}>
-              <Card.Body>
-                <div className="mb-4 d-flex justify-content-center gap-4">
-                  <a href="#" style={{ color: '#1877F2', background: 'rgba(255,255,255,0.8)', padding: '12px', borderRadius: '50%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}><FacebookIcon /></a>
-                  <a href="#" style={{ color: '#E4405F', background: 'rgba(255,255,255,0.8)', padding: '12px', borderRadius: '50%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}><InstagramIcon /></a>
-                  <a href="#" style={{ color: '#000000', background: 'rgba(255,255,255,0.8)', padding: '12px', borderRadius: '50%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}><TiktokIcon /></a>
-                  <a href="#" style={{ color: '#FF0000', background: 'rgba(255,255,255,0.8)', padding: '12px', borderRadius: '50%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}><YoutubeIcon /></a>
-                </div>
-
-                <div className="d-flex flex-column align-items-center mb-4">
-                  {loading ? (
-                    <Spinner animation="border" variant="success" />
-                  ) : selectedTown ? (
-                    <>
-                      <QRPoster 
-                        townSlug={selectedTown.slug} 
-                        townName={selectedTown.name} 
-                        exactUrl={`${window.location.origin}/p/${selectedTown.slug}`} 
-                      />
-                      <h4 className="mt-3 fw-bold" style={{ color: '#004d40' }}>{selectedTown.name}</h4>
-                    </>
-                  ) : (
-                    <div className="p-5 border border-dashed rounded text-muted">
-                      No hay pueblos registrados
-                    </div>
-                  )}
-                </div>
-                
-                <p className="mb-4" style={{ fontSize: '0.95rem', color: '#212529', fontWeight: '500', textShadow: '0 1px 2px rgba(255,255,255,0.8)' }}>
-                  Escanea el código QR físico ubicado en el pueblo para ver sus lugares turísticos.
-                </p>
-
-                <div className="mt-4 pt-3 border-top" style={{ borderColor: 'rgba(0,0,0,0.1) !important' }}>
-                  <Link to="/login" style={{ fontSize: '0.9rem', color: '#004d40', fontWeight: '600', textDecoration: 'none' }}>
-                    ¿Eres Administrador? Ingresa aquí
-                  </Link>
                 </div>
               </Card.Body>
             </Card>
-          </Col>
-        </Row>
-      </Container>
-    </div>
+          )}
+
+          {/* Tarjeta principal del QR */}
+          <Card className="text-center p-4 shadow-lg" style={glassStyle}>
+            <Card.Body>
+              {/* Redes sociales */}
+              <div className="mb-4 d-flex justify-content-center gap-4">
+                <a href="#" style={{ color: '#1877F2', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><FacebookIcon /></a>
+                <a href="#" style={{ color: '#E4405F', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><InstagramIcon /></a>
+                <a href="#" style={{ color: '#000000', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><TiktokIcon /></a>
+                <a href="#" style={{ color: '#FF0000', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><YoutubeIcon /></a>
+              </div>
+
+              <div className="d-flex flex-column align-items-center mb-4">
+                {loading ? (
+                  <Spinner animation="border" variant="success" />
+                ) : selectedTown ? (
+                  <>
+                    <QRPoster 
+                      townSlug={selectedTown.slug} 
+                      townName={selectedTown.name} 
+                      exactUrl={`${window.location.origin}/p/${selectedTown.slug}`} 
+                    />
+                    <h4 className="mt-3 fw-bold" style={{ color: '#004d40' }}>{selectedTown.name}</h4>
+                  </>
+                ) : (
+                  <div className="p-5 border border-dashed rounded text-muted">
+                    No hay pueblos registrados
+                  </div>
+                )}
+              </div>
+              
+              <p className="mb-4 text-muted" style={{ fontSize: '0.95rem', fontWeight: '500' }}>
+                Escanea el código QR físico ubicado en el pueblo para ver sus lugares turísticos.
+              </p>
+
+              <div className="mt-4 pt-3 border-top">
+                <Link to="/login" style={{ fontSize: '0.9rem', color: '#004d40', fontWeight: '600', textDecoration: 'none' }}>
+                  ¿Eres Administrador? Ingresa aquí
+                </Link>
+              </div>
+            </Card.Body>
+          </Card>
+        </div>
+      </Col>
+    </Row>
   );
 };
 export default LandingPage;
