@@ -172,7 +172,7 @@ const LandingPage = () => {
           
           {/* Selección de pueblos (estilo píldoras) */}
           {towns.length > 1 && (
-            <Card className="mb-4 shadow-sm" style={{ borderRadius: '20px', border: 'none' }}>
+            <Card className="mb-4 shadow-sm" style={{ borderRadius: '20px 0px 20px 0px', border: 'none' }}>
               <Card.Body className="p-3">
                 <h6 className="fw-bold mb-3 text-center" style={{ color: '#004d40' }}>Selecciona un Pueblo:</h6>
                 <div className="d-flex flex-wrap justify-content-center gap-2">
