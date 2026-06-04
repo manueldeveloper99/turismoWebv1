@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Navbar, Container, Nav, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 
 const NavbarComponent = () => {
   const navigate = useNavigate();
@@ -104,7 +105,7 @@ const NavbarComponent = () => {
               />
               <span className="text-white me-3" style={{ fontSize: '0.9rem' }}>{user.name}</span>
               <Button variant="outline-light" size="sm" onClick={handleLogout} title="Cerrar Sesión">
-                <span aria-hidden="true">🚪</span>
+                <LogOut size={18} />
               </Button>
             </div>
           ) : (

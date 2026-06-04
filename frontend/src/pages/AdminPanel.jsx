@@ -157,12 +157,16 @@ const AdminPanel = () => {
       }
 
       const placeData = {
-        ...place,
+        id: place.id, // Aseguramos enviar el ID si existe
+        name: place.name,
+        description: place.description,
+        category: place.category,
+        address: place.address,
+        imageUrl: place.imageUrl,
         latitude: parseFloat(place.latitude) || 0,
         longitude: parseFloat(place.longitude) || 0,
-        townId: targetTownId,
-        town: { id: targetTownId },
-        active: place.id ? place.active : true // Si es nuevo (sin id), siempre es true
+        active: Boolean(place.active),
+        town: { id: targetTownId }
       };
       
       if (place.id) {
@@ -195,35 +199,50 @@ const AdminPanel = () => {
   const handleTogglePlaceStatus = async (p) => {
     const originalStatus = p.active;
     const newStatus = !originalStatus;
-    const targetTownId = p.town?.id || p.townId || selectedTown?.id;
+
+    // Mensaje de seguridad al inactivar
+    if (originalStatus && !window.confirm('¿Está seguro de querer inactivar el lugar? El código QR dejará de ser funcional para los turistas.')) {
+      return;
+    }
+
+    // Obtener el ID del pueblo asociado de manera segura
+    const townId = p.town?.id || p.townId || (selectedTown ? selectedTown.id : null);
+
+    if (!townId) {
+      showMessage('Error: No se pudo identificar el pueblo asociado a este lugar', 'danger');
+      return;
+    }
 
     // 1. Actualización optimista inmediata en la UI
     setPlaces(prev => prev.map(item => item.id === p.id ? { ...item, active: newStatus } : item));
 
     try {
-      // 2. Intentamos el endpoint de status
-      await api.put(`/admin/places/${p.id}/status`, { active: newStatus });
-      fetchStats().catch(() => {});
+      // Construimos el objeto para el PUT asegurando que todos los campos requeridos estén presentes
+      const updateData = {
+        ...p, // Incluimos campos originales para evitar pérdida de datos si el backend es estricto
+        name: p.name,
+        description: p.description,
+        category: p.category,
+        address: p.address,
+        imageUrl: p.imageUrl,
+        latitude: parseFloat(p.latitude) || 0,
+        longitude: parseFloat(p.longitude) || 0,
+        active: newStatus,
+        town: { id: Number(townId) }
+      };
+
+      await api.put(`/admin/places/${p.id}`, updateData);
+      
+      // Refrescar datos reales para asegurar que la persistencia fue exitosa
+      fetchPlaces(selectedTown?.slug);
+      fetchStats();
+
+      showMessage(newStatus ? 'Lugar activado exitosamente' : 'Lugar inactivado exitosamente', newStatus ? 'success' : 'warning');
     } catch (err) {
-      // 3. Fallback: Si el endpoint /status no existe, usamos el PUT general
-      // Enviamos el objeto EXACTO que el backend espera (incluyendo la relación town)
-      try {
-        const updateData = {
-          ...p,
-          latitude: parseFloat(p.latitude) || 0,
-          longitude: parseFloat(p.longitude) || 0,
-          active: newStatus,
-          townId: targetTownId,
-          town: { id: targetTownId }
-        };
-        
-        await api.put(`/admin/places/${p.id}`, updateData);
-        fetchStats().catch(() => {});
-      } catch (innerErr) {
-        // 4. Revertimos silenciosamente solo si todo falla. No mostramos showMessage por error.
-        setPlaces(prev => prev.map(item => item.id === p.id ? { ...item, active: originalStatus } : item));
-        console.error("Error persistente al cambiar estado:", innerErr);
-      }
+      // Revertimos en la UI si el servidor rechazó la actualización
+      setPlaces(prev => prev.map(item => item.id === p.id ? { ...item, active: originalStatus } : item));
+      console.error("Error al persistir estado:", err);
+      showMessage('Error: El servidor no pudo guardar el cambio de estado', 'danger');
     }
   };
 
@@ -399,7 +418,13 @@ const AdminPanel = () => {
                 </thead>
                 <tbody>
                   {places.map(p => (
-                    <tr key={p.id}>
+                    <tr 
+                      key={p.id} 
+                      style={{ 
+                        opacity: p.active ? 1 : 0.6, 
+                        backgroundColor: p.active ? 'transparent' : '#f8f9fa' 
+                      }}
+                    >
                       <td>
                         <Image src={p.imageUrl || 'https://via.placeholder.com/50'} rounded width={50} height={50} style={{objectFit: 'cover'}} />
                       </td>
@@ -694,6 +719,15 @@ const AdminPanel = () => {
             <Form.Group className="mb-3">
               <Form.Label>URL de Fotografía</Form.Label>
               <Form.Control type="url" value={place.imageUrl} onChange={e => setPlace({...place, imageUrl: e.target.value})} />
+            </Form.Group>
+            <Form.Group className="mb-4">
+              <Form.Check 
+                type="switch"
+                id="modal-place-active"
+                label={place.active ? "Lugar Activo (Visible para turistas)" : "Lugar Inactivo (Oculto)"}
+                checked={place.active}
+                onChange={e => setPlace({...place, active: e.target.checked})}
+              />
             </Form.Group>
             <Button type="submit" variant="primary" className="w-100">Guardar Lugar Turístico</Button>
           </Form>
