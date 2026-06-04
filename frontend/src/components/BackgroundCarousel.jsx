@@ -1,4 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, EffectCreative } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/effect-creative';
+
 import img1 from '../assets/imagen1.png';
 import img2 from '../assets/imagen2.png';
 import img3 from '../assets/imagen3.png';
@@ -21,34 +26,54 @@ const captions = [
 const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <>
-      {/* Capas del carrusel de fondo */}
-      {backgroundImages.map((img, index) => (
-        <div
-          key={index}
-          style={{
-            position: inline ? 'absolute' : 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundImage: `url(${img})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: index === currentImageIndex ? 1 : 0,
-            transition: 'opacity 1.5s ease-in-out',
-            zIndex: 0
+      {/* Capas del carrusel de fondo con Swiper 3D */}
+      <div style={{
+        position: inline ? 'absolute' : 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 0,
+        overflow: 'hidden'
+      }}>
+        <Swiper
+          modules={[Autoplay, EffectCreative]}
+          effect="creative"
+          grabCursor={true}
+          creativeEffect={{
+            prev: {
+              shadow: true,
+              translate: ['-20%', 0, -1],
+              scale: 0.9,
+              opacity: 0.5,
+            },
+            next: {
+              translate: ['100%', 0, 0],
+            },
           }}
-        />
-      ))}
+          autoplay={{ delay: 5000, disableOnInteraction: false }}
+          speed={1200}
+          loop={true}
+          onSlideChange={(swiper) => setCurrentImageIndex(swiper.realIndex)}
+          style={{ width: '100%', height: '100%' }}
+        >
+          {backgroundImages.map((img, index) => (
+            <SwiperSlide key={index}>
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  backgroundImage: `url(${img})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
       
       {/* Overlay oscuro para que el contenido resalte */}
       <div style={{
@@ -81,7 +106,9 @@ const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
                 bottom: 0,
                 left: 0,
                 opacity: index === currentImageIndex ? 1 : 0,
-                transition: 'opacity 1.5s ease-in-out'
+                transform: index === currentImageIndex ? 'translateY(0)' : 'translateY(20px)',
+                transition: 'all 1s cubic-bezier(0.4, 0, 0.2, 1)',
+                width: '100%'
               }}
             >
               <h2 style={{ color: '#ffffff', fontWeight: '800', fontSize: '2.5rem', marginBottom: '10px' }}>{captions[index]}</h2>
