@@ -31,7 +31,7 @@ const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
       width: '100%',
       height: '100%',
       zIndex: 0,
-      backgroundColor: '#0a0a0a', // Fondo oscuro tipo cine
+      backgroundColor: 'transparent', // Sin fondo, hereda el color limpio de la página
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
