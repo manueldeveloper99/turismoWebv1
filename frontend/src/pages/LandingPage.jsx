@@ -80,7 +80,7 @@ const LandingPage = () => {
   return (
     <Row className="m-0" style={{ height: '100vh', width: '100vw', overflow: 'hidden' }}>
       {/* Mitad Izquierda: Carrusel (Oculto en celulares) */}
-      <Col md={7} lg={7} className="p-0 d-none d-md-block" style={{ height: '100vh', position: 'relative', overflow: 'hidden', borderTopRightRadius: '40px', borderBottomRightRadius: '40px', boxShadow: '5px 0 30px rgba(0,0,0,0.15)', zIndex: 10 }}>
+      <Col md={7} lg={7} className="p-0 d-none d-md-block" style={{ height: '100vh', position: 'relative', overflow: 'hidden', zIndex: 10 }}>
         <BackgroundCarousel inline={true} showCaptions={true} />
       </Col>
 

@@ -35,6 +35,7 @@ const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
+      paddingTop: '60px', // Bajar el carrusel para no chocar con el navbar superior
       overflow: 'hidden'
     }}>
       <Swiper
