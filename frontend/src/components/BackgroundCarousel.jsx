@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectCreative } from 'swiper/modules';
 import 'swiper/css';
@@ -24,100 +23,85 @@ const captions = [
 ];
 
 const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
   return (
-    <>
-      {/* Capas del carrusel de fondo con Swiper 3D */}
-      <div style={{
-        position: inline ? 'absolute' : 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        zIndex: 0,
-        overflow: 'hidden'
-      }}>
-        <Swiper
-          modules={[Autoplay, EffectCreative]}
-          effect="creative"
-          grabCursor={true}
-          creativeEffect={{
-            prev: {
-              shadow: true,
-              translate: ['-20%', 0, -1],
-              scale: 0.9,
-              opacity: 0.5,
-            },
-            next: {
-              translate: ['100%', 0, 0],
-            },
-          }}
-          autoplay={{ delay: 5000, disableOnInteraction: false }}
-          speed={1200}
-          loop={true}
-          onSlideChange={(swiper) => setCurrentImageIndex(swiper.realIndex)}
-          style={{ width: '100%', height: '100%' }}
-        >
-          {backgroundImages.map((img, index) => (
-            <SwiperSlide key={index}>
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  backgroundImage: `url(${img})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-      
-      {/* Overlay oscuro para que el contenido resalte */}
-      <div style={{
-        position: inline ? 'absolute' : 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-        zIndex: 1,
-        pointerEvents: 'none'
-      }} />
-
-      {/* Títulos dinámicos sobre el overlay */}
-      {showCaptions && (
-        <div style={{
-          position: inline ? 'absolute' : 'fixed',
-          bottom: '10%',
-          left: '10%',
-          right: '10%',
-          zIndex: 2,
-          color: 'white',
-          textShadow: '0 4px 12px rgba(0,0,0,0.9)'
-        }}>
-          {backgroundImages.map((_, index) => (
-            <div 
-              key={index}
+    <div style={{
+      position: inline ? 'absolute' : 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      zIndex: 0,
+      backgroundColor: '#0a0a0a', // Fondo muy oscuro para que las cartas floten
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden'
+    }}>
+      <Swiper
+        modules={[Autoplay, EffectCreative]}
+        effect="creative"
+        grabCursor={true}
+        creativeEffect={{
+          limitProgress: 3,
+          prev: {
+            shadow: true,
+            translate: ['-100%', 0, -400],
+            opacity: 0,
+          },
+          next: {
+            translate: ['35%', 0, -150], // Asoma 35% hacia la derecha
+            scale: 0.85,
+            opacity: 0.6,
+            shadow: true
+          },
+        }}
+        autoplay={{ delay: 4000, disableOnInteraction: false }}
+        speed={1000}
+        loop={true}
+        style={{ width: '70%', height: '80%', overflow: 'visible' }} // overflow visible para ver la pila
+      >
+        {backgroundImages.map((img, index) => (
+          <SwiperSlide key={index} style={{ borderRadius: '30px', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}>
+            <div
               style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                opacity: index === currentImageIndex ? 1 : 0,
-                transform: index === currentImageIndex ? 'translateY(0)' : 'translateY(20px)',
-                transition: 'all 1s cubic-bezier(0.4, 0, 0.2, 1)',
-                width: '100%'
+                width: '100%',
+                height: '100%',
+                backgroundImage: `url(${img})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                position: 'relative'
               }}
             >
-              <h2 style={{ color: '#ffffff', fontWeight: '800', fontSize: '2.5rem', marginBottom: '10px' }}>{captions[index]}</h2>
-              <h4 style={{ fontWeight: '500', color: '#00bfa5' }}>Costa Rica: ¡Pura Vida!</h4>
+              {/* Overlay interno oscuro para cada carta (solo si hay textos) */}
+              {showCaptions && (
+                <div style={{
+                  position: 'absolute',
+                  top: 0, left: 0, width: '100%', height: '100%',
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 60%)',
+                  zIndex: 1
+                }} />
+              )}
+
+              {/* Títulos dinámicos dentro de la carta */}
+              {showCaptions && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: '10%',
+                  left: '10%',
+                  right: '10%',
+                  zIndex: 2,
+                  color: 'white',
+                  textShadow: '0 4px 12px rgba(0,0,0,0.9)'
+                }}>
+                  <h2 style={{ color: '#ffffff', fontWeight: '800', fontSize: '2.5rem', marginBottom: '10px' }}>{captions[index]}</h2>
+                  <h4 style={{ fontWeight: '500', color: '#00bfa5' }}>Costa Rica: ¡Pura Vida!</h4>
+                </div>
+              )}
             </div>
-          ))}
-        </div>
-      )}
-    </>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </div>
   );
 };
 
