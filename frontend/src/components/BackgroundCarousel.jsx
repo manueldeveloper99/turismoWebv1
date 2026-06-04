@@ -36,8 +36,20 @@ const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
       alignItems: 'center',
       justifyContent: 'center',
       paddingTop: '60px', // Bajar el carrusel para no chocar con el navbar superior
-      overflow: 'hidden'
+      overflow: 'hidden',
+      WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)',
+      maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)'
     }}>
+      <style>{`
+        .swiper-slide:not(.swiper-slide-active) {
+          filter: blur(4px);
+          transition: filter 0.6s ease;
+        }
+        .swiper-slide-active {
+          filter: blur(0px);
+          transition: filter 0.6s ease;
+        }
+      `}</style>
       <Swiper
         modules={[Autoplay, EffectCoverflow]}
         effect="coverflow"
