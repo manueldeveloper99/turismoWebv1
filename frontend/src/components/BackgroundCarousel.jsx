@@ -66,7 +66,7 @@ const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
         autoplay={{ delay: 3000, disableOnInteraction: false }}
         speed={1500}
         loop={true}
-        loopedSlides={7}
+        loopedSlides={backgroundImages.length}
         style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center' }}
       >
         {backgroundImages.map((img, index) => (
