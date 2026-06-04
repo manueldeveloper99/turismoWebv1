@@ -1,8 +1,4 @@
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, EffectCoverflow } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/effect-coverflow';
-
+import { useState, useEffect } from 'react';
 import img1 from '../assets/imagen1.png';
 import img2 from '../assets/imagen2.png';
 import img3 from '../assets/imagen3.png';
@@ -23,94 +19,78 @@ const captions = [
 ];
 
 const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div style={{
-      position: inline ? 'absolute' : 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      zIndex: 0,
-      backgroundColor: 'transparent', // Sin fondo, hereda el color limpio de la página
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingTop: '60px', // Bajar el carrusel para no chocar con el navbar superior
-      overflow: 'hidden',
-      WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)',
-      maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)'
-    }}>
-      <style>{`
-        .swiper-slide:not(.swiper-slide-active) {
-          filter: blur(5px);
-          transition: filter 1.5s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .swiper-slide-active {
-          filter: blur(0px);
-          transition: filter 1.5s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-      `}</style>
-      <Swiper
-        modules={[Autoplay, EffectCoverflow]}
-        effect="coverflow"
-        grabCursor={true}
-        centeredSlides={true}
-        slidesPerView="auto"
-        coverflowEffect={{
-          rotate: 35,
-          stretch: 0,
-          depth: 250,
-          modifier: 1,
-          slideShadows: true,
-        }}
-        autoplay={{ delay: 3000, disableOnInteraction: false }}
-        speed={1500}
-        loop={true}
-        loopedSlides={backgroundImages.length}
-        style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center' }}
-      >
-        {backgroundImages.map((img, index) => (
-          <SwiperSlide key={index} style={{ width: '60%', height: '70%', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 15px 50px rgba(0,0,0,0.6)' }}>
-            <div
+    <>
+      {/* Capas del carrusel de fondo */}
+      {backgroundImages.map((img, index) => (
+        <div
+          key={index}
+          style={{
+            position: inline ? 'absolute' : 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundImage: `url(${img})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: index === currentImageIndex ? 1 : 0,
+            transition: 'opacity 1.5s ease-in-out',
+            zIndex: 0
+          }}
+        />
+      ))}
+      
+      {/* Overlay oscuro para que el contenido resalte */}
+      <div style={{
+        position: inline ? 'absolute' : 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        zIndex: 1,
+        pointerEvents: 'none'
+      }} />
+
+      {/* Títulos dinámicos sobre el overlay */}
+      {showCaptions && (
+        <div style={{
+          position: inline ? 'absolute' : 'fixed',
+          bottom: '10%',
+          left: '10%',
+          right: '10%',
+          zIndex: 2,
+          color: 'white',
+          textShadow: '0 4px 12px rgba(0,0,0,0.9)'
+        }}>
+          {backgroundImages.map((_, index) => (
+            <div 
+              key={index}
               style={{
-                width: '100%',
-                height: '100%',
-                backgroundImage: `url(${img})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                position: 'relative'
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                opacity: index === currentImageIndex ? 1 : 0,
+                transition: 'opacity 1.5s ease-in-out'
               }}
             >
-              {/* Overlay interno oscuro para cada carta */}
-              {showCaptions && (
-                <div style={{
-                  position: 'absolute',
-                  top: 0, left: 0, width: '100%', height: '100%',
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 60%)',
-                  zIndex: 1
-                }} />
-              )}
-
-              {/* Títulos dinámicos dentro de la carta */}
-              {showCaptions && (
-                <div style={{
-                  position: 'absolute',
-                  bottom: '8%',
-                  left: '8%',
-                  right: '8%',
-                  zIndex: 2,
-                  color: 'white',
-                  textShadow: '0 4px 12px rgba(0,0,0,0.9)'
-                }}>
-                  <h2 style={{ color: '#ffffff', fontWeight: '800', fontSize: '2.5rem', marginBottom: '10px' }}>{captions[index]}</h2>
-                  <h4 style={{ fontWeight: '500', color: '#00bfa5' }}>Costa Rica: ¡Pura Vida!</h4>
-                </div>
-              )}
+              <h2 style={{ color: '#ffffff', fontWeight: '800', fontSize: '2.5rem', marginBottom: '10px' }}>{captions[index]}</h2>
+              <h4 style={{ fontWeight: '500', color: '#00bfa5' }}>Costa Rica: ¡Pura Vida!</h4>
             </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
+          ))}
+        </div>
+      )}
+    </>
   );
 };
 
