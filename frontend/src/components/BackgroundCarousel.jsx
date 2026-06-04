@@ -42,12 +42,12 @@ const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
     }}>
       <style>{`
         .swiper-slide:not(.swiper-slide-active) {
-          filter: blur(4px);
-          transition: filter 0.6s ease;
+          filter: blur(5px);
+          transition: filter 1.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
         .swiper-slide-active {
           filter: blur(0px);
-          transition: filter 0.6s ease;
+          transition: filter 1.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
       `}</style>
       <Swiper
@@ -57,15 +57,16 @@ const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
         centeredSlides={true}
         slidesPerView="auto"
         coverflowEffect={{
-          rotate: 40,
+          rotate: 35,
           stretch: 0,
-          depth: 200,
+          depth: 250,
           modifier: 1,
           slideShadows: true,
         }}
-        autoplay={{ delay: 3500, disableOnInteraction: false }}
-        speed={1000}
+        autoplay={{ delay: 3000, disableOnInteraction: false }}
+        speed={1500}
         loop={true}
+        loopedSlides={7}
         style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center' }}
       >
         {backgroundImages.map((img, index) => (
