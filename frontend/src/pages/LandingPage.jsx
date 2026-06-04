@@ -134,6 +134,20 @@ const LandingPage = () => {
           .bird-13 { animation: flyFast 14s linear infinite forwards 14s; top: 75%; left: 0; }
           .bird-14 { animation: flyReverse 18s linear infinite forwards 11s; top: 85%; right: 0; }
           .bird-15 { animation: flySlowly 26s linear infinite forwards 9s; top: 60%; left: 0; }
+
+          .social-icon {
+            display: inline-flex;
+            background: #f4f6f8;
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+          }
+          .social-icon:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            background: #ffffff;
+          }
         `}</style>
         
         <BirdSilhouette className="bird-1" size={80} />
@@ -193,10 +207,10 @@ const LandingPage = () => {
             <Card.Body>
               {/* Redes sociales */}
               <div className="mb-4 d-flex justify-content-center gap-4">
-                <a href="#" style={{ color: '#1877F2', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><FacebookIcon /></a>
-                <a href="#" style={{ color: '#E4405F', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><InstagramIcon /></a>
-                <a href="#" style={{ color: '#000000', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><TiktokIcon /></a>
-                <a href="#" style={{ color: '#FF0000', background: '#f4f6f8', padding: '12px', borderRadius: '50%', transition: 'transform 0.2s' }}><YoutubeIcon /></a>
+                <a href="#" className="social-icon" style={{ color: '#1877F2' }}><FacebookIcon /></a>
+                <a href="#" className="social-icon" style={{ color: '#E4405F' }}><InstagramIcon /></a>
+                <a href="#" className="social-icon" style={{ color: '#000000' }}><TiktokIcon /></a>
+                <a href="#" className="social-icon" style={{ color: '#FF0000' }}><YoutubeIcon /></a>
               </div>
 
               <div className="d-flex flex-column align-items-center mb-4">
