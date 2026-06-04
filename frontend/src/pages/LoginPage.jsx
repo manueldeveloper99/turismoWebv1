@@ -30,14 +30,14 @@ const LoginPage = () => {
   };
 
   return (
-    <Row className="m-0" style={{ minHeight: '100vh', width: '100vw' }}>
+    <Row className="m-0" style={{ minHeight: '100vh', width: '100vw', backgroundColor: '#f4f6f8' }}>
       {/* Mitad Izquierda: Carrusel (Oculto en celulares) */}
       <Col md={7} lg={7} className="p-0 d-none d-md-block" style={{ position: 'relative', overflow: 'hidden', zIndex: 10 }}>
         <BackgroundCarousel inline={true} showCaptions={true} />
       </Col>
 
       {/* Mitad Derecha: Login */}
-      <Col md={5} lg={5} xs={12} className="d-flex align-items-center justify-content-center p-0" style={{ backgroundColor: '#f4f6f8' }}>
+      <Col md={5} lg={5} xs={12} className="d-flex align-items-center justify-content-center p-0">
         <Card className="text-center p-5 shadow-lg border-0" style={{
           width: '100%',
           maxWidth: '450px',

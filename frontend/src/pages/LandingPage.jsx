@@ -78,14 +78,14 @@ const LandingPage = () => {
   };
 
   return (
-    <Row className="m-0" style={{ height: '100vh', width: '100vw', overflow: 'hidden' }}>
+    <Row className="m-0" style={{ height: '100vh', width: '100vw', overflow: 'hidden', backgroundColor: '#f4f6f8' }}>
       {/* Mitad Izquierda: Carrusel (Oculto en celulares) */}
       <Col md={7} lg={7} className="p-0 d-none d-md-block" style={{ height: '100vh', position: 'relative', overflow: 'hidden', zIndex: 10 }}>
         <BackgroundCarousel inline={true} showCaptions={true} />
       </Col>
 
       {/* Mitad Derecha: Contenido QR con Scroll */}
-      <Col md={5} lg={5} xs={12} className="p-0" style={{ backgroundColor: '#f4f6f8', height: '100vh', overflowY: 'auto', overflowX: 'hidden', position: 'relative' }}>
+      <Col md={5} lg={5} xs={12} className="p-0" style={{ height: '100vh', overflowY: 'auto', overflowX: 'hidden', position: 'relative' }}>
         
         {/* Animaciones de Fauna Tica */}
         <style>{`
