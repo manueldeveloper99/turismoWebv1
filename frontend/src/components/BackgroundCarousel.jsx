@@ -1,7 +1,7 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, EffectCreative } from 'swiper/modules';
+import { Autoplay, EffectCoverflow } from 'swiper/modules';
 import 'swiper/css';
-import 'swiper/css/effect-creative';
+import 'swiper/css/effect-coverflow';
 
 import img1 from '../assets/imagen1.png';
 import img2 from '../assets/imagen2.png';
@@ -31,37 +31,32 @@ const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
       width: '100%',
       height: '100%',
       zIndex: 0,
-      backgroundColor: '#0a0a0a', // Fondo muy oscuro para que las cartas floten
+      backgroundColor: '#0a0a0a', // Fondo oscuro tipo cine
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       overflow: 'hidden'
     }}>
       <Swiper
-        modules={[Autoplay, EffectCreative]}
-        effect="creative"
+        modules={[Autoplay, EffectCoverflow]}
+        effect="coverflow"
         grabCursor={true}
-        creativeEffect={{
-          limitProgress: 3,
-          prev: {
-            shadow: true,
-            translate: ['-100%', 0, -400],
-            opacity: 0,
-          },
-          next: {
-            translate: ['35%', 0, -150], // Asoma 35% hacia la derecha
-            scale: 0.85,
-            opacity: 0.6,
-            shadow: true
-          },
+        centeredSlides={true}
+        slidesPerView="auto"
+        coverflowEffect={{
+          rotate: 40,
+          stretch: 0,
+          depth: 200,
+          modifier: 1,
+          slideShadows: true,
         }}
-        autoplay={{ delay: 4000, disableOnInteraction: false }}
+        autoplay={{ delay: 3500, disableOnInteraction: false }}
         speed={1000}
         loop={true}
-        style={{ width: '70%', height: '80%', overflow: 'visible' }} // overflow visible para ver la pila
+        style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center' }}
       >
         {backgroundImages.map((img, index) => (
-          <SwiperSlide key={index} style={{ borderRadius: '30px', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}>
+          <SwiperSlide key={index} style={{ width: '60%', height: '70%', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 15px 50px rgba(0,0,0,0.6)' }}>
             <div
               style={{
                 width: '100%',
@@ -72,7 +67,7 @@ const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
                 position: 'relative'
               }}
             >
-              {/* Overlay interno oscuro para cada carta (solo si hay textos) */}
+              {/* Overlay interno oscuro para cada carta */}
               {showCaptions && (
                 <div style={{
                   position: 'absolute',
@@ -86,9 +81,9 @@ const BackgroundCarousel = ({ inline = false, showCaptions = false }) => {
               {showCaptions && (
                 <div style={{
                   position: 'absolute',
-                  bottom: '10%',
-                  left: '10%',
-                  right: '10%',
+                  bottom: '8%',
+                  left: '8%',
+                  right: '8%',
                   zIndex: 2,
                   color: 'white',
                   textShadow: '0 4px 12px rgba(0,0,0,0.9)'
