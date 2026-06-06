@@ -2,13 +2,13 @@
 
 Bienvenido al repositorio oficial del **Sistema Web de Turismo Local**, un proyecto universitario diseñado bajo una arquitectura cliente-servidor desacoplada.
 
-## 📖 Descripción General
+##  Descripción General
 Este sistema es una Prueba de Concepto (PoC) y Producto Mínimo Viable (MVP) para promover el turismo a nivel cantonal. 
 El flujo principal consiste en que los turistas escanean un **código QR físico** ubicado estratégicamente en un pueblo, el cual los redirige a la aplicación. Una vez allí, pueden iniciar sesión de forma segura utilizando su cuenta de Google (SSO) y acceder a un listado de lugares turísticos, restaurantes, miradores y más.
 
 Incluye funcionalidades extra (Bonus) como un **Panel de Administración protegido** para realizar un CRUD completo de lugares y pueblos.
 
-## 🛠️ Stack Utilizado
+##  Stack Utilizado
 
 ### Frontend (SPA)
 *   **Librería Principal:** React.js optimizado con Vite.
@@ -31,7 +31,7 @@ Incluye funcionalidades extra (Bonus) como un **Panel de Administración protegi
 
 ---
 
-## 🚀 Instrucciones para correr localmente
+##  Instrucciones para correr localmente
 
 ### Requisitos previos
 *   Node.js (v18+)
@@ -55,7 +55,7 @@ Incluye funcionalidades extra (Bonus) como un **Panel de Administración protegi
 
 ---
 
-## 🌍 URLs Desplegadas (Producción)
+##  URLs Desplegadas (Producción)
 La aplicación se encuentra desplegada públicamente y conectada al pipeline CI/CD de GitHub Actions.
 
 *   **Aplicación Web (Vercel):** [https://turismo-webv1.vercel.app](https://turismo-webv1.vercel.app)
@@ -78,7 +78,7 @@ La aplicación se encuentra desplegada públicamente y conectada al pipeline CI/
 
 ---
 
-## 📱 QR de Prueba
+##  QR de Prueba
 Puedes escanear este código QR directamente desde tu dispositivo móvil para ingresar a un pueblo de prueba en el sistema en producción.
 
 ![QR de Acceso a Santa María](https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://turismo-webv1.vercel.app/p/santa-maria)
