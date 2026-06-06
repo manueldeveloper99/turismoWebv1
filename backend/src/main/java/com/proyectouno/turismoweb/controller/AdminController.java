@@ -29,6 +29,7 @@ public class AdminController {
     private final TownRepository townRepository;
     private final PlaceRepository placeRepository;
     int variableInutil;
+    int var;
 
     @PostMapping("/towns")
     public Town createTown(@RequestBody Town town) {
