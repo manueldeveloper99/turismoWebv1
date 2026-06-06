@@ -16,6 +16,8 @@ const PlacesPage = () => {
   const { townSlug } = useParams();
   const location = useLocation();
   const [places, setPlaces] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [town, setTown] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [viewMode, setViewMode] = useState('mapa'); // 'lista', 'mapa'
@@ -121,9 +123,18 @@ const PlacesPage = () => {
     });
   };
 
+  const uniqueCategories = ['Todos', ...new Set(places.map(p => p.category).filter(Boolean))];
+
+  const filteredPlaces = places.filter(place => {
+    const matchesCategory = selectedCategory === 'Todos' || place.category === selectedCategory;
+    const matchesSearch = place.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          (place.description && place.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesCategory && matchesSearch;
+  });
+
   const centerCoords = selectedPlace?.latitude
     ? [selectedPlace.latitude, selectedPlace.longitude]
-    : (places.length > 0 && places[0].latitude ? [places[0].latitude, places[0].longitude] : [10, -84]);
+    : (filteredPlaces.length > 0 && filteredPlaces[0].latitude ? [filteredPlaces[0].latitude, filteredPlaces[0].longitude] : [10, -84]);
 
   return (
     <Container className="mt-4 pb-5">
@@ -156,11 +167,45 @@ const PlacesPage = () => {
         </div>
       </div>
 
+      {/* Barra de Búsqueda y Filtros */}
+      <div className="bg-white p-3 rounded-4 shadow-sm mb-4">
+        <Row className="g-3 align-items-center">
+          <Col md={5}>
+            <div className="position-relative">
+              <span className="position-absolute top-50 translate-middle-y ms-3" style={{ color: '#adb5bd' }}>🔍</span>
+              <input 
+                type="text" 
+                className="form-control rounded-pill ps-5" 
+                placeholder="Buscar lugar turístico..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </Col>
+          <Col md={7}>
+            <div className="d-flex flex-wrap gap-2">
+              {uniqueCategories.map(cat => (
+                <Badge 
+                  key={cat} 
+                  bg={selectedCategory === cat ? 'primary' : 'light'} 
+                  text={selectedCategory === cat ? 'white' : 'dark'}
+                  className="px-3 py-2 rounded-pill"
+                  style={{ cursor: 'pointer', border: selectedCategory === cat ? '1px solid #0d6efd' : '1px solid #dee2e6', fontSize: '0.9rem', fontWeight: '500' }}
+                  onClick={() => setSelectedCategory(cat)}
+                >
+                  {cat}
+                </Badge>
+              ))}
+            </div>
+          </Col>
+        </Row>
+      </div>
+
       <Row>
         {/* Left Column: List */}
         <Col md={viewMode === 'lista' ? 12 : 4} className={`mb-4 ${viewMode === 'mapa' ? 'd-none d-md-block' : ''}`} style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '15px', overflowX: 'hidden' }}>
           <Row>
-            {places.map((place, index) => (
+            {filteredPlaces.map((place, index) => (
               <Col md={viewMode === 'lista' ? 6 : 12} lg={viewMode === 'lista' ? 4 : 12} key={place.id}>
                 <Card
                   key={place.id}
@@ -195,7 +240,13 @@ const PlacesPage = () => {
               </Col>
             ))}
           </Row>
-          {places.length === 0 && <p className="text-muted">No hay lugares registrados.</p>}
+          {filteredPlaces.length === 0 && (
+            <div className="text-center p-5 text-muted bg-white rounded-4 shadow-sm border">
+              <span style={{ fontSize: '2rem' }}>🕵️‍♂️</span>
+              <p className="mt-2 mb-0 fw-bold">No se encontraron lugares</p>
+              <small>Intenta buscar con otras palabras o selecciona "Todos"</small>
+            </div>
+          )}
         </Col>
 
         {/* Right Column: Map */}
@@ -212,7 +263,7 @@ const PlacesPage = () => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {places.filter(p => p.latitude && p.longitude).map((place, index) => (
+              {filteredPlaces.filter(p => p.latitude && p.longitude).map((place, index) => (
                 <MarkerWithPopup key={place.id} place={place} index={index} />
               ))}
             </MapContainer>
