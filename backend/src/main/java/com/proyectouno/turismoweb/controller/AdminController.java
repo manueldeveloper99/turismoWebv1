@@ -28,8 +28,6 @@ public class AdminController {
     private final UserRepository userRepository;
     private final TownRepository townRepository;
     private final PlaceRepository placeRepository;
-    int a;
-    int u;
 
     @PostMapping("/towns")
     public Town createTown(@RequestBody Town town) {
@@ -114,5 +112,13 @@ public class AdminController {
         stats.put("recentPlaces", recentPlaces);
 
         return ResponseEntity.ok(stats);
+    }
+
+    // Método inútil para probar SonarQube
+    private void funcionInutilParaPruebaSonarQube() {
+        String variableSinUsar = "Esta variable nunca se utiliza y gastará memoria";
+        if (true) {
+            System.out.println("Uso de System.out en lugar de Logger, y un if(true) que siempre se cumple");
+        }
     }
 }
