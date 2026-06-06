@@ -287,7 +287,7 @@ const AdminPanel = () => {
           <ShieldAlert size={48} className="mb-3 text-danger" />
           <h3 className="fw-bold">Acceso Denegado</h3>
           <p>Esta sección es exclusiva para Administradores de Turismo Local UNA.</p>
-          <Button variant="outline-danger" onClick={() => window.location.href = '/'}>Volver al Inicio</Button>
+          <Button variant="outline-danger" onClick={() => window.location.href = '/'}>Volver</Button>
         </Alert>
       </Container>
     );
