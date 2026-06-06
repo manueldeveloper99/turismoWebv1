@@ -207,10 +207,10 @@ const LandingPage = () => {
               <Card.Body>
                 {/* Redes sociales */}
                 <div className="mb-4 d-flex justify-content-center gap-4">
-                  <a href="#" className="social-icon" style={{ color: '#1877F2' }}><FacebookIcon /></a>
-                  <a href="#" className="social-icon" style={{ color: '#E4405F' }}><InstagramIcon /></a>
-                  <a href="#" className="social-icon" style={{ color: '#000000' }}><TiktokIcon /></a>
-                  <a href="#" className="social-icon" style={{ color: '#FF0000' }}><YoutubeIcon /></a>
+                  <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#1877F2' }}><FacebookIcon /></a>
+                  <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#E4405F' }}><InstagramIcon /></a>
+                  <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#000000' }}><TiktokIcon /></a>
+                  <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#FF0000' }}><YoutubeIcon /></a>
                 </div>
 
                 <div className="d-flex flex-column align-items-center mb-4">
