@@ -32,6 +32,7 @@ public class AdminController {
     int var;
     int var2;
     int a;
+    int b;
 
     @PostMapping("/towns")
     public Town createTown(@RequestBody Town town) {
