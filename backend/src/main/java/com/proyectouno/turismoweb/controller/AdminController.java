@@ -114,11 +114,4 @@ public class AdminController {
         return ResponseEntity.ok(stats);
     }
 
-    // Método inútil para probar SonarQube
-    private void funcionInutilParaPruebaSonarQube() {
-        String variableSinUsar = "Esta variable nunca se utiliza y gastará memoria";
-        if (true) {
-            System.out.println("Uso de System.out en lugar de Logger, y un if(true) que siempre se cumple");
-        }
-    }
 }
