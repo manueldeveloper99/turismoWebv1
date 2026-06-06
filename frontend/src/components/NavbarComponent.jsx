@@ -22,7 +22,8 @@ const NavbarComponent = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/');
+    setUserDb(null);
+    window.location.href = '/';
   };
 
   let user = null;
@@ -92,7 +93,7 @@ const NavbarComponent = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              {userDb?.role === 'ROLE_ADMIN' && <Nav.Link onClick={() => navigate('/admin')}>Panel Admin</Nav.Link>}
+              {token && userDb?.role === 'ROLE_ADMIN' && <Nav.Link onClick={() => navigate('/admin')} style={{ color: '#00bfa5', fontWeight: '600' }}>Panel Admin</Nav.Link>}
             </Nav>
 
             {user ? (
