@@ -55,7 +55,7 @@ describe('NavbarComponent', () => {
     expect(localStorage.getItem('token')).toBeNull();
     expect(window.location.href).toBe('/');
 
-    // Restore window.location
+    // Restore window.location1
     window.location = originalLocation;
   });
 });
