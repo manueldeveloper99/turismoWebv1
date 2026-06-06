@@ -26,7 +26,7 @@ describe('NavbarComponent', () => {
 
   it('renders brand name correctly', () => {
     renderWithRouter(<NavbarComponent />);
-    expect(screen.getByText('Turismo Web CR')).toBeInTheDocument();
+    expect(screen.getByText('Turismo Local CR')).toBeInTheDocument();
   });
 
   it('does not show logout button when no token is present', () => {
@@ -38,6 +38,11 @@ describe('NavbarComponent', () => {
     // Set a dummy token
     localStorage.setItem('token', 'dummy.token.here');
     
+    // Mock window.location
+    const originalLocation = window.location;
+    delete window.location;
+    window.location = { href: '' };
+    
     renderWithRouter(<NavbarComponent />);
     
     // As the token is invalid JSON base64, user won't be parsed, but token exists
@@ -48,6 +53,9 @@ describe('NavbarComponent', () => {
     fireEvent.click(logoutBtn);
     
     expect(localStorage.getItem('token')).toBeNull();
-    expect(mockNavigate).toHaveBeenCalledWith('/');
+    expect(window.location.href).toBe('/');
+    
+    // Restore window.location
+    window.location = originalLocation;
   });
 });
