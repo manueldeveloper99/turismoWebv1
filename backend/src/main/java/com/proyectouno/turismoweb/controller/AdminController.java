@@ -116,7 +116,8 @@ public class AdminController {
 
     int function1(int n1, int n2) {
         // esto no hace nada
-        return n1 + n2;
+
+        return 0;
     }
 
 }
