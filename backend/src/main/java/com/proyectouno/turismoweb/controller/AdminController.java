@@ -28,12 +28,6 @@ public class AdminController {
     private final UserRepository userRepository;
     private final TownRepository townRepository;
     private final PlaceRepository placeRepository;
-    int variableInutil;
-    int var;
-    int var2;
-    int a;
-    int b;
-    int c;
 
     @PostMapping("/towns")
     public Town createTown(@RequestBody Town town) {
@@ -119,11 +113,4 @@ public class AdminController {
 
         return ResponseEntity.ok(stats);
     }
-
-    int function1(int n1, int n2) {
-        // esto no hace nada
-
-        return 0;
-    }
-
 }
