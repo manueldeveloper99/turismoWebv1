@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react'; //Alegr
 import { Navbar, Container, Nav, Button, NavDropdown } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import api from '../services/api';
 
 const NavbarComponent = () => {
   const navigate = useNavigate();
@@ -13,9 +14,6 @@ const NavbarComponent = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const apiModule = await import('../services/api');
-      const api = apiModule.default;
-
       if (token) {
         api.get('/users/me')
           .then(res => setUserDb(res.data))
