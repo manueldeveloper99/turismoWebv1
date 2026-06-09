@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badg
 import api from '../services/api';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import QRPoster from '../components/QRPoster';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   Landmark,
@@ -14,9 +15,10 @@ import {
   QrCode,
   Plus,
   ShieldAlert,
-} from 'lucide-react';
+} from 'lucide-react'; //Alegr
 
 const AdminPanel = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('lugares');
   const [towns, setTowns] = useState([]);
   const [selectedTown, setSelectedTown] = useState(null);
@@ -245,7 +247,7 @@ const AdminPanel = () => {
         await api.put(`/admin/places/${p.id}`, updateData);
         fetchStats().catch(() => {});
       } catch (innerErr) {
-        // 4. Revertimos silenciosamente solo si todo falla. No mostramos showMessage por error.
+        // Revertimos silenciosamente solo si todo falla. No mostramos showMessage por error. //Alegr
         setPlaces(prev => prev.map(item => item.id === p.id ? { ...item, active: originalStatus } : item));
         console.error("Error persistente al cambiar estado:", innerErr);
         showMessage('No se pudo actualizar el estado en el servidor', 'danger');
@@ -314,19 +316,19 @@ const AdminPanel = () => {
         <Col md={2} style={sidebarStyle} className="p-3">
           <Nav className="flex-column mt-3">
             <Nav.Link style={navItemStyle('dashboard')} onClick={() => setActiveTab('dashboard')}>
-              <LayoutDashboard size={18} /> Dashboard
+              <LayoutDashboard size={18} /> {t('admin.dashboard')}
             </Nav.Link>
             <Nav.Link style={navItemStyle('pueblos')} onClick={() => setActiveTab('pueblos')}>
-              <Landmark size={18} /> Pueblos
+              <Landmark size={18} /> {t('admin.towns')}
             </Nav.Link>
             <Nav.Link style={navItemStyle('lugares')} onClick={() => setActiveTab('lugares')}>
-              <MapPin size={18} /> Lugares
+              <MapPin size={18} /> {t('admin.places')}
             </Nav.Link>
             <Nav.Link style={navItemStyle('usuarios')} onClick={() => setActiveTab('usuarios')}>
-              <Users size={18} /> Usuarios
+              <Users size={18} /> {t('admin.users')}
             </Nav.Link>
             <Nav.Link style={navItemStyle('estadisticas')} onClick={() => setActiveTab('estadisticas')}>
-              <BarChart3 size={18} /> Estadísticas
+              <BarChart3 size={18} /> {t('admin.stats')}
             </Nav.Link>
           </Nav>
         </Col>

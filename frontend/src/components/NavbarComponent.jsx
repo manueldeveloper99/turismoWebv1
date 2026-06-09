@@ -1,21 +1,33 @@
-import { useState, useEffect } from 'react';
-import { Navbar, Container, Nav, Button } from 'react-bootstrap';
+import { useState, useEffect, useCallback } from 'react';
+import { Navbar, Container, Nav, Button, NavDropdown } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { LogOut, Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const NavbarComponent = () => {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const token = localStorage.getItem('token');
   const [userDb, setUserDb] = useState(null);
+  const [towns, setTowns] = useState([]);
 
   useEffect(() => {
-    if (token) {
-      import('../services/api').then(module => {
-        module.default.get('/users/me').then(res => {
-          setUserDb(res.data);
-        }).catch(e => console.error(e));
-      });
-    }
+    const fetchData = async () => {
+      const apiModule = await import('../services/api');
+      const api = apiModule.default;
+
+      if (token) {
+        api.get('/users/me')
+          .then(res => setUserDb(res.data))
+          .catch(e => console.error(e));
+      }
+
+      api.get('/towns')
+        .then(res => setTowns(res.data))
+        .catch(e => console.error(e));
+    };
+
+    fetchData();
   }, [token]);
 
   const handleLogout = () => {
@@ -91,15 +103,38 @@ const NavbarComponent = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
+              <NavDropdown title={t('nav.select_town')} id="town-dropdown">
+                {towns.map(town => (
+                  <NavDropdown.Item key={town.id} onClick={() => navigate(`/p/${town.slug}/places`)}>
+                    📍 {town.name}
+                  </NavDropdown.Item>
+                ))}
+              </NavDropdown>
+
               {token && userDb?.role === 'ROLE_ADMIN' && (
                 <Nav.Link 
                   onClick={() => navigate('/admin')} 
                   style={{ color: '#00bfa5', fontWeight: '600' }}
                 >
-                  Panel Admin
+                  {t('nav.admin')}
                 </Nav.Link>
               )}
             </Nav>
+
+            <div className="d-flex align-items-center me-3">
+              <Button 
+                variant="link" 
+                className="text-white p-0 me-2 text-decoration-none" 
+                onClick={() => { i18n.changeLanguage('es'); localStorage.setItem('i18nextLng', 'es'); }}
+              >ES</Button>
+              <span className="text-white-50">|</span>
+              <Button 
+                variant="link" 
+                className="text-white p-0 ms-2 text-decoration-none" 
+                onClick={() => { i18n.changeLanguage('en'); localStorage.setItem('i18nextLng', 'en'); }}
+              >EN</Button>
+              <Globe size={18} className="text-white ms-2" />
+            </div>
 
             {user ? (
               <div className="d-flex align-items-center">
@@ -114,12 +149,12 @@ const NavbarComponent = () => {
                 <span className="text-white me-3" style={{ fontSize: '0.9rem' }}>
                   {user.name}
                 </span>
-                <Button variant="outline-light" size="sm" onClick={handleLogout} title="Cerrar Sesión">
+                <Button variant="outline-light" size="sm" onClick={handleLogout} title={t('nav.logout')}>
                   <LogOut size={18} />
                 </Button>
               </div>
             ) : (
-              token && <Button variant="outline-light" onClick={handleLogout}>Cerrar Sesión</Button>
+              token && <Button variant="outline-light" onClick={handleLogout}>{t('nav.logout')}</Button>
             )}
           </Navbar.Collapse>
         </Container>
