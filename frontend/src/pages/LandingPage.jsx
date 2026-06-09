@@ -19,16 +19,16 @@ const TiktokIcon = () => (
 );
 
 const MapPinIcon = ({ size = 16, className, style }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2.5" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     className={className}
     style={style}
   >
@@ -39,15 +39,15 @@ const MapPinIcon = ({ size = 16, className, style }) => (
 
 const BirdSilhouette = ({ size = 40, className }) => (
   <div className={`bird ${className}`}>
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width={size} 
-      height={size} 
-      viewBox="0 0 100 100" 
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 100 100"
     >
-      <path 
-        fill="#004d40" 
-        d="M10,60 C25,20 40,40 50,55 C60,40 75,20 90,60 C75,40 60,50 50,65 C40,50 25,40 10,60 Z" 
+      <path
+        fill="#004d40"
+        d="M10,60 C25,20 40,40 50,55 C60,40 75,20 90,60 C75,40 60,50 50,65 C40,50 25,40 10,60 Z"
       />
     </svg>
   </div>
@@ -86,7 +86,7 @@ const LandingPage = () => {
 
       {/* Mitad Derecha: Contenido QR con Scroll */}
       <Col md={5} lg={5} xs={12} className="p-0" style={{ backgroundColor: '#f4f6f8', height: '100vh', overflowY: 'auto', overflowX: 'hidden', position: 'relative' }}>
-        
+
         {/* Animaciones de Fauna Tica */}
         <style>{`
           @keyframes flySlowly {
@@ -149,7 +149,7 @@ const LandingPage = () => {
             background: #ffffff;
           }
         `}</style>
-        
+
         <BirdSilhouette className="bird-1" size={80} />
         <BirdSilhouette className="bird-2" size={50} />
         <BirdSilhouette className="bird-3" size={110} />
@@ -169,84 +169,84 @@ const LandingPage = () => {
         <div className="d-flex flex-column align-items-center" style={{ minHeight: '100%', padding: '40px 20px', position: 'relative', zIndex: 1 }}>
           <div style={{ flexGrow: 1 }}></div>
           <div style={{ width: '100%', maxWidth: '500px', flexShrink: 0 }}>
-          
-          {/* Selección de pueblos (estilo píldoras) */}
-          {towns.length > 1 && (
-            <Card className="mb-4 shadow-sm" style={{ borderRadius: '20px 0px 20px 0px', border: 'none' }}>
-              <Card.Body className="p-3">
-                <h6 className="fw-bold mb-3 text-center" style={{ color: '#004d40' }}>Selecciona un Pueblo:</h6>
-                <div className="d-flex flex-wrap justify-content-center gap-2">
-                  {towns.map(t => (
-                    <button
-                      key={t.id}
-                      onClick={() => setSelectedTown(t)}
-                      className="btn btn-sm"
-                      style={{
-                        backgroundColor: selectedTown?.id === t.id ? '#00bfa5' : '#e9ecef',
-                        color: selectedTown?.id === t.id ? 'white' : '#495057',
-                        borderRadius: '20px',
-                        fontWeight: '600',
-                        padding: '6px 15px',
-                        border: 'none',
-                        transition: 'all 0.2s',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <MapPinIcon size={14} /> {t.name}
-                    </button>
-                  ))}
+
+            {/* Selección de pueblos (estilo píldoras) */}
+            {towns.length > 1 && (
+              <Card className="mb-4 shadow-sm" style={{ borderRadius: '20px 0px 20px 0px', border: 'none' }}>
+                <Card.Body className="p-3">
+                  <h6 className="fw-bold mb-3 text-center" style={{ color: '#004d40' }}>Selecciona un Pueblo:</h6>
+                  <div className="d-flex flex-wrap justify-content-center gap-2">
+                    {towns.map(t => (
+                      <button
+                        key={t.id}
+                        onClick={() => setSelectedTown(t)}
+                        className="btn btn-sm"
+                        style={{
+                          backgroundColor: selectedTown?.id === t.id ? '#00bfa5' : '#e9ecef',
+                          color: selectedTown?.id === t.id ? 'white' : '#495057',
+                          borderRadius: '20px',
+                          fontWeight: '600',
+                          padding: '6px 15px',
+                          border: 'none',
+                          transition: 'all 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <MapPinIcon size={14} /> {t.name}
+                      </button>
+                    ))}
+                  </div>
+                </Card.Body>
+              </Card>
+            )}
+
+            {/* Tarjeta principal del QR */}
+            <Card className="text-center p-4 shadow-lg" style={glassStyle}>
+              <Card.Body>
+                {/* Redes sociales */}
+                <div className="mb-4 d-flex justify-content-center gap-4">
+                  <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#1877F2' }}><FacebookIcon /></a>
+                  <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#E4405F' }}><InstagramIcon /></a>
+                  <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#000000' }}><TiktokIcon /></a>
+                  <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#FF0000' }}><YoutubeIcon /></a>
+                </div>
+
+                <div className="d-flex flex-column align-items-center mb-4">
+                  {loading ? (
+                    <Spinner animation="border" variant="success" />
+                  ) : selectedTown ? (
+                    <>
+                      <QRPoster
+                        townSlug={selectedTown.slug}
+                        townName={selectedTown.name}
+                        exactUrl={`${window.location.origin}/p/${selectedTown.slug}`}
+                      />
+                      <h4 className="mt-3 fw-bold" style={{ color: '#004d40' }}>{selectedTown.name}</h4>
+                    </>
+                  ) : (
+                    <div className="p-5 border border-dashed rounded text-muted">
+                      No hay pueblos registrados
+                    </div>
+                  )}
+                </div>
+
+                <p className="mb-4 text-muted" style={{ fontSize: '0.95rem', fontWeight: '500' }}>
+                  Escanea el código QR físico ubicado en el pueblo para ver sus lugares turísticos.
+                </p>
+
+                <style>{`.admin-lock:hover { color: #00bfa5 !important; }`}</style>
+                <div className="mt-3 text-end">
+                  <Link to="/login" style={{ color: '#dee2e6' }} title="Acceso Administrativo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="admin-lock" style={{ transition: 'color 0.2s' }}>
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                  </Link>
                 </div>
               </Card.Body>
             </Card>
-          )}
-
-          {/* Tarjeta principal del QR */}
-          <Card className="text-center p-4 shadow-lg" style={glassStyle}>
-            <Card.Body>
-              {/* Redes sociales */}
-              <div className="mb-4 d-flex justify-content-center gap-4">
-                <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#1877F2' }}><FacebookIcon /></a>
-                <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#E4405F' }}><InstagramIcon /></a>
-                <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#000000' }}><TiktokIcon /></a>
-                <a href="https://x.com/elonmusk" target="_blank" rel="noopener noreferrer" className="social-icon" style={{ color: '#FF0000' }}><YoutubeIcon /></a>
-              </div>
-
-              <div className="d-flex flex-column align-items-center mb-4">
-                {loading ? (
-                  <Spinner animation="border" variant="success" />
-                ) : selectedTown ? (
-                  <>
-                    <QRPoster 
-                      townSlug={selectedTown.slug} 
-                      townName={selectedTown.name} 
-                      exactUrl={`${window.location.origin}/p/${selectedTown.slug}`} 
-                    />
-                    <h4 className="mt-3 fw-bold" style={{ color: '#004d40' }}>{selectedTown.name}</h4>
-                  </>
-                ) : (
-                  <div className="p-5 border border-dashed rounded text-muted">
-                    No hay pueblos registrados
-                  </div>
-                )}
-              </div>
-              
-              <p className="mb-4 text-muted" style={{ fontSize: '0.95rem', fontWeight: '500' }}>
-                Escanea el código QR físico ubicado en el pueblo para ver sus lugares turísticos.
-              </p>
-
-              <style>{`.admin-lock:hover { color: #00bfa5 !important; }`}</style>
-              <div className="mt-3 text-end">
-                <Link to="/login" style={{ color: '#dee2e6' }} title="Acceso Administrativo">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="admin-lock" style={{ transition: 'color 0.2s' }}>
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
-                </Link>
-              </div>
-            </Card.Body>
-          </Card>
           </div>
           <div style={{ flexGrow: 1 }}></div>
         </div>

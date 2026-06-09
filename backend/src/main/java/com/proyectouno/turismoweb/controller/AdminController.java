@@ -88,11 +88,11 @@ public class AdminController {
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getStats() {
         Map<String, Object> stats = new HashMap<>();
-        
+
         long totalTowns = townRepository.count();
         long totalPlaces = placeRepository.count();
         long totalUsers = userRepository.count();
-        
+
         stats.put("totalTowns", totalTowns);
         stats.put("totalPlaces", totalPlaces);
         stats.put("totalUsers", totalUsers);
@@ -113,4 +113,5 @@ public class AdminController {
 
         return ResponseEntity.ok(stats);
     }
+
 }

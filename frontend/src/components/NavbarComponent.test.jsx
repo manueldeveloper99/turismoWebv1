@@ -37,25 +37,25 @@ describe('NavbarComponent', () => {
   it('handles logout correctly', () => {
     // Set a dummy token
     localStorage.setItem('token', 'dummy.token.here');
-    
+
     // Mock window.location
     const originalLocation = window.location;
     delete window.location;
     window.location = { href: '' };
-    
+
     renderWithRouter(<NavbarComponent />);
-    
+
     // As the token is invalid JSON base64, user won't be parsed, but token exists
     // so the fallback button "Cerrar Sesión" (text) should be present
     const logoutBtn = screen.getByText('Cerrar Sesión');
     expect(logoutBtn).toBeInTheDocument();
-    
+
     fireEvent.click(logoutBtn);
-    
+
     expect(localStorage.getItem('token')).toBeNull();
     expect(window.location.href).toBe('/');
-    
-    // Restore window.location
+
+    // Restore window.location1
     window.location = originalLocation;
   });
 });
