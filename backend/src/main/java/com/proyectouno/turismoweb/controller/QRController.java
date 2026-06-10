@@ -36,7 +36,11 @@ public class QRController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         try {
-            String url = frontendUrl + "/p/" + slug;
+            // Aseguramos que no haya doble diagonal si frontendUrl termina en /
+            String baseUrl = frontendUrl.endsWith("/") 
+                ? frontendUrl.substring(0, frontendUrl.length() - 1) : frontendUrl;
+            String url = baseUrl + "/p/" + slug;
+
             QRCodeWriter writer = new QRCodeWriter();
             BitMatrix matrix = writer.encode(url, BarcodeFormat.QR_CODE, 300, 300);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
