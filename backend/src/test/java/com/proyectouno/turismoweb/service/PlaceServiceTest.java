@@ -72,4 +72,10 @@ public class PlaceServiceTest {
         assertEquals("Mirador", savedPlace.getName());
         verify(placeRepository).save(place1);
     }
+
+    @Test
+    void testDeletePlace() {
+        placeService.deletePlace(1L);
+        verify(placeRepository).deleteById(1L);
+    }
 }

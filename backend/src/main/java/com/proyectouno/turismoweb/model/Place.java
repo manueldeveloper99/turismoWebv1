@@ -30,6 +30,7 @@ public class Place {
     private Double latitude;
     private Double longitude;
 
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default true")
     private Boolean active = true;
 

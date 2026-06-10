@@ -72,4 +72,21 @@ public class TownServiceTest {
         assertFalse(result.isPresent());
         verify(townRepository).findBySlug("unknown");
     }
+
+    @Test
+    void testSaveTown() {
+        when(townRepository.save(any(Town.class))).thenReturn(town1);
+
+        Town savedTown = townService.saveTown(town1);
+
+        assertNotNull(savedTown);
+        assertEquals("Santa María", savedTown.getName());
+        verify(townRepository).save(town1);
+    }
+
+    @Test
+    void testDeleteTown() {
+        townService.deleteTown(1L);
+        verify(townRepository).deleteById(1L);
+    }
 }
