@@ -24,7 +24,7 @@ jobs:
           cache: maven
 
       - name: Build and Test Backend
-        run: mvn -B test
+        run: mvn -B verify
         working-directory: ./backend
 
       - name: Analyze Backend with SonarCloud
