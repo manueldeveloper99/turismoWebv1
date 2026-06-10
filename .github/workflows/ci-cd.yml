@@ -48,4 +48,11 @@ jobs:
         run: npm run build
         working-directory: ./frontend
 
+      - name: Send Discord Notification
+        if: always()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -d "{\"content\": \"🚀 **Alerta del Pipeline (Turismo Web)**\n👤 **Autor:** ${{ github.actor }}\n🌿 **Rama:** ${{ github.ref_name }}\n✅ **Estado:** ${{ job.status }}\n🔗 **Ver más:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+          ${{ secrets.DISCORD_WEBHOOK }}
+
   # TODO: Agregar Job de Deploy (GCP Cloud Run o Firebase) dependiendo de la configuración de Secrets.
