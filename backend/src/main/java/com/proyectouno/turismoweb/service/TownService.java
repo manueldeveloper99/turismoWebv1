@@ -28,4 +28,8 @@ public class TownService {
     public void deleteTown(Long id) {
         townRepository.deleteById(id);
     }
+
+    public long countTowns() {
+        return townRepository.count();
+    }
 }

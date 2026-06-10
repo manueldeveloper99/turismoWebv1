@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,6 +41,40 @@ public class UserServiceTest {
         normalUser.setEmail("user@gmail.com");
         normalUser.setRole("ROLE_USER");
         normalUser.setActive(true);
+    }
+
+    @Test
+    void testGetOrCreateUser_ExistingUser() {
+        when(userRepository.findByEmail("admin@gmail.com")).thenReturn(Optional.of(adminUser));
+
+        User result = userService.getOrCreateUser("admin@gmail.com", "Admin", "url");
+
+        assertEquals("admin@gmail.com", result.getEmail());
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void testGetOrCreateUser_NewUser_FirstUserIsAdmin() {
+        when(userRepository.findByEmail("new@gmail.com")).thenReturn(Optional.empty());
+        when(userRepository.count()).thenReturn(0L);
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        User result = userService.getOrCreateUser("new@gmail.com", "New User", "url");
+
+        assertEquals("ROLE_ADMIN", result.getRole());
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void testGetOrCreateUser_NewUser_SubsequentUserIsRegular() {
+        when(userRepository.findByEmail("user2@gmail.com")).thenReturn(Optional.empty());
+        when(userRepository.count()).thenReturn(5L);
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        User result = userService.getOrCreateUser("user2@gmail.com", "User 2", "url");
+
+        assertEquals("ROLE_USER", result.getRole());
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
@@ -74,5 +110,35 @@ public class UserServiceTest {
 
         assertFalse(updatedUser.getActive());
         verify(userRepository).save(normalUser);
+    }
+
+    @Test
+    void testUpdateStatus_LastAdminThrowsException() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(adminUser));
+        when(userRepository.countByRole("ROLE_ADMIN")).thenReturn(1L);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            userService.updateStatus(1L, false);
+        });
+
+        assertTrue(exception.getMessage().contains("El sistema debe tener al menos un administrador activo"));
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void testCountUsers() {
+        when(userRepository.count()).thenReturn(10L);
+        assertEquals(10L, userService.countUsers());
+        verify(userRepository).count();
+    }
+
+    @Test
+    void testGetAllUsers() {
+        when(userRepository.findAll()).thenReturn(Arrays.asList(adminUser, normalUser));
+        
+        List<User> users = userService.getAllUsers();
+        
+        assertEquals(2, users.size());
+        verify(userRepository).findAll();
     }
 }
