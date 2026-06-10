@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -128,5 +130,15 @@ public class UserServiceTest {
         when(userRepository.count()).thenReturn(10L);
         assertEquals(10L, userService.countUsers());
         verify(userRepository).count();
+    }
+
+    @Test
+    void testGetAllUsers() {
+        when(userRepository.findAll()).thenReturn(Arrays.asList(adminUser, normalUser));
+        
+        List<User> users = userService.getAllUsers();
+        
+        assertEquals(2, users.size());
+        verify(userRepository).findAll();
     }
 }
