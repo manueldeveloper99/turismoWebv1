@@ -26,7 +26,7 @@ describe('NavbarComponent', () => {
 
   it('renders brand name correctly', () => {
     renderWithRouter(<NavbarComponent />);
-    expect(screen.getByText('Turismo Local CR')).toBeInTheDocument();
+    expect(screen.getByText('Turismo Reprobado')).toBeInTheDocument();
   });
 
   it('does not show logout button when no token is present', () => {
