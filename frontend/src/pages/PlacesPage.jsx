@@ -36,7 +36,7 @@ const MarkerWithPopup = ({ place, index, isSelected, onSelect, getCategoryColor,
       <Popup className="custom-popup" autoPan={false}>
         <div style={{ width: '200px' }}>
           <img src={place.imageUrl || 'https://via.placeholder.com/200'} alt={place.name} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px 8px 0 0', marginBottom: '8px' }} />
-          <h6 className="fw-bold mb-1">{place.name}</h6>
+          <h6 className="fw-bold mb-1 text-truncate">{index + 1}. {place.name}</h6>
           <span className="badge rounded-pill mb-2" style={{backgroundColor: getCategoryColor(place.category), color: '#fff'}}>{place.category}</span>
           <p style={{ fontSize: '0.8rem', margin: 0 }} className="text-truncate">{place.description}</p>
         </div>
@@ -44,6 +44,14 @@ const MarkerWithPopup = ({ place, index, isSelected, onSelect, getCategoryColor,
     </Marker>
   );
 };
+
+// Icono personalizado para el usuario (Punto azul con borde blanco)
+const userIcon = L.divIcon({
+  className: 'user-location-marker',
+  html: `<div style="background-color: #0d6efd; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>`,
+  iconSize: [18, 18],
+  iconAnchor: [9, 9]
+});
 
 // Componente para el Botón GPS
 const LocationButton = ({ onLocationFound }) => {
@@ -81,37 +89,6 @@ const PlacesPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const mapRef = useRef(null);
-
-  const MarkerWithPopup = ({ place, index }) => {
-    const markerRef = useRef(null);
-    const isSelected = selectedPlace?.id === place.id;
-    
-    useEffect(() => {
-      if (isSelected && markerRef.current) {
-        markerRef.current.openPopup();
-      }
-    }, [isSelected]);
-
-    return (
-      <Marker 
-        ref={markerRef}
-        position={[place.latitude, place.longitude]}
-        icon={createCustomIcon(getCategoryColor(place.category), index + 1)}
-        eventHandlers={{
-          click: () => setSelectedPlace(place),
-        }}
-      >
-        <Popup className="custom-popup" autoPan={false}>
-          <div style={{ width: '200px' }}>
-            <img src={place.imageUrl || 'https://via.placeholder.com/200'} alt={place.name} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px 8px 0 0', marginBottom: '8px' }} />
-            <h6 className="fw-bold mb-1">{place.name}</h6>
-            <span className="badge rounded-pill mb-2" style={{backgroundColor: getCategoryColor(place.category), color: '#fff'}}>{place.category}</span>
-            <p style={{ fontSize: '0.8rem', margin: 0 }} className="text-truncate">{place.description}</p>
-          </div>
-        </Popup>
-      </Marker>
-    );
-  };
 
   useEffect(() => {
     setCurrentPage(1);
@@ -178,14 +155,6 @@ const PlacesPage = () => {
       popupAnchor: [0, -35]
     });
   };
-
-  // Icono personalizado para el usuario (Punto azul con borde blanco)
-  const userIcon = L.divIcon({
-    className: 'user-location-marker',
-    html: `<div style="background-color: #0d6efd; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>`,
-    iconSize: [18, 18],
-    iconAnchor: [9, 9]
-  });
 
   const centerCoords = selectedPlace?.latitude 
     ? [selectedPlace.latitude, selectedPlace.longitude] 

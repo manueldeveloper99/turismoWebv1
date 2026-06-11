@@ -3,7 +3,7 @@ import { Button, Card, Form, InputGroup } from 'react-bootstrap';
 import { MessageSquare, Send, X, Bot, Sparkles, Smile, Meh, Frown } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import api from '../services/api';
-// Alegr 
+
 const AIChatbot = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
