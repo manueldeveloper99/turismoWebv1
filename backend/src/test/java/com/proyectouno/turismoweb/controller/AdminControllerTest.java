@@ -1,7 +1,6 @@
 package com.proyectouno.turismoweb.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.proyectouno.turismoweb.model.Place;
 import com.proyectouno.turismoweb.model.Place;
 import com.proyectouno.turismoweb.model.Town;
 import com.proyectouno.turismoweb.model.User;
