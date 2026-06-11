@@ -8,16 +8,18 @@ import BackgroundCarousel from './BackgroundCarousel';
 describe('Componente BackgroundCarousel', () => {
   it('debe renderizar el contenedor del carrusel', () => {
     const { container } = render(<BackgroundCarousel />);
-    // VITEST: Usamos selectores estándar para verificar la existencia de clases de Bootstrap.
-    const carousel = container.querySelector('.carousel');
-    expect(carousel).toBeInTheDocument();
+    // VITEST: Verificamos que se rendericen las capas de imágenes del carrusel (son divs con background-image).
+    const divs = container.querySelectorAll('div');
+    const imageLayers = Array.from(divs).filter(div => div.style.backgroundImage);
+    expect(imageLayers.length).toBeGreaterThan(0);
   });
 
   it('debe tener imágenes con estilo de cobertura completa', () => {
     const { container } = render(<BackgroundCarousel />);
-    const images = container.querySelectorAll('img');
-    if (images.length > 0) {
-      expect(images[0]).toHaveStyle({ objectFit: 'cover' });
+    const divs = container.querySelectorAll('div');
+    const imageLayers = Array.from(divs).filter(div => div.style.backgroundImage);
+    if (imageLayers.length > 0) {
+      expect(imageLayers[0]).toHaveStyle({ backgroundSize: 'cover' });
     }
   });
 });

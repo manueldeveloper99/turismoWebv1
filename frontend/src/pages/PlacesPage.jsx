@@ -5,7 +5,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import api from '../services/api';
 import { useTranslation } from 'react-i18next';//Alegr
-import { MapPin, Target } from 'lucide-react';//Alegr
+import { MapPin, Target, MessageSquare } from 'lucide-react';
+import { DiscussionEmbed } from 'disqus-react';
 
 // Ayuda a que se actualice la vista del mapa al cambiar el lugar seleccionado
 function ChangeView({ center, zoom }) {
@@ -55,6 +56,7 @@ const userIcon = L.divIcon({
   iconAnchor: [9, 9]
 });
 
+
 // Componente para el Botón GPS
 const LocationButton = ({ onLocationFound }) => {
   const map = useMap();
@@ -89,7 +91,7 @@ const LocationButton = ({ onLocationFound }) => {
 
 const PlacesPage = () => {
   const { townSlug } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [places, setPlaces] = useState([]);
   const [searchPlace, setSearchPlace] = useState('');
   const [town, setTown] = useState(null);
@@ -166,6 +168,7 @@ const PlacesPage = () => {
     };
     fetchPlaces();
   }, [townSlug, currentPage]);
+
 
   const centerCoords = useMemo(() => {
     if (selectedPlace?.latitude && selectedPlace?.longitude) {
@@ -294,6 +297,31 @@ const PlacesPage = () => {
           </div>
         </Col>
       </Row>
+
+      {/* Disqus Comments Section */}
+      {selectedPlace && (
+        <Row className="mt-5">
+          <Col md={12}>
+            <Card className="shadow-sm border-0" style={{ borderRadius: '15px' }}>
+              <Card.Body className="p-4">
+                <h4 className="fw-bold mb-4 d-flex align-items-center">
+                  <MessageSquare className="me-2 text-primary" />
+                  {t('places.reviews', 'Reseñas y Comentarios')} - {selectedPlace.name}
+                </h4>
+                <DiscussionEmbed
+                  shortname="turismo-local-cr"
+                  config={{
+                    url: `${window.location.origin}/p/${townSlug}/places?destino=${selectedPlace.id}`,
+                    identifier: `place-${selectedPlace.id}`,
+                    title: selectedPlace.name,
+                    language: i18n.language || 'es_MX'
+                  }}
+                />
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      )}
     </Container>
   );
 };
