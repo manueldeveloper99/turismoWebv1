@@ -52,7 +52,7 @@ const AIChatbot = () => {
       });
 
       // Manejo robusto de la respuesta: extraemos el contenido ya sea si viene como objeto o como string directo.
-      const aiResponse = res.data?.response || (typeof res.data === 'string' ? res.data : 'Lo siento, no pude encontrar información sobre eso.');
+      const aiResponse = res.data?.response || res.data?.content || (typeof res.data === 'string' ? res.data : 'Lo siento, no recibí una respuesta clara del servidor.');
       const aiSentiment = res.data?.sentiment || 'neutral';
       const recommendedPlaces = res.data?.recommendedPlaces || [];
 
