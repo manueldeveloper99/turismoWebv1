@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'; 
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react'; 
 import { Container, Row, Col, Card, Badge, Button, Pagination } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -38,7 +38,7 @@ const MarkerWithPopup = ({ place, index, isSelected, onSelect, getCategoryColor,
       <Popup className="custom-popup" autoPan={false}>
         <div style={{ width: '200px' }}>
           <img src={place.imageUrl || 'https://via.placeholder.com/200'} alt={place.name} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px 8px 0 0', marginBottom: '8px' }} />
-          <h6 className="fw-bold mb-1">{place.name}</h6>
+          <h6 className="fw-bold mb-1 text-truncate">{index + 1}. {place.name}</h6>
           <span className="badge rounded-pill mb-2" style={{backgroundColor: getCategoryColor(place.category), color: '#fff'}}>{place.category}</span>
           <p style={{ fontSize: '0.8rem', margin: 0 }} className="text-truncate">{place.description}</p>
         </div>
@@ -47,20 +47,30 @@ const MarkerWithPopup = ({ place, index, isSelected, onSelect, getCategoryColor,
   );
 };
 
+// Icono personalizado para el usuario (Punto azul con borde blanco)
+const userIcon = L.divIcon({
+  className: 'user-location-marker',
+  html: `<div style="background-color: #0d6efd; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>`,
+  iconSize: [18, 18],
+  iconAnchor: [9, 9]
+});
+
 // Componente para el Botón GPS
 const LocationButton = ({ onLocationFound }) => {
   const map = useMap();
 
   useEffect(() => {
-    map.on("locationfound", (e) => {
+    const onLocationFoundHandler = (e) => {
       map.flyTo(e.latlng, 16);
       if (onLocationFound) onLocationFound(e.latlng);
-    });
-    return () => map.off("locationfound");
+    };
+
+    map.on("locationfound", onLocationFoundHandler);
+    return () => map.off("locationfound", onLocationFoundHandler);
   }, [map, onLocationFound]);
 
   const handleLocation = () => {
-    map.locate({ enableHighAccuracy: true });
+    map.locate({ enableHighAccuracy: true, setView: false });
   };
   return (
     <div className="leaflet-top leaflet-right" style={{ marginTop: '10px', marginRight: '10px' }}>
@@ -90,36 +100,41 @@ const PlacesPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const mapRef = useRef(null);
 
-  const MarkerWithPopup = ({ place, index }) => {
-    const markerRef = useRef(null);
-    const isSelected = selectedPlace?.id === place.id;
-    
-    useEffect(() => {
-      if (isSelected && markerRef.current) {
-        markerRef.current.openPopup();
-      }
-    }, [isSelected]);
+  // Funciones de ayuda memoizadas para evitar errores de renderizado
+  const getCategoryColor = useCallback((category) => {
+    if(!category) return '#6c757d';
+    const cat = category.toLowerCase();
+    if (cat.includes('mirador')) return '#cca300';
+    if (cat.includes('cultural') || cat.includes('histórico') || cat.includes('museo')) return '#77dd77';
+    if (cat.includes('gastronomía') || cat.includes('restaurante')) return '#ffb347';
+    if (cat.includes('parque')) return '#0d6efd';
+    return '#6c757d';
+  }, []);
 
-    return (
-      <Marker 
-        ref={markerRef}
-        position={[place.latitude, place.longitude]}
-        icon={createCustomIcon(getCategoryColor(place.category), index + 1)}
-        eventHandlers={{
-          click: () => setSelectedPlace(place),
-        }}
-      >
-        <Popup className="custom-popup" autoPan={false}>
-          <div style={{ width: '200px' }}>
-            <img src={place.imageUrl || 'https://via.placeholder.com/200'} alt={place.name} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px 8px 0 0', marginBottom: '8px' }} />
-            <h6 className="fw-bold mb-1">{place.name}</h6>
-            <span className="badge rounded-pill mb-2" style={{backgroundColor: getCategoryColor(place.category), color: '#fff'}}>{place.category}</span>
-            <p style={{ fontSize: '0.8rem', margin: 0 }} className="text-truncate">{place.description}</p>
-          </div>
-        </Popup>
-      </Marker>
-    );
-  };
+  const createCustomIcon = useCallback((color, number) => {
+    return L.divIcon({
+      className: 'custom-leaflet-icon',
+      html: `<div style="background-color: ${color}; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+               <span style="transform: rotate(45deg); color: white; font-weight: bold; font-size: 14px;">${number}</span>
+             </div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 30],
+      popupAnchor: [0, -35]
+    });
+  }, []);
+
+  // Escuchar recomendaciones del Chatbot IA
+  useEffect(() => {
+    const onFocusPlace = (e) => {
+      const place = e.detail;
+      if (place && place.latitude) {
+        setSelectedPlace(place);
+        setViewMode('mapa'); // Cambiar a vista mapa para ver la recomendación
+      }
+    };
+    window.addEventListener('focusPlace', onFocusPlace);
+    return () => window.removeEventListener('focusPlace', onFocusPlace);
+  }, []);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -152,52 +167,13 @@ const PlacesPage = () => {
     fetchPlaces();
   }, [townSlug, currentPage]);
 
-  const getCategoryColor = (category) => {
-    if(!category) return '#6c757d';
-    const cat = category.toLowerCase();
-    if (cat.includes('mirador')) return '#cca300'; // Amarillo oscuro
-    if (cat.includes('cultural') || cat.includes('histórico') || cat.includes('museo')) return '#77dd77'; // Verde claro
-    if (cat.includes('gastronomía') || cat.includes('restaurante')) return '#ffb347'; // Naranja claro
-    if (cat.includes('parque')) return '#0d6efd'; // Azul
-    return '#6c757d'; // Default
-  };
-
-
-
-  const createCustomIcon = (color, number) => {
-    return L.divIcon({
-      className: 'custom-leaflet-icon',
-      html: `<div style="
-               background-color: ${color}; 
-               width: 30px; 
-               height: 30px; 
-               border-radius: 50% 50% 50% 0; 
-               transform: rotate(-45deg); 
-               display: flex; 
-               align-items: center; 
-               justify-content: center; 
-               border: 2px solid white; 
-               box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-             ">
-               <span style="transform: rotate(45deg); color: white; font-weight: bold; font-size: 14px;">${number}</span>
-             </div>`,
-      iconSize: [30, 30],
-      iconAnchor: [15, 30],
-      popupAnchor: [0, -35]
-    });
-  };
-
-  // Icono personalizado para el usuario (Punto azul con borde blanco)
-  const userIcon = L.divIcon({
-    className: 'user-location-marker',
-    html: `<div style="background-color: #0d6efd; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>`,
-    iconSize: [18, 18],
-    iconAnchor: [9, 9]
-  });
-
-  const centerCoords = selectedPlace?.latitude 
-    ? [selectedPlace.latitude, selectedPlace.longitude] 
-    : (places.length > 0 && places[0].latitude ? [places[0].latitude, places[0].longitude] : [10, -84]);
+  const centerCoords = useMemo(() => {
+    if (selectedPlace?.latitude && selectedPlace?.longitude) {
+      return [selectedPlace.latitude, selectedPlace.longitude];
+    }
+    const firstWithCoords = places.find(p => p.latitude && p.longitude);
+    return firstWithCoords ? [firstWithCoords.latitude, firstWithCoords.longitude] : [10, -84];
+  }, [selectedPlace, places]);
 
   return (
     <Container className="mt-4 pb-5">
