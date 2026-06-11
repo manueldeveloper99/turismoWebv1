@@ -11,3 +11,6 @@ backend/turismodb.trace.db
 # Environment variables
 .env
 .env.local
+
+# PWA assets
+dev-dist

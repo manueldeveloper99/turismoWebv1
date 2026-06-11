@@ -8,6 +8,12 @@ El flujo principal consiste en que los turistas escanean un **código QR físico
 
 Incluye funcionalidades extra (Bonus) como un **Panel de Administración protegido** para realizar un CRUD completo de lugares y pueblos.
 
+##  PWA (Progressive Web App)
+El sistema es instalable en dispositivos móviles y permite:
+*   **Acceso Rápido:** Icono en la pantalla de inicio.
+*   **Carga Optimizada:** Cacheo de recursos estáticos para mejor rendimiento.
+*   **Experiencia Nativa:** Interfaz a pantalla completa (standalone).
+
 ##  Stack Utilizado
 
 ### Frontend (SPA)
