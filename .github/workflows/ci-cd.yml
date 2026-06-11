@@ -24,13 +24,13 @@ jobs:
           cache: maven
 
       - name: Build and Test Backend
-        run: mvn -B test
+        run: mvn -B verify
         working-directory: ./backend
 
       - name: Analyze Backend with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TURISMO_WEB }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=manueldeveloper99_turismoWebv1 -Dsonar.organization=manueldeveloper99 -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.exclusions=**/*
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=manueldeveloper99_turismoWebv1 -Dsonar.organization=manueldeveloper99 -Dsonar.host.url=https://sonarcloud.io
         working-directory: ./backend
 
       - name: Set up Node.js
@@ -44,8 +44,19 @@ jobs:
         run: npm install
         working-directory: ./frontend
 
+      - name: Run Frontend Tests
+        run: npm test
+        working-directory: ./frontend
+
       - name: Build Frontend
         run: npm run build
         working-directory: ./frontend
+
+      - name: Send Discord Notification
+        if: always()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -d "{\"content\": \"🚀 **Alerta del Pipeline (Turismo Web)**\n👤 **Autor:** ${{ github.actor }}\n🌿 **Rama:** ${{ github.ref_name }}\n✅ **Estado:** ${{ job.status }}\n🔗 **Ver más:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+          ${{ secrets.DISCORD_WEBHOOK }}
 
   # TODO: Agregar Job de Deploy (GCP Cloud Run o Firebase) dependiendo de la configuración de Secrets.

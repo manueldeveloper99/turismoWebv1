@@ -16,22 +16,40 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public User getOrCreateUser(String email, String name, String pictureUrl) {
+        return userRepository.findByEmail(email).orElseGet(() -> {
+            User newUser = User.builder()
+                    .email(email)
+                    .name(name)
+                    .pictureUrl(pictureUrl)
+                    // Si es el primer usuario en la BD, lo hacemos ADMIN, sino USER
+                    .role(userRepository.count() == 0 ? "ROLE_ADMIN" : "ROLE_USER")
+                    .active(true)
+                    .build();
+            return userRepository.save(newUser);
+        });
+    }
+
     public User updateRole(Long id, String role) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        
+
         validateLastAdmin(user, role, user.getActive());
-        
+
         user.setRole(role);
         return userRepository.save(user);
     }
 
     public User updateStatus(Long id, Boolean active) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        
+
         validateLastAdmin(user, user.getRole(), active);
 
         user.setActive(active);
         return userRepository.save(user);
+    }
+
+    public long countUsers() {
+        return userRepository.count();
     }
 
     private void validateLastAdmin(User user, String newRole, Boolean newActiveStatus) {
@@ -40,7 +58,8 @@ public class UserService {
 
         if (isCurrentlyAdmin && willNotBeAdmin) {
             if (userRepository.countByRole("ROLE_ADMIN") <= 1) {
-                throw new RuntimeException("Operación denegada: El sistema debe tener al menos un administrador activo.");
+                throw new RuntimeException("Operación denegada: "
+                        + "El sistema debe tener al menos un administrador activo.");
             }
         }
     }

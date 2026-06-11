@@ -5,12 +5,16 @@ import com.proyectouno.turismoweb.model.Town;
 import com.proyectouno.turismoweb.service.PlaceService;
 import com.proyectouno.turismoweb.service.TownService;
 import com.proyectouno.turismoweb.service.UserService;
-import com.proyectouno.turismoweb.repository.UserRepository;
-import com.proyectouno.turismoweb.repository.TownRepository;
-import com.proyectouno.turismoweb.repository.PlaceRepository;
 import com.proyectouno.turismoweb.model.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
@@ -25,9 +29,6 @@ public class AdminController {
     private final TownService townService;
     private final PlaceService placeService;
     private final UserService userService;
-    private final UserRepository userRepository;
-    private final TownRepository townRepository;
-    private final PlaceRepository placeRepository;
 
     @PostMapping("/towns")
     public Town createTown(@RequestBody Town town) {
@@ -89,16 +90,16 @@ public class AdminController {
     public ResponseEntity<Map<String, Object>> getStats() {
         Map<String, Object> stats = new HashMap<>();
 
-        long totalTowns = townRepository.count();
-        long totalPlaces = placeRepository.count();
-        long totalUsers = userRepository.count();
+        long totalTowns = townService.countTowns();
+        long totalPlaces = placeService.countPlaces();
+        long totalUsers = userService.countUsers();
 
         stats.put("totalTowns", totalTowns);
         stats.put("totalPlaces", totalPlaces);
         stats.put("totalUsers", totalUsers);
 
         // Categorías
-        List<Place> allPlaces = placeRepository.findAll();
+        List<Place> allPlaces = placeService.getAllPlaces();
         Map<String, Long> placesByCategory = allPlaces.stream()
                 .filter(p -> p.getCategory() != null)
                 .collect(Collectors.groupingBy(Place::getCategory, Collectors.counting()));
