@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react'; //Alegr
+import { useState, useEffect, useMemo } from 'react'; //Alegr
 import { Navbar, Container, Nav, Button, NavDropdown } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { LogOut, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
+import AIChatbot from './AIChatbot';  //Alegr 
 
 const NavbarComponent = () => {
   const navigate = useNavigate();
@@ -56,12 +57,19 @@ const NavbarComponent = () => {
     boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
     borderBottomRightRadius: '25px',
     position: 'relative',
-    overflow: 'hidden',
     zIndex: 1000,
     width: '100%'
   };
 
-  const leaves = Array.from({ length: 8 });
+  // Memorizar estilos de las hojas para evitar parpadeo en re-renders
+  const leafStyles = useMemo(() => {
+    return Array.from({ length: 8 }).map(() => ({
+      left: `${Math.random() * 95}%`,
+      duration: `${3 + Math.random() * 4}s`,
+      delay: `${Math.random() * 5}s`,
+      scale: 0.5 + Math.random() * 0.8
+    }));
+  }, []);
 
   return (
     <>
@@ -85,17 +93,19 @@ const NavbarComponent = () => {
       <Navbar variant="dark" expand="lg" style={navbarStyle} className="mx-auto">
 
         {/* Partículas de hojas cayendo */}
-        {leaves.map((_, i) => (
-          <div key={i} className="leaf" style={{
-            left: `${Math.random() * 95}%`,
-            animation: `fallAndSway ${3 + Math.random() * 4}s linear infinite`,
-            animationDelay: `${Math.random() * 5}s`,
-            transform: `scale(${0.5 + Math.random() * 0.8})`
-          }}></div>
-        ))}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', pointerEvents: 'none', borderBottomRightRadius: '25px' }}>
+          {leafStyles.map((style, i) => (
+            <div key={i} className="leaf" style={{
+              left: style.left,
+              animation: `fallAndSway ${style.duration} linear infinite`,
+              animationDelay: style.delay,
+              transform: `scale(${style.scale})`
+            }}></div>
+          ))}
+        </div>
 
         <Container style={{ position: 'relative', zIndex: 1 }}>
-          <Navbar.Brand href="/" style={{ color: 'white', fontWeight: '800', letterSpacing: '1px', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+          <Navbar.Brand as={Link} to="/" style={{ color: 'white', fontWeight: '800', letterSpacing: '1px', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
             Turismo Local CR
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -157,6 +167,7 @@ const NavbarComponent = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+      <AIChatbot />
     </>
   );
 };
