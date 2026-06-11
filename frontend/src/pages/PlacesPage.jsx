@@ -91,7 +91,7 @@ const LocationButton = ({ onLocationFound }) => {
 
 const PlacesPage = () => {
   const { townSlug } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [places, setPlaces] = useState([]);
   const [searchPlace, setSearchPlace] = useState('');
   const [town, setTown] = useState(null);
