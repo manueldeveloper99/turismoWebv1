@@ -20,6 +20,12 @@ const AIChatbot = () => {
     }
   }, [chat]);
 
+  // Función para interactuar con el sistema al hacer clic en un lugar recomendado
+  const handlePlaceClick = (place) => {
+    const event = new CustomEvent('focusPlace', { detail: place });
+    window.dispatchEvent(event);
+  };
+
   // Extraer el pueblo actual de la URL si existe (/p/nombre-pueblo/places)
   const getCurrentTown = () => {
     const pathParts = location.pathname.split('/');
@@ -48,11 +54,20 @@ const AIChatbot = () => {
       // Manejo robusto de la respuesta: extraemos el contenido ya sea si viene como objeto o como string directo.
       const aiResponse = res.data?.response || (typeof res.data === 'string' ? res.data : 'Lo siento, no pude encontrar información sobre eso.');
       const aiSentiment = res.data?.sentiment || 'neutral';
+<<<<<<< HEAD
+=======
+      const recommendedPlaces = res.data?.recommendedPlaces || [];
+>>>>>>> Feature-Branch-Alessandro2
 
       setChat(prev => [...prev, { 
         role: 'ai', 
         content: aiResponse,
+<<<<<<< HEAD
         sentiment: aiSentiment
+=======
+        sentiment: aiSentiment,
+        recommendedPlaces: recommendedPlaces
+>>>>>>> Feature-Branch-Alessandro2
       }]);
     } catch (err) {
       // Logueamos el error para depuración técnica en la consola
@@ -96,6 +111,24 @@ const AIChatbot = () => {
                 <div className={`p-3 rounded-2xl max-w-80 ${msg.role === 'user' ? 'bg-primary text-white' : 'bg-light'}`} style={{ borderRadius: '15px', maxWidth: '85%', fontSize: '0.9rem' }}>
                   {msg.content}
                 </div>
+                {msg.role === 'ai' && msg.recommendedPlaces && msg.recommendedPlaces.length > 0 && (
+                  <div className="d-flex overflow-auto gap-2 py-2 w-100" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    {msg.recommendedPlaces.map((p) => (
+                      <Card 
+                        key={p.id} 
+                        className="flex-shrink-0 shadow-sm border-0" 
+                        style={{ width: '140px', cursor: 'pointer', borderRadius: '12px' }}
+                        onClick={() => handlePlaceClick(p)}
+                      >
+                        <Card.Img src={p.imageUrl || 'https://via.placeholder.com/150'} style={{ height: '70px', objectFit: 'cover', borderRadius: '12px 12px 0 0' }} />
+                        <Card.Body className="p-2">
+                          <div className="fw-bold text-truncate" style={{ fontSize: '0.75rem' }}>{p.name}</div>
+                          <div className="text-muted" style={{ fontSize: '0.65rem' }}>{p.category}</div>
+                        </Card.Body>
+                      </Card>
+                    ))}
+                  </div>
+                )}
                 {msg.role === 'ai' && (
                   <div className="mt-1 d-flex align-items-center" style={{ fontSize: '0.7rem' }}>
                     {getSentimentIcon(msg.sentiment)} <span className="ms-1 text-muted">IA Analizando...</span>
