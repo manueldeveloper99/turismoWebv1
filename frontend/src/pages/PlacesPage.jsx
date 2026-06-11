@@ -179,8 +179,39 @@ const PlacesPage = () => {
   }, [selectedPlace, places]);
 
   return (
-    <Container className="mt-4 pb-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
+    <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
+      {/* Abstract Background Blobs */}
+      <div style={{
+        position: 'absolute',
+        top: '-10%',
+        left: '-10%',
+        width: '50vw',
+        height: '50vw',
+        minWidth: '300px',
+        minHeight: '300px',
+        background: 'linear-gradient(135deg, rgba(0, 191, 165, 0.35) 0%, rgba(0, 150, 136, 0.15) 100%)',
+        borderRadius: '50%',
+        filter: 'blur(120px)',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '-10%',
+        right: '-10%',
+        width: '60vw',
+        height: '60vw',
+        minWidth: '400px',
+        minHeight: '400px',
+        background: 'linear-gradient(135deg, rgba(0, 188, 212, 0.25) 0%, rgba(0, 77, 64, 0.15) 100%)',
+        borderRadius: '50%',
+        filter: 'blur(150px)',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }} />
+
+      <Container className="pt-4 pb-5" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="m-0 fw-bold">{t('places.title')} - {town?.name || townSlug}</h2>
         <Button 
           variant="outline-dark" 
@@ -189,19 +220,19 @@ const PlacesPage = () => {
         >
           {viewMode === 'lista' ? t('places.map_view') : t('places.list_view')}
         </Button>
-        <div className="d-none d-md-flex bg-white rounded-pill p-1 shadow-sm" style={{ border: '1px solid #ced4da' }}>
+        <div className="d-none d-md-flex bg-body rounded-pill p-1 shadow-sm border">
            <Button 
-             variant={viewMode === 'lista' ? 'primary' : 'white'} 
-             className="rounded-pill px-3 fw-bold" 
-             style={{border: 'none', color: viewMode === 'lista' ? 'white' : '#495057'}}
+             variant={viewMode === 'lista' ? 'primary' : 'transparent'} 
+             className={`rounded-pill px-3 fw-bold ${viewMode !== 'lista' ? 'text-body' : 'text-white'}`} 
+             style={{border: 'none'}}
              onClick={() => setViewMode('lista')}
            >
              {t('places.list_view')}
            </Button>
            <Button 
-             variant={viewMode === 'mapa' ? 'primary' : 'white'} 
-             className="rounded-pill px-3 fw-bold" 
-             style={{border: 'none', color: viewMode === 'mapa' ? 'white' : '#495057'}}
+             variant={viewMode === 'mapa' ? 'primary' : 'transparent'} 
+             className={`rounded-pill px-3 fw-bold ${viewMode !== 'mapa' ? 'text-body' : 'text-white'}`}
+             style={{border: 'none'}}
              onClick={() => setViewMode('mapa')}
            >
              {t('places.map_view')}
@@ -217,7 +248,7 @@ const PlacesPage = () => {
             <Col md={viewMode === 'lista' ? 6 : 12} lg={viewMode === 'lista' ? 4 : 12} key={place.id}>
             <Card 
               key={place.id} 
-              className="mb-3 shadow-sm border-0" 
+              className="mb-3 shadow-sm border-0 translucent-card" 
               style={{ 
                 cursor: place.latitude ? 'pointer' : 'default', 
                 borderRadius: '12px',
@@ -322,7 +353,8 @@ const PlacesPage = () => {
           </Col>
         </Row>
       )}
-    </Container>
+      </Container>
+    </div>
   );
 };
 
