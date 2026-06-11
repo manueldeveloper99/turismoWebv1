@@ -18,7 +18,10 @@ public class PlaceController {
     private final PlaceService placeService;
 
     @GetMapping
-    public Page<Place> getPlacesByTown(@PathVariable String slug, Pageable pageable, @RequestParam(defaultValue = "false") boolean onlyActive) {
+    public Page<Place> getPlacesByTown(
+            @PathVariable String slug, 
+            Pageable pageable, 
+            @RequestParam(defaultValue = "false") boolean onlyActive) {
         return placeService.getPlacesByTownSlug(slug, pageable, onlyActive);
     }
 }
