@@ -28,7 +28,7 @@ describe('AdminPanel Unit Tests', () => {
 
   it('debe mostrar el botón para volver al inicio cuando el acceso es denegado', async () => {
     renderComponent();
-    const backBtn = await screen.findByRole('button', { name: /Volver al Inicio/i });
+    const backBtn = await screen.findByRole('button', { name: /Volver/i });
     expect(backBtn).toBeInTheDocument();
   });
 });

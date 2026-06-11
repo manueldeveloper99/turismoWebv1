@@ -14,6 +14,22 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => key,
+    i18n: { language: 'es' }
+  }),
+}));
+
+// Mock api
+vi.mock('../services/api', () => ({
+  default: {
+    get: vi.fn(() => Promise.resolve({ data: {} })),
+    post: vi.fn(() => Promise.resolve({ data: {} }))
+  }
+}));
+
 describe('NavbarComponent', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -46,8 +62,8 @@ describe('NavbarComponent', () => {
     renderWithRouter(<NavbarComponent />);
 
     // As the token is invalid JSON base64, user won't be parsed, but token exists
-    // so the fallback button "Cerrar Sesión" (text) should be present
-    const logoutBtn = screen.getByText('Cerrar Sesión');
+    // so the fallback button "nav.logout" (text) should be present
+    const logoutBtn = screen.getByText('nav.logout');
     expect(logoutBtn).toBeInTheDocument();
 
     fireEvent.click(logoutBtn);

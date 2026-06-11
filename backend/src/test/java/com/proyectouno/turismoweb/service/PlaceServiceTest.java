@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -63,8 +62,33 @@ public class PlaceServiceTest {
 
         Page<Place> results = placeService.getPlacesByTownSlug("unknown", Pageable.unpaged(), false);
 
-        assertTrue(results.getContent().isEmpty());
+        assertTrue(results.isEmpty());
         verify(placeRepository).findByTownSlug(eq("unknown"), any(Pageable.class));
+    }
+
+    @Test
+    void testGetPlacesByTownSlug_OnlyActive() {
+        when(placeRepository.findByTownSlugAndActiveTrue(eq("santa-maria"), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Arrays.asList(place1)));
+
+        Page<Place> results = placeService.getPlacesByTownSlug("santa-maria", Pageable.unpaged(), true);
+
+        assertEquals(1, results.getContent().size());
+        verify(placeRepository).findByTownSlugAndActiveTrue(eq("santa-maria"), any(Pageable.class));
+    }
+
+    @Test
+    void testGetAllPlacesList() {
+        when(placeRepository.findAll()).thenReturn(Arrays.asList(place1));
+        java.util.List<Place> results = placeService.getAllPlaces();
+        assertEquals(1, results.size());
+    }
+
+    @Test
+    void testGetAllPlacesPage() {
+        when(placeRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(Arrays.asList(place1)));
+        Page<Place> results = placeService.getAllPlaces(Pageable.unpaged());
+        assertEquals(1, results.getContent().size());
     }
 
     @Test
@@ -82,5 +106,12 @@ public class PlaceServiceTest {
     void testDeletePlace() {
         placeService.deletePlace(1L);
         verify(placeRepository).deleteById(1L);
+    }
+
+    @Test
+    void testCountPlaces() {
+        when(placeRepository.count()).thenReturn(5L);
+        long count = placeService.countPlaces();
+        assertEquals(5L, count);
     }
 }

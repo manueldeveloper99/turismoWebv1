@@ -49,7 +49,9 @@ Incluye funcionalidades extra (Bonus) como un **Panel de Administración protegi
 ### 2. Levantar el Frontend (React)
 1. Abre una nueva terminal y navega a la carpeta del frontend: `cd frontend`
 2. Instala las dependencias: `npm install`
-3. Asegúrate de tener un archivo `.env` configurado apuntando a tu backend local.
+3. Crea un archivo `.env` en la raíz de la carpeta `frontend` con las siguientes variables:
+   * `VITE_GA_MEASUREMENT_ID`: Tu ID de seguimiento de Google Analytics 4.
+   * `VITE_API_URL`: (Opcional) URL de tu API backend.
 4. Inicia el servidor de desarrollo: `npm run dev`
 *(El frontend quedará corriendo en `http://localhost:5173`)*
 
