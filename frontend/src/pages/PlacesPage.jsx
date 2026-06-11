@@ -211,7 +211,7 @@ const PlacesPage = () => {
 
       <Row>
         {/* Left Column: List */}
-        <Col md={viewMode === 'lista' ? 12 : 4} className={`mb-4 ${viewMode === 'mapa' ? 'd-none d-md-block' : ''}`} style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '15px', overflowX: 'hidden' }}>
+        <Col md={viewMode === 'lista' ? 12 : 4} className={`mb-4 custom-scrollbar ${viewMode === 'mapa' ? 'd-none d-md-block' : ''}`} style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '15px', overflowX: 'hidden' }}>
           <Row>
           {places.map((place, index) => (
             <Col md={viewMode === 'lista' ? 6 : 12} lg={viewMode === 'lista' ? 4 : 12} key={place.id}>
