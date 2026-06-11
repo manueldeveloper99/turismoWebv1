@@ -1,5 +1,5 @@
 import { QRCodeSVG } from 'qrcode.react';
-import { MapPin, Printer } from 'lucide-react';
+import { MapPin, Printer } from 'lucide-react';  //Alegr
 
 function QRPoster({ townSlug, townName, exactUrl }) {
   const url = exactUrl || `${import.meta.env.VITE_APP_URL}/p/${townSlug}`;

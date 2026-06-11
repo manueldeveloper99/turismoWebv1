@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badge, Image, Toast, ToastContainer } from 'react-bootstrap';
 import api from '../services/api';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import QRPoster from '../components/QRPoster';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   Landmark,
@@ -14,9 +15,10 @@ import {
   QrCode,
   Plus,
   ShieldAlert,
-} from 'lucide-react';
+} from 'lucide-react'; //Alegr
 
 const AdminPanel = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('lugares');
   const [towns, setTowns] = useState([]);
   const [selectedTown, setSelectedTown] = useState(null);
@@ -32,41 +34,11 @@ const AdminPanel = () => {
   const [msg, setMsg] = useState({ text: '', type: '' });
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
   const [accessDenied, setAccessDenied] = useState(false);
   const [loading, setLoading] = useState(true);
   const messageTimerRef = useRef(null);
 
-  useEffect(() => {
-    // Validar acceso
-    api.get('/users/me').then(res => {
-      if (res.data.role !== 'ROLE_ADMIN' || !res.data.active) {
-        setAccessDenied(true);
-      } else {
-        setCurrentUser(res.data);
-        fetchTowns();
-      }
-    }).catch(err => {
-      setAccessDenied(true);
-    }).finally(() => {
-      setLoading(false);
-    });
-  }, []);
-
-  const fetchUsers = () => {
-    api.get('/admin/users').then(res => setUsers(res.data)).catch(console.error);
-  };
-
-  const fetchStats = () => {
-    return api.get('/admin/stats').then(res => { setStats(res.data); return res.data; }).catch(err => { console.error(err); return null; });
-  };
-
-  useEffect(() => {
-    if (!accessDenied && activeTab === 'usuarios') fetchUsers();
-    if (!accessDenied && (activeTab === 'dashboard' || activeTab === 'estadisticas' || activeTab === 'pueblos')) fetchStats();
-  }, [activeTab, accessDenied]);
-
-  const fetchTowns = () => {
+  const fetchTowns = useCallback(() => {
     return api.get('/towns').then(res => {
       const data = res.data || [];
       setTowns(data);
@@ -78,15 +50,9 @@ const AdminPanel = () => {
       console.error("Error fetching towns", err);
       return [];
     });
-  };
-
-  useEffect(() => {
-    if (selectedTown) {
-      fetchPlaces();
-    }
   }, [selectedTown]);
 
-  const fetchPlaces = (slug) => {
+  const fetchPlaces = useCallback((slug) => {
     const targetSlug = slug || selectedTown?.slug;
     if (targetSlug) {
       return api.get(`/towns/${targetSlug}/places`)
@@ -101,7 +67,41 @@ const AdminPanel = () => {
         });
     }
     return Promise.resolve([]);
-  }
+  }, [selectedTown?.slug]);
+
+  useEffect(() => {
+    // Validar acceso
+    api.get('/users/me').then(res => {
+      if (res.data.role !== 'ROLE_ADMIN' || !res.data.active) {
+        setAccessDenied(true);
+      } else {
+        fetchTowns();
+      }
+    }).catch(() => {
+      setAccessDenied(true);
+    }).finally(() => {
+      setLoading(false);
+    });
+  }, [fetchTowns]);
+
+  const fetchUsers = () => {
+    api.get('/admin/users').then(res => setUsers(res.data)).catch(console.error);
+  };
+
+  const fetchStats = () => {
+    return api.get('/admin/stats').then(res => { setStats(res.data); return res.data; }).catch(err => { console.error(err); return null; });
+  };
+
+  useEffect(() => {
+    if (!accessDenied && activeTab === 'usuarios') fetchUsers();
+    if (!accessDenied && (activeTab === 'dashboard' || activeTab === 'estadisticas' || activeTab === 'pueblos')) fetchStats();
+  }, [activeTab, accessDenied]);
+
+  useEffect(() => {
+    if (selectedTown) {
+      fetchPlaces();
+    }
+  }, [selectedTown, fetchPlaces]);
 
   const showMessage = (text, type = 'success') => {
     // Limpiar temporizador anterior si existe para evitar conflictos
@@ -137,7 +137,7 @@ const AdminPanel = () => {
 
       setTown({ slug: '', name: '', description: '', imageUrl: '' });
       setShowTownModal(false);
-    } catch (err) {
+    } catch {
       showMessage('Error al guardar el pueblo (Asegúrate de estar autenticado)', 'danger');
     }
   };
@@ -150,7 +150,7 @@ const AdminPanel = () => {
         fetchTowns();
         fetchStats();
         if (selectedTown?.id === id) setSelectedTown(null);
-      } catch (err) {
+      } catch {
         showMessage('Error al eliminar el pueblo', 'danger');
       }
     }
@@ -166,12 +166,16 @@ const AdminPanel = () => {
       }
 
       const placeData = {
-        ...place,
+        id: place.id, // Aseguramos enviar el ID si existe
+        name: place.name,
+        description: place.description,
+        category: place.category,
+        address: place.address,
+        imageUrl: place.imageUrl,
         latitude: parseFloat(place.latitude) || 0,
         longitude: parseFloat(place.longitude) || 0,
-        townId: targetTownId,
-        town: { id: targetTownId },
-        active: place.id ? place.active : true // Si es nuevo (sin id), siempre es true
+        active: Boolean(place.active),
+        town: { id: targetTownId }
       };
 
       if (place.id) {
@@ -196,7 +200,7 @@ const AdminPanel = () => {
       // Resetear formulario
       setPlace({ name: '', description: '', category: '', address: '', imageUrl: '', latitude: '', longitude: '', townId: '', active: true });
       setShowPlaceModal(false);
-    } catch (err) {
+    } catch {
       showMessage('Error al guardar el lugar (Asegúrate de estar autenticado)', 'danger');
     }
   };
@@ -204,7 +208,19 @@ const AdminPanel = () => {
   const handleTogglePlaceStatus = async (p) => {
     const originalStatus = p.active;
     const newStatus = !originalStatus;
-    const targetTownId = p.town?.id || p.townId || selectedTown?.id;
+
+    // Mensaje de seguridad al inactivar
+    if (originalStatus && !window.confirm('¿Está seguro de querer inactivar el lugar? El código QR dejará de ser funcional para los turistas.')) {
+      return;
+    }
+
+    // Obtener el ID del pueblo asociado de manera segura
+    const townId = p.town?.id || p.townId || (selectedTown ? selectedTown.id : null);
+
+    if (!townId) {
+      showMessage('Error: No se pudo identificar el pueblo asociado a este lugar', 'danger');
+      return;
+    }
 
     // 1. Actualización optimista inmediata en la UI
     setPlaces(prev => prev.map(item => item.id === p.id ? { ...item, active: newStatus } : item));
@@ -212,10 +228,9 @@ const AdminPanel = () => {
     try {
       // 2. Intentamos el endpoint de status
       await api.put(`/admin/places/${p.id}/status`, { active: newStatus });
-      fetchStats().catch(() => { });
-      showMessage(`Estado de ${p.name} actualizado`);
-    } catch (err) {
-      // 3. Fallback: Si el endpoint /status no existe, usamos el PUT general
+      fetchStats().catch(() => {});
+    } catch {
+        // Fallback: Si el endpoint /status no existe, usamos el PUT general
       // Enviamos el objeto EXACTO que el backend espera (incluyendo la relación town)
       try {
         const updateData = {
@@ -223,18 +238,17 @@ const AdminPanel = () => {
           latitude: parseFloat(p.latitude) || 0,
           longitude: parseFloat(p.longitude) || 0,
           active: newStatus,
-          townId: targetTownId,
-          town: { id: targetTownId }
+          townId: townId,
+          town: { id: townId }
         };
-
+        
         await api.put(`/admin/places/${p.id}`, updateData);
-        fetchStats().catch(() => { });
-        showMessage(`Estado de ${p.name} actualizado`);
+        fetchStats().catch(() => {});
       } catch (innerErr) {
-        // 4. Revertimos y notificamos al usuario el fallo total
+        // Revertimos silenciosamente solo si todo falla. No mostramos showMessage por error. //Alegr
         setPlaces(prev => prev.map(item => item.id === p.id ? { ...item, active: originalStatus } : item));
-        showMessage(`Error crítico: No se pudo actualizar el estado de ${p.name}`, 'danger');
         console.error("Error persistente al cambiar estado:", innerErr);
+        showMessage('No se pudo actualizar el estado en el servidor', 'danger');
       }
     }
   };
@@ -246,7 +260,7 @@ const AdminPanel = () => {
         showMessage('Lugar eliminado');
         await fetchPlaces(selectedTown?.slug);
         await fetchStats();
-      } catch (err) {
+      } catch {
         showMessage('Error al eliminar el lugar', 'danger');
       }
     }
@@ -300,19 +314,19 @@ const AdminPanel = () => {
         <Col md={2} style={sidebarStyle} className="p-3">
           <Nav className="flex-column mt-3">
             <Nav.Link style={navItemStyle('dashboard')} onClick={() => setActiveTab('dashboard')}>
-              <LayoutDashboard size={18} /> Dashboard
+              <LayoutDashboard size={18} /> {t('admin.dashboard')}
             </Nav.Link>
             <Nav.Link style={navItemStyle('pueblos')} onClick={() => setActiveTab('pueblos')}>
-              <Landmark size={18} /> Pueblos
+              <Landmark size={18} /> {t('admin.towns')}
             </Nav.Link>
             <Nav.Link style={navItemStyle('lugares')} onClick={() => setActiveTab('lugares')}>
-              <MapPin size={18} /> Lugares
+              <MapPin size={18} /> {t('admin.places')}
             </Nav.Link>
             <Nav.Link style={navItemStyle('usuarios')} onClick={() => setActiveTab('usuarios')}>
-              <Users size={18} /> Usuarios
+              <Users size={18} /> {t('admin.users')}
             </Nav.Link>
             <Nav.Link style={navItemStyle('estadisticas')} onClick={() => setActiveTab('estadisticas')}>
-              <BarChart3 size={18} /> Estadísticas
+              <BarChart3 size={18} /> {t('admin.stats')}
             </Nav.Link>
           </Nav>
         </Col>
@@ -370,9 +384,9 @@ const AdminPanel = () => {
                           variant="outline-primary"
                           size="sm"
                           className="me-2"
-                          onClick={() => { 
-                            setQrTown({ ...t, exactUrl: `${window.location.origin}/p/${t.slug}` }); 
-                            setShowQRModal(true); 
+                          onClick={() => {
+                            setQrTown({ ...t, exactUrl: `${window.location.origin}/p/${t.slug}` });
+                            setShowQRModal(true);
                           }}
                         >
                           <QrCode size={16} className="me-1" /> QR
@@ -431,7 +445,13 @@ const AdminPanel = () => {
                 </thead>
                 <tbody>
                   {places.map(p => (
-                    <tr key={p.id}>
+                    <tr 
+                      key={p.id} 
+                      style={{ 
+                        opacity: p.active ? 1 : 0.6, 
+                        backgroundColor: p.active ? 'transparent' : '#f8f9fa' 
+                      }}
+                    >
                       <td>
                         <Image src={p.imageUrl || 'https://via.placeholder.com/50'} rounded width={50} height={50} style={{ objectFit: 'cover' }} />
                       </td>
@@ -457,7 +477,7 @@ const AdminPanel = () => {
                               setQrTown({
                                 name: p.name,
                                 slug: selectedTown.slug,
-                                exactUrl: `${window.location.origin}/p/${selectedTown.slug}?destino=${p.id}`
+                                exactUrl: `${window.location.origin}/p/${selectedTown.slug}/places?destino=${p.id}`
                               });
                               setShowQRModal(true);
                             }}
@@ -579,7 +599,7 @@ const AdminPanel = () => {
                               await api.put(`/admin/users/${u.id}/status`, { active: e.target.checked });
                               fetchUsers();
                               showMessage(e.target.checked ? 'Usuario activado' : 'Usuario bloqueado');
-                            } catch (err) {
+                          } catch {
                               showMessage('Error actualizando estado', 'danger');
                             }
                           }}
@@ -733,6 +753,15 @@ const AdminPanel = () => {
             <Form.Group className="mb-3">
               <Form.Label>URL de Fotografía</Form.Label>
               <Form.Control type="url" value={place.imageUrl} onChange={e => setPlace({ ...place, imageUrl: e.target.value })} />
+            </Form.Group>
+            <Form.Group className="mb-4">
+              <Form.Check 
+                type="switch"
+                id="modal-place-active"
+                label={place.active ? "Lugar Activo (Visible para turistas)" : "Lugar Inactivo (Oculto)"}
+                checked={place.active}
+                onChange={e => setPlace({...place, active: e.target.checked})}
+              />
             </Form.Group>
             <Button type="submit" variant="primary" className="w-100">Guardar Lugar Turístico</Button>
           </Form>

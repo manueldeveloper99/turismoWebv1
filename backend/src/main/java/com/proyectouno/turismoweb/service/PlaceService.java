@@ -16,11 +16,19 @@ public class PlaceService {
         return placeRepository.findByTownSlug(townSlug);
     }
 
+    public List<Place> getAllPlaces() {
+        return placeRepository.findAll();
+    }
+
     public Place savePlace(Place place) {
         return placeRepository.save(place);
     }
 
     public void deletePlace(Long id) {
         placeRepository.deleteById(id);
+    }
+
+    public long countPlaces() {
+        return placeRepository.count();
     }
 }

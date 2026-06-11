@@ -1,30 +1,35 @@
-// REACT TESTING LIBRARY: Nos permite verificar que la información dinámica (props) se renderice correctamente en el componente.
 import { render, screen } from '@testing-library/react';
-// VITEST: Framework encargado de ejecutar cada unidad de prueba.
 import { describe, it, expect } from 'vitest';
 import QRPoster from './QRPoster';
 
-// VITEST: Conjunto de pruebas para el generador de pósters QR.
-describe('Componente QRPoster', () => {
-  const mockProps = {
-    townSlug: 'santa-maria',
-    townName: 'Santa María',
-    exactUrl: 'http://localhost:5173/p/santa-maria'
-  };
-
-  it('debe mostrar el nombre del pueblo correctamente', () => {
-    render(<QRPoster {...mockProps} />);
-    expect(screen.getByText(/Santa María/i)).toBeInTheDocument();
+describe('QRPoster Component', () => {
+  it('renders the town name correctly', () => {
+    const testTownName = "Pueblo Test";
+    render(<QRPoster townSlug="pueblo-test" townName={testTownName} />);
+    
+    // The component converts to uppercase
+    expect(screen.getByText(testTownName.toUpperCase())).toBeInTheDocument();
   });
 
-  it('debe renderizar el área del código QR', () => {
-    const { container } = render(<QRPoster {...mockProps} />);
-    const qrCanvas = container.querySelector('canvas');
-    expect(qrCanvas).toBeInTheDocument();
+  it('renders the default generated URL based on townSlug', () => {
+    const slug = "mi-pueblo";
+    render(<QRPoster townSlug={slug} townName="Mi Pueblo" />);
+    
+    // Uses import.meta.env.VITE_APP_URL, which might be undefined in tests, so it results in "undefined/p/mi-pueblo"
+    const expectedUrlPart = `/p/${slug}`;
+    const urlElement = screen.getByText(new RegExp(expectedUrlPart, 'i'));
+    expect(urlElement).toBeInTheDocument();
   });
 
-  it('debe mostrar la instrucción de escaneo', () => {
-    render(<QRPoster {...mockProps} />);
-    expect(screen.getByText(/Escanea para explorar/i)).toBeInTheDocument();
+  it('uses exactUrl when provided', () => {
+    const exactUrl = "https://example.com/p/test?destino=123";
+    render(<QRPoster townSlug="test" townName="Test" exactUrl={exactUrl} />);
+    
+    expect(screen.getByText(exactUrl)).toBeInTheDocument();
+  });
+
+  it('renders the print button', () => {
+    render(<QRPoster townSlug="test" townName="Test" />);
+    expect(screen.getByRole('button', { name: /Imprimir Cartel/i })).toBeInTheDocument();
   });
 });

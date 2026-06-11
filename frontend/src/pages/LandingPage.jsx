@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'; //Alegr 
 import { Container, Card, Row, Col, ListGroup, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import BackgroundCarousel from '../components/BackgroundCarousel';
 import api from '../services/api';
 import QRPoster from '../components/QRPoster';
+import { useTranslation } from 'react-i18next';
 
 const LandingPage = () => {
+  const { t } = useTranslation();
   const [towns, setTowns] = useState([]);
   const [selectedTown, setSelectedTown] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,7 +43,7 @@ const LandingPage = () => {
           {towns.length > 1 && (
             <Col md={3} className="mb-4">
               <Card style={{ ...glassStyle, maxHeight: '70vh', overflowY: 'auto' }} className="p-3">
-                <h5 className="text-center fw-bold mb-3" style={{ color: '#004d40' }}>Seleccionar Pueblo</h5>
+                <h5 className="text-center fw-bold mb-3" style={{ color: '#004d40' }}>{t('nav.select_town')}</h5>
                 <ListGroup variant="flush" style={{ background: 'transparent' }}>
                   {towns.map(t => (
                     <ListGroup.Item 
@@ -57,7 +59,7 @@ const LandingPage = () => {
                         marginBottom: '5px'
                       }}
                     >
-                      📍 {t.name}
+                       {t.name}
                     </ListGroup.Item>
                   ))}
                 </ListGroup>
@@ -69,8 +71,8 @@ const LandingPage = () => {
             <Card className="text-center p-4 shadow-lg" style={glassStyle}>
               <Card.Body>
                 <div className="mb-4">
-                  <h1 style={{ color: '#004d40', fontWeight: '900', textShadow: '0 2px 4px rgba(255,255,255,0.6)' }}>Turismo Local</h1>
-                  <p style={{ color: '#212529', fontWeight: '500' }}>Descubre la belleza de nuestros pueblos</p>
+                  <h1 style={{ color: '#004d40', fontWeight: '900', textShadow: '0 2px 4px rgba(255,255,255,0.6)' }}>{t('landing.title')}</h1>
+                  <p style={{ color: '#212529', fontWeight: '500' }}>{t('landing.subtitle')}</p>
                 </div>
 
                 <div className="d-flex flex-column align-items-center mb-4">
@@ -78,27 +80,23 @@ const LandingPage = () => {
                     <Spinner animation="border" variant="success" />
                   ) : selectedTown ? (
                     <>
-                      <QRPoster 
-                        townSlug={selectedTown.slug} 
-                        townName={selectedTown.name} 
-                        exactUrl={`${window.location.origin}/p/${selectedTown.slug}`} 
-                      />
+                      <QRPoster townSlug={selectedTown.slug} townName={selectedTown.name} />
                       <h4 className="mt-3 fw-bold" style={{ color: '#004d40' }}>{selectedTown.name}</h4>
                     </>
                   ) : (
                     <div className="p-5 border border-dashed rounded text-muted">
-                      No hay pueblos registrados
+                      {t('landing.no_towns')}
                     </div>
                   )}
                 </div>
                 
                 <p className="mb-4" style={{ fontSize: '0.95rem', color: '#212529', fontWeight: '500', textShadow: '0 1px 2px rgba(255,255,255,0.8)' }}>
-                  Escanea el código QR físico ubicado en el pueblo para ver sus lugares turísticos.
+                  {t('landing.instruction')}
                 </p>
 
                 <div className="mt-4 pt-3 border-top" style={{ borderColor: 'rgba(0,0,0,0.1) !important' }}>
                   <Link to="/login" style={{ fontSize: '0.9rem', color: '#004d40', fontWeight: '600', textDecoration: 'none' }}>
-                    ¿Eres Administrador? Ingresa aquí
+                    {t('landing.admin_link')}
                   </Link>
                 </div>
               </Card.Body>

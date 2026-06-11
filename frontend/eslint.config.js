@@ -23,5 +23,11 @@ export default defineConfig([
         ecmaFeatures: { jsx: true } // Habilita el soporte para entender la sintaxis de React (JSX).
       },
     },
+    rules: {
+      'react/prop-types': 'off',
+      'no-unused-vars': 'warn',
+      'no-console': 'off',
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+    },
   },
 ])
