@@ -1,6 +1,9 @@
-import { useState, useEffect, useCallback } from 'react'; //Alegr
-import { Navbar, Container, Nav, Button, NavDropdown } from 'react-bootstrap';
+import { useState, useEffect, useCallback } from 'react'; //Alegr //Alegr
+import { Navbar, Container, Nav, Button, NavDropdown, NavDropdown } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { LogOut, Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import api from '../services/api';
 import { LogOut, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
@@ -8,11 +11,33 @@ import api from '../services/api';
 const NavbarComponent = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const token = localStorage.getItem('token');
   const [userDb, setUserDb] = useState(null);
   const [towns, setTowns] = useState([]);
+  // Inicializamos el estado con una función. React la ejecutará solo una vez al montar.
+  const [leafData] = useState(() => Array.from({ length: 8 }).map(() => ({
+    left: `${Math.random() * 95}%`,
+    animationDuration: `${3 + Math.random() * 4}s`,
+    animationDelay: `${Math.random() * 5}s`,
+    scale: 0.5 + Math.random() * 0.8
+  })));
+  const [towns, setTowns] = useState([]);
 
   useEffect(() => {
+    const fetchData = async () => {
+      if (token) {
+        api.get('/users/me')
+          .then(res => setUserDb(res.data))
+          .catch(e => console.error(e));
+      }
+
+      api.get('/towns')
+        .then(res => setTowns(res.data))
+        .catch(e => console.error(e));
+    };
+
+    fetchData();
     const fetchData = async () => {
       if (token) {
         api.get('/users/me')
@@ -30,6 +55,8 @@ const NavbarComponent = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    setUserDb(null);
+    window.location.href = '/';
     setUserDb(null);
     window.location.href = '/';
   };
@@ -61,8 +88,6 @@ const NavbarComponent = () => {
     width: '100%'
   };
 
-  const leaves = Array.from({ length: 8 });
-
   return (
     <>
       <style>{`
@@ -85,22 +110,40 @@ const NavbarComponent = () => {
       <Navbar variant="dark" expand="lg" style={navbarStyle} className="mx-auto">
 
         {/* Partículas de hojas cayendo */}
-        {leaves.map((_, i) => (
+        {leafData.map((leaf, i) => (
           <div key={i} className="leaf" style={{
-            left: `${Math.random() * 95}%`,
-            animation: `fallAndSway ${3 + Math.random() * 4}s linear infinite`,
-            animationDelay: `${Math.random() * 5}s`,
-            transform: `scale(${0.5 + Math.random() * 0.8})`
+            left: leaf.left,
+            animation: `fallAndSway ${leaf.animationDuration} linear infinite`,
+            animationDelay: leaf.animationDelay,
+            transform: `scale(${leaf.scale})`
           }}></div>
         ))}
 
         <Container style={{ position: 'relative', zIndex: 1 }}>
           <Navbar.Brand href="/" style={{ color: 'white', fontWeight: '800', letterSpacing: '1px', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
             Turismo Local CR
+          <Navbar.Brand href="/" style={{ color: 'white', fontWeight: '800', letterSpacing: '1px', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+            Turismo Local CR
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
+              <NavDropdown title={t('nav.select_town')} id="town-dropdown">
+                {towns.map(town => (
+                  <NavDropdown.Item key={town.id} onClick={() => navigate(`/p/${town.slug}/places`)}>
+                    📍 {town.name}
+                  </NavDropdown.Item>
+                ))}
+              </NavDropdown>
+
+              {token && userDb?.role === 'ROLE_ADMIN' && (
+                <Nav.Link 
+                  onClick={() => navigate('/admin')} 
+                  style={{ color: '#00bfa5', fontWeight: '600' }}
+                >
+                  {t('nav.admin')}
+                </Nav.Link>
+              )}
               <NavDropdown title={t('nav.select_town')} id="town-dropdown">
                 {towns.map(town => (
                   <NavDropdown.Item key={town.id} onClick={() => navigate(`/p/${town.slug}/places`)}>
@@ -134,8 +177,29 @@ const NavbarComponent = () => {
               <Globe size={18} className="text-white ms-2" />
             </div>
 
+            <div className="d-flex align-items-center me-3">
+              <Button 
+                variant="link" 
+                className="text-white p-0 me-2 text-decoration-none" 
+                onClick={() => { i18n.changeLanguage('es'); localStorage.setItem('i18nextLng', 'es'); }}
+              >ES</Button>
+              <span className="text-white-50">|</span>
+              <Button 
+                variant="link" 
+                className="text-white p-0 ms-2 text-decoration-none" 
+                onClick={() => { i18n.changeLanguage('en'); localStorage.setItem('i18nextLng', 'en'); }}
+              >EN</Button>
+              <Globe size={18} className="text-white ms-2" />
+            </div>
+
             {user ? (
               <div className="d-flex align-items-center">
+                <img 
+                  src={user.picture} 
+                  alt="avatar" 
+                  width="32" 
+                  height="32" 
+                  className="rounded-circle me-2 border border-white" 
                 <img 
                   src={user.picture} 
                   alt="avatar" 
@@ -148,10 +212,15 @@ const NavbarComponent = () => {
                   {user.name}
                 </span>
                 <Button variant="outline-light" size="sm" onClick={handleLogout} title={t('nav.logout')}>
+                <span className="text-white me-3" style={{ fontSize: '0.9rem' }}>
+                  {user.name}
+                </span>
+                <Button variant="outline-light" size="sm" onClick={handleLogout} title={t('nav.logout')}>
                   <LogOut size={18} />
                 </Button>
               </div>
             ) : (
+              token && <Button variant="outline-light" onClick={handleLogout}>{t('nav.logout')}</Button>
               token && <Button variant="outline-light" onClick={handleLogout}>{t('nav.logout')}</Button>
             )}
           </Navbar.Collapse>
