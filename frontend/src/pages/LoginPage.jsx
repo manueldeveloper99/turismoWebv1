@@ -12,7 +12,7 @@ const LoginPage = () => {
 
   const handleSuccess = async (credentialResponse) => {
     try {
-      const res = await api.post('/auth/google', { token: credentialResponse.credential });
+      await api.post('/auth/google', { token: credentialResponse.credential });
       localStorage.setItem('token', credentialResponse.credential); 
       if (townSlug) {
          navigate(`/p/${townSlug}/places`);

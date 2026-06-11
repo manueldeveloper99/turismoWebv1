@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badge, Image, Toast, ToastContainer } from 'react-bootstrap';
+import { useSearchParams } from 'react-router-dom'; // Importamos useSearchParams para manejar los parámetros de consulta
+import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badge, Image, Toast, ToastContainer, Pagination } from 'react-bootstrap';
 import api from '../services/api';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import QRPoster from '../components/QRPoster';
@@ -20,9 +21,18 @@ import {
 const AdminPanel = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('lugares');
-  const [towns, setTowns] = useState([]);
-  const [selectedTown, setSelectedTown] = useState(null);
-  const [places, setPlaces] = useState([]);
+const [towns, setTowns] = useState([]);
+const [selectedTown, setSelectedTown] = useState(null);
+const [places, setPlaces] = useState([]); // ESTADOS NUEVOS DE REACT
+const [searchPlace, setSearchPlace] = useState('');
+const [searchParams, setSearchParams] = useSearchParams();//
+const [sortOrder, setSortOrder] = useState('az'); // Estado para el ordenamiento de lugares
+const [currentPage, setCurrentPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+  
+  
+  
+  
 
   const [showTownModal, setShowTownModal] = useState(false);
   const [showPlaceModal, setShowPlaceModal] = useState(false);
@@ -86,15 +96,19 @@ const AdminPanel = () => {
     if (selectedTown) {
       fetchPlaces();
     }
-  }, [selectedTown]);
+  }, [selectedTown, currentPage]);
 
   const fetchPlaces = (slug) => {
     const targetSlug = slug || selectedTown?.slug;
     if (targetSlug) {
-      return api.get(`/towns/${targetSlug}/places`)
+      return api.get(`/towns/${targetSlug}/places`, {
+        params: { page: currentPage - 1, size: 20 }
+      })
         .then(res => {
-          const data = res.data || [];
+          const data = res.data.content || res.data || [];
+          const total = res.data.totalPages || 1;
           setPlaces(data);
+          setTotalPages(total);
           return data;
         })
         .catch(err => {
@@ -422,17 +436,47 @@ const AdminPanel = () => {
                 </Button>
               </div>
 
-              <div className="mb-4 w-25">
-                <Form.Select
-                  value={selectedTown?.id || ''}
-                  onChange={(e) => {
-                    const found = towns.find(t => t.id === parseInt(e.target.value));
-                    setSelectedTown(found);
-                  }}
-                >
-                  {towns.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                </Form.Select>
-              </div>
+             <div className="d-flex gap-3 mb-4">
+  <div style={{ width: '250px' }}>
+    <Form.Select
+      value={selectedTown?.id || ''}
+      onChange={(e) => {
+        const found = towns.find(t => t.id === parseInt(e.target.value));
+        setSelectedTown(found);
+        setCurrentPage(1); // Reiniciar a página 1 al cambiar de pueblo
+      }}
+    >
+      {towns.map(t => (
+        <option key={t.id} value={t.id}>
+          {t.name}
+        </option>
+      ))}
+    </Form.Select>
+  </div>
+
+ <div style={{ width: '300px' }}>
+  <Form.Control
+    type="text"
+    placeholder="Buscar lugar turístico..."
+    value={searchPlace}
+    onChange={(e) => {
+      setSearchPlace(e.target.value);
+      setSearchParams({ search: e.target.value });
+      setCurrentPage(1); // Resetear a la primera página al buscar
+    }}
+  />
+</div>
+
+<div style={{ width: '200px' }}>
+  <Form.Select
+    value={sortOrder}
+    onChange={(e) => setSortOrder(e.target.value)}
+  >
+    <option value="az">Ordenar A-Z</option>
+    <option value="za">Ordenar Z-A</option>
+  </Form.Select>
+</div>
+</div>
 
               <Table hover responsive className="align-middle">
                 <thead className="bg-light">
@@ -446,7 +490,19 @@ const AdminPanel = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {places.map(p => (
+               {places
+  .filter(p => //filtra y ordena de la a a la z o de la z a ala a
+    !searchPlace ||
+    p.name.toLowerCase().includes(searchPlace.toLowerCase())
+  )
+  .sort((a, b) => {
+    if (sortOrder === 'az') {
+      return a.name.localeCompare(b.name);
+    } else {
+      return b.name.localeCompare(a.name);
+    }
+  })
+  .map(p => (
                     <tr 
                       key={p.id} 
                       style={{ 
@@ -498,6 +554,17 @@ const AdminPanel = () => {
                   {places.length === 0 && <tr><td colSpan="6" className="text-center text-muted">No hay lugares en este pueblo</td></tr>}
                 </tbody>
               </Table>
+              {totalPages > 1 && (
+                <Pagination className="justify-content-center mt-3">
+                  <Pagination.Prev disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} />
+                  {[...Array(totalPages).keys()].map(n => (
+                    <Pagination.Item key={n + 1} active={n + 1 === currentPage} onClick={() => setCurrentPage(n + 1)}>
+                      {n + 1}
+                    </Pagination.Item>
+                  ))}
+                  <Pagination.Next disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} />
+                </Pagination>
+              )}
             </div>
           )}
 

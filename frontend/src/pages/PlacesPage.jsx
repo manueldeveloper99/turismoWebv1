@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'; 
-import { Container, Row, Col, Card, Badge, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge, Button, Pagination } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -81,22 +81,66 @@ const PlacesPage = () => {
   const { townSlug } = useParams();
   const { t } = useTranslation();
   const [places, setPlaces] = useState([]);
+  const [searchPlace, setSearchPlace] = useState('');
   const [town, setTown] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [viewMode, setViewMode] = useState('mapa'); // 'lista', 'mapa'
   const [userLocation, setUserLocation] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const mapRef = useRef(null);
+
+  const MarkerWithPopup = ({ place, index }) => {
+    const markerRef = useRef(null);
+    const isSelected = selectedPlace?.id === place.id;
+    
+    useEffect(() => {
+      if (isSelected && markerRef.current) {
+        markerRef.current.openPopup();
+      }
+    }, [isSelected]);
+
+    return (
+      <Marker 
+        ref={markerRef}
+        position={[place.latitude, place.longitude]}
+        icon={createCustomIcon(getCategoryColor(place.category), index + 1)}
+        eventHandlers={{
+          click: () => setSelectedPlace(place),
+        }}
+      >
+        <Popup className="custom-popup" autoPan={false}>
+          <div style={{ width: '200px' }}>
+            <img src={place.imageUrl || 'https://via.placeholder.com/200'} alt={place.name} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px 8px 0 0', marginBottom: '8px' }} />
+            <h6 className="fw-bold mb-1">{place.name}</h6>
+            <span className="badge rounded-pill mb-2" style={{backgroundColor: getCategoryColor(place.category), color: '#fff'}}>{place.category}</span>
+            <p style={{ fontSize: '0.8rem', margin: 0 }} className="text-truncate">{place.description}</p>
+          </div>
+        </Popup>
+      </Marker>
+    );
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [townSlug]);
 
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
-        const res = await api.get(`/towns/${townSlug}/places`);
-        // FILTRAR: Solo mostrar lugares activos al turista
-        const activePlaces = (res.data || []).filter(p => p.active === true);
-        setPlaces(activePlaces);
-        const placeWithCoords = activePlaces.find(p => p.latitude && p.longitude);
-        if (placeWithCoords) {
-          setSelectedPlace(placeWithCoords);
+        const res = await api.get(`/towns/${townSlug}/places`, {
+          params: { page: currentPage - 1, size: 20, onlyActive: true }
+        });
+        
+        const data = res.data.content || res.data || [];
+        const total = res.data.totalPages || 1;
+
+        setPlaces(data);
+        setTotalPages(total);
+
+        if (data.length > 0) {
+          const placeWithCoords = data.find(p => p.latitude && p.longitude);
+          if (placeWithCoords) setSelectedPlace(placeWithCoords);
         }
         
         const townRes = await api.get(`/towns/${townSlug}`);
@@ -106,7 +150,7 @@ const PlacesPage = () => {
       }
     };
     fetchPlaces();
-  }, [townSlug]);
+  }, [townSlug, currentPage]);
 
   const getCategoryColor = (category) => {
     if(!category) return '#6c757d';
@@ -225,6 +269,17 @@ const PlacesPage = () => {
             </Col>
           ))}
           </Row>
+          {totalPages > 1 && (
+            <Pagination className="justify-content-center mt-3">
+              <Pagination.Prev disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} />
+              {[...Array(totalPages).keys()].map(n => (
+                <Pagination.Item key={n + 1} active={n + 1 === currentPage} onClick={() => setCurrentPage(n + 1)}>
+                  {n + 1}
+                </Pagination.Item>
+              ))}
+              <Pagination.Next disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} />
+            </Pagination>
+          )}
           {places.length === 0 && <p className="text-muted">{t('places.no_places')}</p>}
         </Col>
 

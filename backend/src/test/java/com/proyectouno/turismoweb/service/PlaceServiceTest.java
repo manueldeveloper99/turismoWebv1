@@ -16,6 +16,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 public class PlaceServiceTest {
@@ -43,23 +46,25 @@ public class PlaceServiceTest {
 
     @Test
     void testGetPlacesByTownSlug_Found() {
-        when(placeRepository.findByTownSlug("santa-maria")).thenReturn(Arrays.asList(place1));
+        when(placeRepository.findByTownSlug(eq("santa-maria"), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Arrays.asList(place1)));
 
-        List<Place> results = placeService.getPlacesByTownSlug("santa-maria");
+        Page<Place> results = placeService.getPlacesByTownSlug("santa-maria", Pageable.unpaged(), false);
 
-        assertEquals(1, results.size());
-        assertEquals("Mirador", results.get(0).getName());
-        verify(placeRepository).findByTownSlug("santa-maria");
+        assertEquals(1, results.getContent().size());
+        assertEquals("Mirador", results.getContent().get(0).getName());
+        verify(placeRepository).findByTownSlug(eq("santa-maria"), any(Pageable.class));
     }
 
     @Test
     void testGetPlacesByTownSlug_NotFound() {
-        when(placeRepository.findByTownSlug("unknown")).thenReturn(Collections.emptyList());
+        when(placeRepository.findByTownSlug(eq("unknown"), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        List<Place> results = placeService.getPlacesByTownSlug("unknown");
+        Page<Place> results = placeService.getPlacesByTownSlug("unknown", Pageable.unpaged(), false);
 
-        assertTrue(results.isEmpty());
-        verify(placeRepository).findByTownSlug("unknown");
+        assertTrue(results.getContent().isEmpty());
+        verify(placeRepository).findByTownSlug(eq("unknown"), any(Pageable.class));
     }
 
     @Test

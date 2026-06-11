@@ -2,7 +2,8 @@ import { QRCodeSVG } from 'qrcode.react';
 import { MapPin, Printer } from 'lucide-react';  //Alegr
 
 function QRPoster({ townSlug, townName, exactUrl }) {
-  const url = exactUrl || `${import.meta.env.VITE_APP_URL}/p/${townSlug}`;
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : import.meta.env.VITE_APP_URL;
+  const url = exactUrl || `${baseUrl}/p/${townSlug}`;
 
   return (
     <div className="d-flex flex-column align-items-center p-2">
