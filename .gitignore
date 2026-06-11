@@ -7,3 +7,7 @@ build/
 # H2 Database files
 backend/turismodb.mv.db
 backend/turismodb.trace.db
+
+# Environment variables
+.env
+.env.local

@@ -54,20 +54,13 @@ const AIChatbot = () => {
       // Manejo robusto de la respuesta: extraemos el contenido ya sea si viene como objeto o como string directo.
       const aiResponse = res.data?.response || (typeof res.data === 'string' ? res.data : 'Lo siento, no pude encontrar información sobre eso.');
       const aiSentiment = res.data?.sentiment || 'neutral';
-<<<<<<< HEAD
-=======
       const recommendedPlaces = res.data?.recommendedPlaces || [];
->>>>>>> Feature-Branch-Alessandro2
 
       setChat(prev => [...prev, { 
         role: 'ai', 
         content: aiResponse,
-<<<<<<< HEAD
-        sentiment: aiSentiment
-=======
         sentiment: aiSentiment,
         recommendedPlaces: recommendedPlaces
->>>>>>> Feature-Branch-Alessandro2
       }]);
     } catch (err) {
       // Logueamos el error para depuración técnica en la consola

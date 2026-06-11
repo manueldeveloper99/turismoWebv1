@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom'; // Importamos useSearchParams para manejar los parámetros de consulta
+import { useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badge, Image, Toast, ToastContainer, Pagination } from 'react-bootstrap';
+import ReactGA from 'react-ga4';
 import api from '../services/api';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import QRPoster from '../components/QRPoster';
@@ -134,9 +135,11 @@ const [totalPages, setTotalPages] = useState(1);
     try {
       if (town.id) {
         await api.put(`/admin/towns/${town.id}`, town);
+        ReactGA.event({ category: 'Admin', action: 'Update Town', label: town.name });
         showMessage('Pueblo actualizado exitosamente');
       } else {
         const res = await api.post('/admin/towns', town);
+        ReactGA.event({ category: 'Admin', action: 'Create Town', label: town.name });
         const newTown = res.data;
         showMessage('Pueblo agregado exitosamente');
         // Preparamos y mostramos el QR inmediatamente con los datos de la respuesta
@@ -162,6 +165,7 @@ const [totalPages, setTotalPages] = useState(1);
     if (window.confirm('¿Estás seguro de eliminar este pueblo y todos sus lugares?')) {
       try {
         await api.delete(`/admin/towns/${id}`);
+        ReactGA.event({ category: 'Admin', action: 'Delete Town', label: `ID: ${id}` });
         showMessage('Pueblo eliminado');
         fetchTowns();
         fetchStats();
@@ -196,9 +200,11 @@ const [totalPages, setTotalPages] = useState(1);
 
       if (place.id) {
         await api.put(`/admin/places/${place.id}`, placeData);
+        ReactGA.event({ category: 'Admin', action: 'Update Place', label: place.name });
         showMessage('Lugar actualizado exitosamente');
       } else {
         await api.post('/admin/places', placeData);
+        ReactGA.event({ category: 'Admin', action: 'Create Place', label: place.name });
         showMessage('Lugar agregado exitosamente');
       }
 
@@ -244,6 +250,7 @@ const [totalPages, setTotalPages] = useState(1);
     try {
       // 2. Intentamos el endpoint de status
       await api.put(`/admin/places/${p.id}/status`, { active: newStatus });
+      ReactGA.event({ category: 'Admin', action: 'Toggle Place Status', label: `${p.name}: ${newStatus}` });
       fetchStats().catch(() => {});
     } catch (err) {
       // 3. Fallback: Si el endpoint /status no existe, usamos el PUT general
@@ -273,6 +280,7 @@ const [totalPages, setTotalPages] = useState(1);
     if (window.confirm('¿Estás seguro de eliminar este lugar?')) {
       try {
         await api.delete(`/admin/places/${id}`);
+        ReactGA.event({ category: 'Admin', action: 'Delete Place', label: `ID: ${id}` });
         showMessage('Lugar eliminado');
         await fetchPlaces(selectedTown?.slug);
         await fetchStats();
