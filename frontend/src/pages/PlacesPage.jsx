@@ -7,11 +7,13 @@ import api from '../services/api';
 import { useTranslation } from 'react-i18next';//Alegr
 import { MapPin, Target } from 'lucide-react';//Alegr
 
-// Helper for changing map center dynamically
+// Ayuda a que se actualice la vista del mapa al cambiar el lugar seleccionado
 function ChangeView({ center, zoom }) {
   const map = useMap();
   useEffect(() => {
-    map.setView(center, zoom);
+    if (center) {
+      map.setView(center, zoom);
+    }
   }, [center, zoom, map]);
   return null;
 }
@@ -56,11 +58,17 @@ const userIcon = L.divIcon({
 // Componente para el Botón GPS
 const LocationButton = ({ onLocationFound }) => {
   const map = useMap();
-  const handleLocation = () => {
-    map.locate().on("locationfound", function (e) {
+
+  useEffect(() => {
+    map.on("locationfound", (e) => {
       map.flyTo(e.latlng, 16);
       if (onLocationFound) onLocationFound(e.latlng);
     });
+    return () => map.off("locationfound");
+  }, [map, onLocationFound]);
+
+  const handleLocation = () => {
+    map.locate({ enableHighAccuracy: true });
   };
   return (
     <div className="leaflet-top leaflet-right" style={{ marginTop: '10px', marginRight: '10px' }}>

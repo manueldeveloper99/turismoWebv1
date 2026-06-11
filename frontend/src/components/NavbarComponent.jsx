@@ -166,8 +166,8 @@ const NavbarComponent = () => {
             )}
           </Navbar.Collapse>
         </Container>
-        <AIChatbot />
       </Navbar>
+      <AIChatbot />
     </>
   );
 };
