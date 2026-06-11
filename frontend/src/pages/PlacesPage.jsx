@@ -96,6 +96,7 @@ const PlacesPage = () => {
   const [searchPlace, setSearchPlace] = useState('');
   const [town, setTown] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('Todas');
   const [viewMode, setViewMode] = useState('mapa'); // 'lista', 'mapa'
   const [userLocation, setUserLocation] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -137,6 +138,26 @@ const PlacesPage = () => {
     window.addEventListener('focusPlace', onFocusPlace);
     return () => window.removeEventListener('focusPlace', onFocusPlace);
   }, []);
+
+  const uniqueCategories = useMemo(() => {
+    const cats = new Set(places.map(p => p.category).filter(Boolean));
+    return ['Todas', ...Array.from(cats)];
+  }, [places]);
+
+  const filteredPlaces = useMemo(() => {
+    return places.filter(place => {
+      const matchesSearch = place.name.toLowerCase().includes(searchPlace.toLowerCase()) || 
+                            (place.description && place.description.toLowerCase().includes(searchPlace.toLowerCase()));
+      const matchesCategory = selectedCategory === 'Todas' || place.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [places, searchPlace, selectedCategory]);
+
+  useEffect(() => {
+    if (selectedPlace && !filteredPlaces.find(p => p.id === selectedPlace.id)) {
+      setSelectedPlace(null);
+    }
+  }, [filteredPlaces, selectedPlace]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -211,7 +232,7 @@ const PlacesPage = () => {
       }} />
 
       <Container className="pt-4 pb-5" style={{ position: 'relative', zIndex: 1 }}>
-        <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="m-0 fw-bold">{t('places.title')} - {town?.name || townSlug}</h2>
         <Button 
           variant="outline-dark" 
@@ -240,11 +261,44 @@ const PlacesPage = () => {
         </div>
       </div>
 
+      {/* Search and Filters */}
+      <Row className="mb-4">
+        <Col md={6} lg={4} className="mb-3 mb-md-0">
+          <div className="position-relative">
+            <input 
+              type="text" 
+              className="form-control rounded-pill pe-5 translucent-card" 
+              placeholder={t('places.search_placeholder', 'Buscar lugar...')} 
+              value={searchPlace}
+              onChange={(e) => setSearchPlace(e.target.value)}
+              style={{ border: '1px solid var(--bs-border-color)' }}
+            />
+            <span className="position-absolute top-50 end-0 translate-middle-y me-3 text-muted">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+          </div>
+        </Col>
+        <Col md={6} lg={8}>
+          <div className="d-flex gap-2 overflow-auto custom-scrollbar pb-2" style={{ whiteSpace: 'nowrap' }}>
+            {uniqueCategories.map(cat => (
+              <Button 
+                key={cat}
+                variant={selectedCategory === cat ? 'primary' : 'outline-secondary'}
+                className="rounded-pill px-3 py-1 translucent-card"
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat}
+              </Button>
+            ))}
+          </div>
+        </Col>
+      </Row>
+
       <Row>
         {/* Left Column: List */}
         <Col md={viewMode === 'lista' ? 12 : 4} className={`mb-4 custom-scrollbar ${viewMode === 'mapa' ? 'd-none d-md-block' : ''}`} style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '15px', overflowX: 'hidden' }}>
           <Row>
-          {places.map((place, index) => (
+          {filteredPlaces.map((place, index) => (
             <Col md={viewMode === 'lista' ? 6 : 12} lg={viewMode === 'lista' ? 4 : 12} key={place.id}>
             <Card 
               key={place.id} 
@@ -290,7 +344,7 @@ const PlacesPage = () => {
               <Pagination.Next disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} />
             </Pagination>
           )}
-          {places.length === 0 && <p className="text-muted">{t('places.no_places')}</p>}
+          {filteredPlaces.length === 0 && <p className="text-muted">{t('places.no_places')}</p>}
         </Col>
 
         {/* Right Column: Map */}
@@ -308,7 +362,7 @@ const PlacesPage = () => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {places.filter(p => p.latitude && p.longitude).map((place, index) => (
+              {filteredPlaces.filter(p => p.latitude && p.longitude).map((place, index) => (
                 <MarkerWithPopup 
                   key={place.id} 
                   place={place} 
