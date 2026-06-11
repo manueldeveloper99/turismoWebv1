@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom'; // Importamos useSearchParams para manejar los parámetros de consulta
-import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badge, Image, Toast, ToastContainer } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Alert, Nav, Table, Modal, Badge, Image, Toast, ToastContainer, Pagination } from 'react-bootstrap';
 import api from '../services/api';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import QRPoster from '../components/QRPoster';
@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'; //Alegr
 
 const AdminPanel = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('lugares');
 const [towns, setTowns] = useState([]);
 const [selectedTown, setSelectedTown] = useState(null);
@@ -26,6 +27,8 @@ const [places, setPlaces] = useState([]); // ESTADOS NUEVOS DE REACT
 const [searchPlace, setSearchPlace] = useState('');
 const [searchParams, setSearchParams] = useSearchParams();//
 const [sortOrder, setSortOrder] = useState('az'); // Estado para el ordenamiento de lugares
+const [currentPage, setCurrentPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
   
   
   
@@ -93,15 +96,19 @@ const [sortOrder, setSortOrder] = useState('az'); // Estado para el ordenamiento
     if (selectedTown) {
       fetchPlaces();
     }
-  }, [selectedTown]);
+  }, [selectedTown, currentPage]);
 
   const fetchPlaces = (slug) => {
     const targetSlug = slug || selectedTown?.slug;
     if (targetSlug) {
-      return api.get(`/towns/${targetSlug}/places`)
+      return api.get(`/towns/${targetSlug}/places`, {
+        params: { page: currentPage - 1, size: 20 }
+      })
         .then(res => {
-          const data = res.data || [];
+          const data = res.data.content || res.data || [];
+          const total = res.data.totalPages || 1;
           setPlaces(data);
+          setTotalPages(total);
           return data;
         })
         .catch(err => {
@@ -436,6 +443,7 @@ const [sortOrder, setSortOrder] = useState('az'); // Estado para el ordenamiento
       onChange={(e) => {
         const found = towns.find(t => t.id === parseInt(e.target.value));
         setSelectedTown(found);
+        setCurrentPage(1); // Reiniciar a página 1 al cambiar de pueblo
       }}
     >
       {towns.map(t => (
@@ -454,6 +462,7 @@ const [sortOrder, setSortOrder] = useState('az'); // Estado para el ordenamiento
     onChange={(e) => {
       setSearchPlace(e.target.value);
       setSearchParams({ search: e.target.value });
+      setCurrentPage(1); // Resetear a la primera página al buscar
     }}
   />
 </div>
@@ -545,6 +554,17 @@ const [sortOrder, setSortOrder] = useState('az'); // Estado para el ordenamiento
                   {places.length === 0 && <tr><td colSpan="6" className="text-center text-muted">No hay lugares en este pueblo</td></tr>}
                 </tbody>
               </Table>
+              {totalPages > 1 && (
+                <Pagination className="justify-content-center mt-3">
+                  <Pagination.Prev disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} />
+                  {[...Array(totalPages).keys()].map(n => (
+                    <Pagination.Item key={n + 1} active={n + 1 === currentPage} onClick={() => setCurrentPage(n + 1)}>
+                      {n + 1}
+                    </Pagination.Item>
+                  ))}
+                  <Pagination.Next disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} />
+                </Pagination>
+              )}
             </div>
           )}
 
