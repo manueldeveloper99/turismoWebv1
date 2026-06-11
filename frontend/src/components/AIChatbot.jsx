@@ -48,7 +48,14 @@ const AIChatbot = () => {
       // Enviamos el mensaje junto con el contexto del pueblo actual
       const res = await api.post('/ai/chat', { 
         prompt: message,
-        townContext: currentTown 
+        townContext: currentTown,
+        // Enviamos las categorías válidas para que el backend filtre la DB correctamente
+        categories: {
+          'Gastronomía': ['restaurante', 'comida', 'cafetería', 'bar'],
+          'Cultural': ['museo', 'teatro', 'iglesia', 'historia'],
+          'Mirador': ['vista', 'paisaje', 'montaña'],
+          'Parque': ['recreación', 'naturaleza', 'senderismo']
+        }
       });
 
       // Manejo robusto de la respuesta: extraemos el contenido ya sea si viene como objeto o como string directo.

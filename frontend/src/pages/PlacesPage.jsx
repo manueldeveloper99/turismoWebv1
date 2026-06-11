@@ -8,6 +8,13 @@ import { useTranslation } from 'react-i18next';//Alegr
 import { MapPin, Target, MessageSquare } from 'lucide-react';
 import { DiscussionEmbed } from 'disqus-react';
 
+// Definición del icono para la ubicación del usuario
+const userIcon = L.icon({
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/235/235861.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+});
+
 // Ayuda a que se actualice la vista del mapa al cambiar el lugar seleccionado
 function ChangeView({ center, zoom }) {
   const map = useMap();
@@ -48,18 +55,7 @@ const MarkerWithPopup = ({ place, index, isSelected, onSelect, getCategoryColor,
   );
 };
 
-// Icono personalizado para el usuario (Punto azul con borde blanco)
-const userIcon = L.divIcon({
-  className: 'user-location-marker',
-  html: `<div style="background-color: #0d6efd; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>`,
-  iconSize: [18, 18],
-  iconAnchor: [9, 9]
-});
 
-<<<<<<< HEAD
-=======
-
->>>>>>> cf885d285bf4612d7e213c4ae8e34ea24736accd
 // Componente para el Botón GPS
 const LocationButton = ({ onLocationFound }) => {
   const map = useMap();
@@ -172,10 +168,6 @@ const PlacesPage = () => {
     fetchPlaces();
   }, [townSlug, currentPage]);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> cf885d285bf4612d7e213c4ae8e34ea24736accd
   const centerCoords = useMemo(() => {
     if (selectedPlace?.latitude && selectedPlace?.longitude) {
       return [selectedPlace.latitude, selectedPlace.longitude];
@@ -305,29 +297,21 @@ const PlacesPage = () => {
       </Row>
 
       {/* Disqus Comments Section */}
-      {selectedPlace && (
-        <Row className="mt-5">
-          <Col md={12}>
-            <Card className="shadow-sm border-0" style={{ borderRadius: '15px' }}>
-              <Card.Body className="p-4">
-                <h4 className="fw-bold mb-4 d-flex align-items-center">
-                  <MessageSquare className="me-2 text-primary" />
-                  {t('places.reviews', 'Reseñas y Comentarios')} - {selectedPlace.name}
-                </h4>
-                <DiscussionEmbed
-                  shortname="turismo-local-cr"
-                  config={{
-                    url: `${window.location.origin}/p/${townSlug}/places?destino=${selectedPlace.id}`,
-                    identifier: `place-${selectedPlace.id}`,
-                    title: selectedPlace.name,
-                    language: i18n.language || 'es_MX'
-                  }}
-                />
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      )}
+      <div className="mt-5">
+        <h4 className="fw-bold mb-4">
+          <MessageSquare className="me-2" />
+          {t('places.comments') || 'Comentarios'}
+        </h4>
+        <DiscussionEmbed
+          shortname="turismo-local-cr"
+          config={{
+            url: window.location.href,
+            identifier: townSlug,
+            title: town?.name || townSlug,
+            language: i18n.language === 'en' ? 'en_US' : 'es_ES'
+          }}
+        />
+      </div>
     </Container>
   );
 };

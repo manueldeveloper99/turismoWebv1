@@ -7,6 +7,7 @@ import com.proyectouno.turismoweb.service.TownService;
 import com.proyectouno.turismoweb.service.UserService;
 import com.proyectouno.turismoweb.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,34 +32,34 @@ public class AdminController {
     private final UserService userService;
 
     @PostMapping("/towns")
-    public Town createTown(@RequestBody Town town) {
+    public Town createTown(@NonNull @RequestBody Town town) {
         return townService.saveTown(town);
     }
 
     @PutMapping("/towns/{id}")
-    public Town updateTown(@PathVariable Long id, @RequestBody Town town) {
+    public Town updateTown(@NonNull @PathVariable Long id, @NonNull @RequestBody Town town) {
         town.setId(id);
         return townService.saveTown(town);
     }
 
     @DeleteMapping("/towns/{id}")
-    public void deleteTown(@PathVariable Long id) {
+    public void deleteTown(@NonNull @PathVariable Long id) {
         townService.deleteTown(id);
     }
 
     @PostMapping("/places")
-    public Place createPlace(@RequestBody Place place) {
+    public Place createPlace(@NonNull @RequestBody Place place) {
         return placeService.savePlace(place);
     }
 
     @PutMapping("/places/{id}")
-    public Place updatePlace(@PathVariable Long id, @RequestBody Place place) {
+    public Place updatePlace(@NonNull @PathVariable Long id, @NonNull @RequestBody Place place) {
         place.setId(id);
         return placeService.savePlace(place);
     }
 
     @DeleteMapping("/places/{id}")
-    public void deletePlace(@PathVariable Long id) {
+    public void deletePlace(@NonNull @PathVariable Long id) {
         placeService.deletePlace(id);
     }
 
@@ -69,7 +70,7 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}/role")
-    public ResponseEntity<?> updateUserRole(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> updateUserRole(@NonNull @PathVariable Long id, @RequestBody Map<String, String> body) {
         try {
             User updatedUser = userService.updateRole(id, body.get("role"));
             return ResponseEntity.ok(updatedUser);
@@ -81,7 +82,7 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}/status")
-    public User updateUserStatus(@PathVariable Long id, @RequestBody Map<String, Boolean> body) {
+    public User updateUserStatus(@NonNull @PathVariable Long id, @RequestBody Map<String, Boolean> body) {
         return userService.updateStatus(id, body.get("active"));
     }
 
