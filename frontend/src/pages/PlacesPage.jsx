@@ -14,12 +14,42 @@ function ChangeView({ center, zoom }) {
   return null;
 }
 
+// Definido fuera para evitar que el marcador se reinicie al cambiar el estado de la página
+const MarkerWithPopup = ({ place, index, isSelected, onSelect, getCategoryColor, createCustomIcon }) => {
+  const markerRef = useRef(null);
+  
+  useEffect(() => {
+    if (isSelected && markerRef.current) {
+      markerRef.current.openPopup();
+    }
+  }, [isSelected]);
+
+  return (
+    <Marker 
+      ref={markerRef}
+      position={[place.latitude, place.longitude]}
+      icon={createCustomIcon(getCategoryColor(place.category), index + 1)}
+      eventHandlers={{ click: () => onSelect(place) }}
+    >
+      <Popup className="custom-popup" autoPan={false}>
+        <div style={{ width: '200px' }}>
+          <img src={place.imageUrl || 'https://via.placeholder.com/200'} alt={place.name} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px 8px 0 0', marginBottom: '8px' }} />
+          <h6 className="fw-bold mb-1">{place.name}</h6>
+          <span className="badge rounded-pill mb-2" style={{backgroundColor: getCategoryColor(place.category), color: '#fff'}}>{place.category}</span>
+          <p style={{ fontSize: '0.8rem', margin: 0 }} className="text-truncate">{place.description}</p>
+        </div>
+      </Popup>
+    </Marker>
+  );
+};
+
 // Componente para el Botón GPS
-const LocationButton = () => {
+const LocationButton = ({ onLocationFound }) => {
   const map = useMap();
   const handleLocation = () => {
     map.locate().on("locationfound", function (e) {
       map.flyTo(e.latlng, 16);
+      if (onLocationFound) onLocationFound(e.latlng);
     });
   };
   return (
@@ -44,38 +74,8 @@ const PlacesPage = () => {
   const [town, setTown] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [viewMode, setViewMode] = useState('mapa'); // 'lista', 'mapa'
+  const [userLocation, setUserLocation] = useState(null);
   const mapRef = useRef(null);
-
-  const MarkerWithPopup = ({ place, index }) => {
-    const markerRef = useRef(null);
-    const isSelected = selectedPlace?.id === place.id;
-    
-    useEffect(() => {
-      if (isSelected && markerRef.current) {
-        markerRef.current.openPopup();
-      }
-    }, [isSelected]);
-
-    return (
-      <Marker 
-        ref={markerRef}
-        position={[place.latitude, place.longitude]}
-        icon={createCustomIcon(getCategoryColor(place.category), index + 1)}
-        eventHandlers={{
-          click: () => setSelectedPlace(place),
-        }}
-      >
-        <Popup className="custom-popup" autoPan={false}>
-          <div style={{ width: '200px' }}>
-            <img src={place.imageUrl || 'https://via.placeholder.com/200'} alt={place.name} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px 8px 0 0', marginBottom: '8px' }} />
-            <h6 className="fw-bold mb-1">{place.name}</h6>
-            <span className="badge rounded-pill mb-2" style={{backgroundColor: getCategoryColor(place.category), color: '#fff'}}>{place.category}</span>
-            <p style={{ fontSize: '0.8rem', margin: 0 }} className="text-truncate">{place.description}</p>
-          </div>
-        </Popup>
-      </Marker>
-    );
-  };
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -132,6 +132,14 @@ const PlacesPage = () => {
       popupAnchor: [0, -35]
     });
   };
+
+  // Icono personalizado para el usuario (Punto azul con borde blanco)
+  const userIcon = L.divIcon({
+    className: 'user-location-marker',
+    html: `<div style="background-color: #0d6efd; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>`,
+    iconSize: [18, 18],
+    iconAnchor: [9, 9]
+  });
 
   const centerCoords = selectedPlace?.latitude 
     ? [selectedPlace.latitude, selectedPlace.longitude] 
@@ -220,14 +228,27 @@ const PlacesPage = () => {
               ref={mapRef}
             >
               <ChangeView center={centerCoords} zoom={14} />
-              <LocationButton />
+              <LocationButton onLocationFound={setUserLocation} />
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               {places.filter(p => p.latitude && p.longitude).map((place, index) => (
-                <MarkerWithPopup key={place.id} place={place} index={index} />
+                <MarkerWithPopup 
+                  key={place.id} 
+                  place={place} 
+                  index={index} 
+                  isSelected={selectedPlace?.id === place.id}
+                  onSelect={setSelectedPlace}
+                  getCategoryColor={getCategoryColor}
+                  createCustomIcon={createCustomIcon}
+                />
               ))}
+              {userLocation && (
+                <Marker position={userLocation} icon={userIcon}>
+                  <Popup>Estás aquí</Popup>
+                </Marker>
+              )}
             </MapContainer>
           </div>
         </Col>
