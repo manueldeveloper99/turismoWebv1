@@ -45,12 +45,18 @@ const AIChatbot = () => {
         townContext: currentTown 
       });
 
+      // Manejo robusto de la respuesta: extraemos el contenido ya sea si viene como objeto o como string directo.
+      const aiResponse = res.data?.response || (typeof res.data === 'string' ? res.data : 'Lo siento, no pude encontrar información sobre eso.');
+      const aiSentiment = res.data?.sentiment || 'neutral';
+
       setChat(prev => [...prev, { 
         role: 'ai', 
-        content: res.data.response,
-        sentiment: res.data.sentiment // El backend analiza el sentimiento
+        content: aiResponse,
+        sentiment: aiSentiment
       }]);
     } catch (err) {
+      // Logueamos el error para depuración técnica en la consola
+      console.error('Error en la comunicación con el agente de IA:', err);
       setChat(prev => [...prev, { role: 'ai', content: 'Lo siento, tuve un problema al procesar tu solicitud.', sentiment: 'neutral' }]);
     } finally {
       setLoading(false);
