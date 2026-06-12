@@ -5,7 +5,6 @@ import { LogOut, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
-import AIChatbot from './AIChatbot';  //Alegr 
 
 const NavbarComponent = () => {
   const navigate = useNavigate();
@@ -182,7 +181,6 @@ const NavbarComponent = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <AIChatbot />
     </>
   );
 };
