@@ -11,18 +11,22 @@ import { ThemeProvider } from './contexts/ThemeContext'
 
 // Inicializar GA4 con tu ID de medición
 // Lo ideal es que este ID esté en tu archivo .env como VITE_GA_MEASUREMENT_ID
-const TRACKING_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || "G-XXXXXXXXXX";
-ReactGA.initialize(TRACKING_ID);
+const TRACKING_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+if (TRACKING_ID && TRACKING_ID !== "G-XXXXXXXXXX") {
+  ReactGA.initialize(TRACKING_ID);
+}
 
 // Componente auxiliar para rastrear cambios de página automáticamente
 const PageTracker = () => {
   const location = useLocation();
 
   useEffect(() => {
-    ReactGA.send({ 
-      hitType: "pageview", 
-      page: location.pathname + location.search 
-    });
+    if (TRACKING_ID && TRACKING_ID !== "G-XXXXXXXXXX") {
+      ReactGA.send({ 
+        hitType: "pageview", 
+        page: location.pathname + location.search 
+      });
+    }
   }, [location]);
 
   return null;

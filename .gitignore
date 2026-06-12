@@ -1,13 +1,29 @@
-*.json
-# Java/Maven/Gradle
-target/
-build/
-.gradle/
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+*.env*
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # H2 Database files
-backend/turismodb.mv.db
-backend/turismodb.trace.db
-
-# Environment variables
-.env
-.env.local
+backend/*.db
+backend/*.trace.db
