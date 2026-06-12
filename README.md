@@ -55,11 +55,13 @@ El sistema es instalable en dispositivos móviles y permite:
 ### 2. Levantar el Frontend (React)
 1. Abre una nueva terminal y navega a la carpeta del frontend: `cd frontend`
 2. Instala las dependencias: `npm install`
-3. Crea un archivo `.env` en la raíz de la carpeta `frontend` con las siguientes variables:
-   * `VITE_GA_MEASUREMENT_ID`: Tu ID de seguimiento de Google Analytics 4.
-   * `VITE_API_URL`: (Opcional) URL de tu API backend.
+3. Configura las variables de entorno (consulta `frontend/.env.example`):
+   * **Para desarrollo local:** Copia `frontend/.env.example` a `frontend/.env.local` y rellena los valores.
+   * **Para producción (Vercel):** Configura las variables `VITE_API_URL`, `VITE_GA_MEASUREMENT_ID` y `VITE_GOOGLE_CLIENT_ID` directamente en el panel de control de Vercel para tu proyecto.
 4. Inicia el servidor de desarrollo: `npm run dev`
 *(El frontend quedará corriendo en `http://localhost:5173`)*
+
+> **Nota:** Los archivos `.env` están ignorados por seguridad. Consulta `.env.example` para ver las variables requeridas.
 
 ---
 
