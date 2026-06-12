@@ -30,6 +30,14 @@ vi.mock('../services/api', () => ({
   }
 }));
 
+// Mock ThemeContext
+vi.mock('../contexts/ThemeContext', () => ({
+  useTheme: () => ({
+    theme: 'light',
+    toggleTheme: vi.fn()
+  }),
+}));
+
 describe('NavbarComponent', () => {
   beforeEach(() => {
     vi.clearAllMocks();

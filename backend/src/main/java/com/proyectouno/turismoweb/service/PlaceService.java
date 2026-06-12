@@ -5,6 +5,7 @@ import com.proyectouno.turismoweb.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,22 +19,22 @@ public class PlaceService {
         return placeRepository.findAll();
     }
 
-    public Page<Place> getPlacesByTownSlug(String townSlug, Pageable pageable, boolean onlyActive) {
+    public Page<Place> getPlacesByTownSlug(@NonNull String townSlug, @NonNull Pageable pageable, boolean onlyActive) {
         if (onlyActive) {
             return placeRepository.findByTownSlugAndActiveTrue(townSlug, pageable);
         }
         return placeRepository.findByTownSlug(townSlug, pageable);
     }
 
-    public Page<Place> getAllPlaces(Pageable pageable) {
+    public Page<Place> getAllPlaces(@NonNull Pageable pageable) {
         return placeRepository.findAll(pageable);
     }
 
-    public Place savePlace(Place place) {
+    public Place savePlace(@NonNull Place place) {
         return placeRepository.save(place);
     }
 
-    public void deletePlace(Long id) {
+    public void deletePlace(@NonNull Long id) {
         placeRepository.deleteById(id);
     }
 

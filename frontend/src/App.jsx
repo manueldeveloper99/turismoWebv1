@@ -7,6 +7,7 @@ import AdminPanel from './pages/AdminPanel'
 import ErrorPage from './pages/ErrorPage'
 import LandingPage from './pages/LandingPage'
 import NavbarComponent from './components/NavbarComponent'
+import { ThemeProvider } from './contexts/ThemeContext'
 
 // Inicializar GA4 con tu ID de medición
 // Lo ideal es que este ID esté en tu archivo .env como VITE_GA_MEASUREMENT_ID
@@ -33,18 +34,20 @@ const PageTracker = () => {
 
 function App() {
   return (
-    <BrowserRouter>
-      <PageTracker />
-      <NavbarComponent />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/p/:townSlug" element={<LoginPage />} />
-        <Route path="/p/:townSlug/places" element={<PlacesPage />} />
-        <Route path="/admin" element={<AdminPanel />} />
-        <Route path="*" element={<ErrorPage message="Página no encontrada" />} />
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <PageTracker />
+        <NavbarComponent />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/p/:townSlug" element={<LoginPage />} />
+          <Route path="/p/:townSlug/places" element={<PlacesPage />} />
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="*" element={<ErrorPage message="Página no encontrada" />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   )
 }
 
