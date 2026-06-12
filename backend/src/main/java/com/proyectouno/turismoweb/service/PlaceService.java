@@ -19,7 +19,7 @@ public class PlaceService {
         return placeRepository.findAll();
     }
 
-    public Page<Place> getPlacesByTownSlug(String townSlug, Pageable pageable, boolean onlyActive) {
+    public Page<Place> getPlacesByTownSlug(@NonNull String townSlug, @NonNull Pageable pageable, boolean onlyActive) {
         if (onlyActive) {
             return placeRepository.findByTownSlugAndActiveTrue(townSlug, pageable);
         }
