@@ -12,12 +12,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
+
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class PlaceServiceTest {
@@ -28,8 +32,10 @@ public class PlaceServiceTest {
     @InjectMocks
     private PlaceService placeService;
 
-    private Place place1;
-    private Town town;
+    @NonNull
+    private Place place1 = new Place();
+    @NonNull
+    private Town town = new Town();
 
     @BeforeEach
     void setUp() {
@@ -45,8 +51,9 @@ public class PlaceServiceTest {
 
     @Test
     void testGetPlacesByTownSlug_Found() {
+        List<Place> content = Arrays.asList(place1);
         when(placeRepository.findByTownSlug(eq("santa-maria"), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(Arrays.asList(place1)));
+                .thenReturn(new PageImpl<>(content));
 
         Page<Place> results = placeService.getPlacesByTownSlug("santa-maria", Pageable.unpaged(), false);
 
@@ -57,8 +64,9 @@ public class PlaceServiceTest {
 
     @Test
     void testGetPlacesByTownSlug_NotFound() {
+        List<Place> emptyList = Collections.emptyList();
         when(placeRepository.findByTownSlug(eq("unknown"), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(Collections.emptyList()));
+                .thenReturn(new PageImpl<>(emptyList));
 
         Page<Place> results = placeService.getPlacesByTownSlug("unknown", Pageable.unpaged(), false);
 
@@ -68,8 +76,9 @@ public class PlaceServiceTest {
 
     @Test
     void testGetPlacesByTownSlug_OnlyActive() {
+        List<Place> content = Arrays.asList(place1);
         when(placeRepository.findByTownSlugAndActiveTrue(eq("santa-maria"), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(Arrays.asList(place1)));
+                .thenReturn(new PageImpl<>(content));
 
         Page<Place> results = placeService.getPlacesByTownSlug("santa-maria", Pageable.unpaged(), true);
 
@@ -86,14 +95,15 @@ public class PlaceServiceTest {
 
     @Test
     void testGetAllPlacesPage() {
-        when(placeRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(Arrays.asList(place1)));
+        List<Place> content = Arrays.asList(place1);
+        when(placeRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(content));
         Page<Place> results = placeService.getAllPlaces(Pageable.unpaged());
         assertEquals(1, results.getContent().size());
     }
 
     @Test
     void testSavePlace() {
-        when(placeRepository.save(any(Place.class))).thenReturn(place1);
+        when(placeRepository.save(argThat(Objects::nonNull))).thenReturn(place1);
 
         Place savedPlace = placeService.savePlace(place1);
 
@@ -104,8 +114,9 @@ public class PlaceServiceTest {
 
     @Test
     void testDeletePlace() {
-        placeService.deletePlace(1L);
-        verify(placeRepository).deleteById(1L);
+        Long id = 1L;
+        placeService.deletePlace(id);
+        verify(placeRepository).deleteById(id);
     }
 
     @Test

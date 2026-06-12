@@ -9,9 +9,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.lang.NonNull;
+import java.util.Objects;
+import java.util.Optional;
+
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -25,8 +28,10 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private User adminUser;
-    private User normalUser;
+    @NonNull
+    private User adminUser = new User();
+    @NonNull
+    private User normalUser = new User();
 
     @BeforeEach
     void setUp() {
@@ -50,14 +55,14 @@ public class UserServiceTest {
         User result = userService.getOrCreateUser("admin@gmail.com", "Admin", "url");
 
         assertEquals("admin@gmail.com", result.getEmail());
-        verify(userRepository, never()).save(any());
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void testGetOrCreateUser_NewUser_FirstUserIsAdmin() {
         when(userRepository.findByEmail("new@gmail.com")).thenReturn(Optional.empty());
         when(userRepository.count()).thenReturn(0L);
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> (User) invocation.getArgument(0));
 
         User result = userService.getOrCreateUser("new@gmail.com", "New User", "url");
 
@@ -69,7 +74,7 @@ public class UserServiceTest {
     void testGetOrCreateUser_NewUser_SubsequentUserIsRegular() {
         when(userRepository.findByEmail("user2@gmail.com")).thenReturn(Optional.empty());
         when(userRepository.count()).thenReturn(5L);
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> (User) invocation.getArgument(0));
 
         User result = userService.getOrCreateUser("user2@gmail.com", "User 2", "url");
 
@@ -135,9 +140,9 @@ public class UserServiceTest {
     @Test
     void testGetAllUsers() {
         when(userRepository.findAll()).thenReturn(Arrays.asList(adminUser, normalUser));
-        
+
         List<User> users = userService.getAllUsers();
-        
+
         assertEquals(2, users.size());
         verify(userRepository).findAll();
     }

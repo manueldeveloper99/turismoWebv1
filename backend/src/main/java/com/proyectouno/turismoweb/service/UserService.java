@@ -3,6 +3,7 @@ package com.proyectouno.turismoweb.service;
 import com.proyectouno.turismoweb.model.User;
 import com.proyectouno.turismoweb.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User getOrCreateUser(String email, String name, String pictureUrl) {
+    public User getOrCreateUser(@NonNull String email, String name, String pictureUrl) {
         return userRepository.findByEmail(email).orElseGet(() -> {
             User newUser = User.builder()
                     .email(email)
@@ -30,7 +31,7 @@ public class UserService {
         });
     }
 
-    public User updateRole(Long id, String role) {
+    public User updateRole(@NonNull Long id, String role) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 
         validateLastAdmin(user, role, user.getActive());
@@ -39,7 +40,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateStatus(Long id, Boolean active) {
+    public User updateStatus(@NonNull Long id, Boolean active) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 
         validateLastAdmin(user, user.getRole(), active);
