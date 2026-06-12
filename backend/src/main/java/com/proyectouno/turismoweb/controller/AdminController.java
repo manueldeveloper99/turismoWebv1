@@ -71,8 +71,14 @@ public class AdminController {
 
     @PutMapping("/users/{id}/role")
     public ResponseEntity<?> updateUserRole(@NonNull @PathVariable Long id, @RequestBody Map<String, String> body) {
+        String role = body.get("role");
+        if (role == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "El campo 'role' es obligatorio.");
+            return ResponseEntity.badRequest().body(error);
+        }
         try {
-            User updatedUser = userService.updateRole(id, body.get("role"));
+            User updatedUser = userService.updateRole(id, role);
             return ResponseEntity.ok(updatedUser);
         } catch (RuntimeException e) {
             Map<String, String> error = new HashMap<>();
@@ -83,7 +89,11 @@ public class AdminController {
 
     @PutMapping("/users/{id}/status")
     public User updateUserStatus(@NonNull @PathVariable Long id, @RequestBody Map<String, Boolean> body) {
-        return userService.updateStatus(id, body.get("active"));
+        Boolean active = body.get("active");
+        if (active == null) {
+            throw new IllegalArgumentException("El campo 'active' no puede ser nulo.");
+        }
+        return userService.updateStatus(id, active);
     }
 
     // -- STATS --
