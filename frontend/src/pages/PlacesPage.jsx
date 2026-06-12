@@ -382,50 +382,31 @@ const PlacesPage = () => {
       </Row>
 
       {/* Disqus Comments Section */}
-<<<<<<< HEAD
-      {selectedPlace && (
-        <Row className="mt-5">
-          <Col md={12}>
-            <Card className="shadow-sm border-0" style={{ borderRadius: '15px' }}>
-              <Card.Body className="p-4">
-                <h4 className="fw-bold mb-4 d-flex align-items-center">
-                  <MessageSquare className="me-2 text-primary" />
-                  {t('places.reviews', 'Reseñas y Comentarios')} - {selectedPlace.name}
-                </h4>
-                <DiscussionEmbed
-                  shortname="turismo-local-cr"
-                  config={{
-                    url: `${window.location.origin}/p/${townSlug}/places?destino=${selectedPlace.id}`,
-                    identifier: `place-${selectedPlace.id}`,
-                    title: selectedPlace.name,
-                    language: i18n.language || 'es_MX'
-                  }}
-                />
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      )}
-      </Container>
-    </div>
-=======
-      <div className="mt-5">
-        <h4 className="fw-bold mb-4">
-          <MessageSquare className="me-2" />
-          {t('places.comments') || 'Comentarios'}
-        </h4>
-        <DiscussionEmbed
-          shortname="turismo-local-cr"
-          config={{
-            url: window.location.href,
-            identifier: townSlug,
-            title: town?.name || townSlug,
-            language: i18n.language === 'en' ? 'en_US' : 'es_ES'
-          }}
-        />
-      </div>
-    </Container>
->>>>>>> Feature-Branch-Alessandro2
+{selectedPlace && (
+  <Row className="mt-5">
+    <Col md={12}>
+      <Card className="shadow-sm border-0" style={{ borderRadius: '15px' }}>
+        <Card.Body className="p-4">
+          <h4 className="fw-bold mb-4 d-flex align-items-center">
+            <MessageSquare className="me-2 text-primary" />
+            {t('places.reviews', 'Reseñas y Comentarios')} - {selectedPlace.name}
+          </h4>
+          <DiscussionEmbed
+            shortname="turismo-local-cr"
+            config={{
+              url: `${window.location.origin}/p/${townSlug}/places?destino=${selectedPlace.id}`,
+              identifier: `place-${selectedPlace.id}`,
+              title: selectedPlace.name,
+              language: i18n.language === 'en' ? 'en_US' : 'es_ES'
+            }}
+          />
+        </Card.Body>
+      </Card>
+    </Col>
+  </Row>
+)}
+</Container>
+</div>
   );
 };
 
