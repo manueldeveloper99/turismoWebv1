@@ -7,8 +7,9 @@ import 'leaflet/dist/leaflet.css'
 import './i18n'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <GoogleOAuthProvider clientId="57063760649-7bndboevdute7ejlotmfinnim6rfte7e.apps.googleusercontent.com">
+  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <App />
   </GoogleOAuthProvider>
 )
