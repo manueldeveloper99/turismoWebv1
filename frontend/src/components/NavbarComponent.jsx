@@ -62,15 +62,15 @@ const NavbarComponent = () => {
     width: '100%'
   };
 
-  // Memorizar estilos de las hojas para evitar parpadeo en re-renders
-  const leafStyles = useMemo(() => {
+  // Memorizar estilos de las hojas usando useState con inicializador perezoso
+  const [leafStyles] = useState(() => {
     return Array.from({ length: 8 }).map(() => ({
       left: `${Math.random() * 95}%`,
       duration: `${3 + Math.random() * 4}s`,
       delay: `${Math.random() * 5}s`,
       scale: 0.5 + Math.random() * 0.8
     }));
-  }, []);
+  });
 
   return (
     <>

@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'; 
-import { Container, Row, Col, Card, Badge, Button, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Pagination } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import api from '../services/api';
 import { useTranslation } from 'react-i18next';//Alegr
-import { MapPin, Target, MessageSquare } from 'lucide-react';
+import { Target, MessageSquare } from 'lucide-react';
 import { DiscussionEmbed } from 'disqus-react';
 
 // Definición del icono para la ubicación del usuario
@@ -154,11 +154,13 @@ const PlacesPage = () => {
 
   useEffect(() => {
     if (selectedPlace && !filteredPlaces.find(p => p.id === selectedPlace.id)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedPlace(null);
     }
   }, [filteredPlaces, selectedPlace]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
   }, [townSlug]);
 

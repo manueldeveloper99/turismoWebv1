@@ -26,7 +26,7 @@ const [towns, setTowns] = useState([]);
 const [selectedTown, setSelectedTown] = useState(null);
 const [places, setPlaces] = useState([]); // ESTADOS NUEVOS DE REACT
 const [searchPlace, setSearchPlace] = useState('');
-const [searchParams, setSearchParams] = useSearchParams();//
+const [, setSearchParams] = useSearchParams();
 const [sortOrder, setSortOrder] = useState('az'); // Estado para el ordenamiento de lugares
 const [currentPage, setCurrentPage] = useState(1);
 const [totalPages, setTotalPages] = useState(1);
@@ -45,10 +45,24 @@ const [totalPages, setTotalPages] = useState(1);
   const [msg, setMsg] = useState({ text: '', type: '' });
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [, setCurrentUser] = useState(null);
   const [accessDenied, setAccessDenied] = useState(false);
   const [loading, setLoading] = useState(true);
   const messageTimerRef = useRef(null);
+
+  const fetchTowns = () => {
+    return api.get('/towns').then(res => {
+      const data = res.data || [];
+      setTowns(data);
+      if (data.length > 0 && !selectedTown) {
+        setSelectedTown(data[0]);
+      }
+      return data;
+    }).catch(err => {
+      console.error("Error fetching towns", err);
+      return [];
+    });
+  };
 
   useEffect(() => {
     // Validar acceso
@@ -74,30 +88,12 @@ const [totalPages, setTotalPages] = useState(1);
     return api.get('/admin/stats').then(res => { setStats(res.data); return res.data; }).catch(err => { console.error(err); return null; });
   };
 
+
+
   useEffect(() => {
     if (!accessDenied && activeTab === 'usuarios') fetchUsers();
     if (!accessDenied && (activeTab === 'dashboard' || activeTab === 'estadisticas' || activeTab === 'pueblos')) fetchStats();
   }, [activeTab, accessDenied]);
-
-  const fetchTowns = () => {
-    return api.get('/towns').then(res => {
-      const data = res.data || [];
-      setTowns(data);
-      if (data.length > 0 && !selectedTown) {
-        setSelectedTown(data[0]);
-      }
-      return data;
-    }).catch(err => {
-      console.error("Error fetching towns", err);
-      return [];
-    });
-  };
-
-  useEffect(() => {
-    if (selectedTown) {
-      fetchPlaces();
-    }
-  }, [selectedTown, currentPage]);
 
   const fetchPlaces = (slug) => {
     const targetSlug = slug || selectedTown?.slug;
@@ -118,7 +114,13 @@ const [totalPages, setTotalPages] = useState(1);
         });
     }
     return Promise.resolve([]);
-  }
+  };
+
+  useEffect(() => {
+    if (selectedTown) {
+      fetchPlaces();
+    }
+  }, [selectedTown, currentPage]);
 
   const showMessage = (text, type = 'success') => {
     // Limpiar temporizador anterior si existe para evitar conflictos
