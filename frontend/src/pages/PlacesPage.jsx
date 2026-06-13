@@ -282,7 +282,7 @@ const PlacesPage = () => {
               <Button 
                 key={cat}
                 variant={selectedCategory === cat ? 'primary' : 'outline-secondary'}
-                className="rounded-pill px-3 py-1 translucent-card"
+                className={`rounded-pill px-3 py-1 ${selectedCategory === cat ? 'shadow-sm' : 'translucent-card'}`}
                 onClick={() => setSelectedCategory(cat)}
               >
                 {cat}
