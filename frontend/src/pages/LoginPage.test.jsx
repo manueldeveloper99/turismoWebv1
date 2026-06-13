@@ -34,7 +34,7 @@ describe('LoginPage Unit Tests', () => {
 
   it('debe renderizar el título de bienvenida para administradores', () => {
     renderComponent();
-    expect(screen.getByText(/login.admin_title/i)).toBeInTheDocument();
+    expect(screen.getByText(/login.admin_title/i)).toBeInTheDocument(); // Cambiar esto por /BotonQueNoExiste/i
   });
 
   it('debe mostrar el botón de inicio de sesión con Google', () => {

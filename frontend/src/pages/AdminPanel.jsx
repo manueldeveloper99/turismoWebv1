@@ -22,18 +22,18 @@ import {
 const AdminPanel = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('lugares');
-const [towns, setTowns] = useState([]);
-const [selectedTown, setSelectedTown] = useState(null);
-const [places, setPlaces] = useState([]); // ESTADOS NUEVOS DE REACT
-const [searchPlace, setSearchPlace] = useState('');
-const [, setSearchParams] = useSearchParams();
-const [sortOrder, setSortOrder] = useState('az'); // Estado para el ordenamiento de lugares
-const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
-  
-  
-  
-  
+  const [towns, setTowns] = useState([]);
+  const [selectedTown, setSelectedTown] = useState(null);
+  const [places, setPlaces] = useState([]); // ESTADOS NUEVOS DE REACT
+  const [searchPlace, setSearchPlace] = useState('');
+  const [, setSearchParams] = useSearchParams();
+  const [sortOrder, setSortOrder] = useState('az'); // Estado para el ordenamiento de lugares
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+
+
+
 
   const [showTownModal, setShowTownModal] = useState(false);
   const [showPlaceModal, setShowPlaceModal] = useState(false);
@@ -253,7 +253,7 @@ const [totalPages, setTotalPages] = useState(1);
       // 2. Intentamos el endpoint de status
       await api.put(`/admin/places/${p.id}/status`, { active: newStatus });
       ReactGA.event({ category: 'Admin', action: 'Toggle Place Status', label: `${p.name}: ${newStatus}` });
-      fetchStats().catch(() => {});
+      fetchStats().catch(() => { });
     } catch (err) {
       // 3. Fallback: Si el endpoint /status no existe, usamos el PUT general
       // Enviamos el objeto EXACTO que el backend espera (incluyendo la relación town)
@@ -266,9 +266,9 @@ const [totalPages, setTotalPages] = useState(1);
           townId: townId,
           town: { id: townId }
         };
-        
+
         await api.put(`/admin/places/${p.id}`, updateData);
-        fetchStats().catch(() => {});
+        fetchStats().catch(() => { });
       } catch (innerErr) {
         // Revertimos silenciosamente solo si todo falla. No mostramos showMessage por error. //Alegr
         setPlaces(prev => prev.map(item => item.id === p.id ? { ...item, active: originalStatus } : item));
@@ -291,6 +291,8 @@ const [totalPages, setTotalPages] = useState(1);
       }
     }
   };
+
+  // Probando CI/CD
 
   const sidebarStyle = {
     minHeight: 'calc(100vh - 56px)',
@@ -446,47 +448,47 @@ const [totalPages, setTotalPages] = useState(1);
                 </Button>
               </div>
 
-             <div className="d-flex gap-3 mb-4">
-  <div style={{ width: '250px' }}>
-    <Form.Select
-      value={selectedTown?.id || ''}
-      onChange={(e) => {
-        const found = towns.find(t => t.id === parseInt(e.target.value));
-        setSelectedTown(found);
-        setCurrentPage(1); // Reiniciar a página 1 al cambiar de pueblo
-      }}
-    >
-      {towns.map(t => (
-        <option key={t.id} value={t.id}>
-          {t.name}
-        </option>
-      ))}
-    </Form.Select>
-  </div>
+              <div className="d-flex gap-3 mb-4">
+                <div style={{ width: '250px' }}>
+                  <Form.Select
+                    value={selectedTown?.id || ''}
+                    onChange={(e) => {
+                      const found = towns.find(t => t.id === parseInt(e.target.value));
+                      setSelectedTown(found);
+                      setCurrentPage(1); // Reiniciar a página 1 al cambiar de pueblo
+                    }}
+                  >
+                    {towns.map(t => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </div>
 
- <div style={{ width: '300px' }}>
-  <Form.Control
-    type="text"
-    placeholder="Buscar lugar turístico..."
-    value={searchPlace}
-    onChange={(e) => {
-      setSearchPlace(e.target.value);
-      setSearchParams({ search: e.target.value });
-      setCurrentPage(1); // Resetear a la primera página al buscar
-    }}
-  />
-</div>
+                <div style={{ width: '300px' }}>
+                  <Form.Control
+                    type="text"
+                    placeholder="Buscar lugar turístico..."
+                    value={searchPlace}
+                    onChange={(e) => {
+                      setSearchPlace(e.target.value);
+                      setSearchParams({ search: e.target.value });
+                      setCurrentPage(1); // Resetear a la primera página al buscar
+                    }}
+                  />
+                </div>
 
-<div style={{ width: '200px' }}>
-  <Form.Select
-    value={sortOrder}
-    onChange={(e) => setSortOrder(e.target.value)}
-  >
-    <option value="az">Ordenar A-Z</option>
-    <option value="za">Ordenar Z-A</option>
-  </Form.Select>
-</div>
-</div>
+                <div style={{ width: '200px' }}>
+                  <Form.Select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                  >
+                    <option value="az">Ordenar A-Z</option>
+                    <option value="za">Ordenar Z-A</option>
+                  </Form.Select>
+                </div>
+              </div>
 
               <Table hover responsive className="align-middle">
                 <thead className="bg-light">
@@ -500,67 +502,67 @@ const [totalPages, setTotalPages] = useState(1);
                   </tr>
                 </thead>
                 <tbody>
-               {places
-  .filter(p => //filtra y ordena de la a a la z o de la z a ala a
-    !searchPlace ||
-    p.name.toLowerCase().includes(searchPlace.toLowerCase())
-  )
-  .sort((a, b) => {
-    if (sortOrder === 'az') {
-      return a.name.localeCompare(b.name);
-    } else {
-      return b.name.localeCompare(a.name);
-    }
-  })
-  .map(p => (
-                    <tr 
-                      key={p.id} 
-                      style={{ 
-                        opacity: p.active ? 1 : 0.6, 
-                        backgroundColor: p.active ? 'transparent' : '#f8f9fa' 
-                      }}
-                    >
-                      <td>
-                        <Image src={p.imageUrl || 'https://via.placeholder.com/50'} rounded width={50} height={50} style={{ objectFit: 'cover' }} />
-                      </td>
-                      <td className="fw-bold">{p.name}</td>
-                      <td><span className="px-3 py-1 rounded-pill" style={{ backgroundColor: '#fef3c7', color: '#92400e', fontSize: '0.75rem', fontWeight: '600' }}>{p.category}</span></td>
-                      <td>{p.address}</td>
-                      <td>
-                        <Form.Check
-                          type="switch"
-                          id={`switch-place-${p.id}`}
-                          label={p.active ? "Activo" : "Inactivo"}
-                          checked={p.active}
-                          onChange={() => handleTogglePlaceStatus(p)}
-                        />
-                      </td>
-                      <td>
-                        {p.active && (
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            className="me-2"
-                            onClick={() => {
-                              setQrTown({
-                                name: p.name,
-                                slug: selectedTown.slug,
-                                exactUrl: `${window.location.origin}/p/${selectedTown.slug}/places?destino=${p.id}`
-                              });
-                              setShowQRModal(true);
-                            }}
-                          >
-                            <QrCode size={16} className="me-1" /> QR
-                          </Button>
-                        )}
-                        <Button variant="outline-secondary" size="sm" className="me-2" onClick={() => {
-                          setPlace({ ...p, townId: selectedTown.id });
-                          setShowPlaceModal(true);
-                        }}><Pencil size={14} /></Button>
-                        <Button variant="outline-danger" size="sm" onClick={() => handleDeletePlace(p.id)}><Trash2 size={14} /></Button>
-                      </td>
-                    </tr>
-                  ))}
+                  {places
+                    .filter(p => //filtra y ordena de la a a la z o de la z a ala a
+                      !searchPlace ||
+                      p.name.toLowerCase().includes(searchPlace.toLowerCase())
+                    )
+                    .sort((a, b) => {
+                      if (sortOrder === 'az') {
+                        return a.name.localeCompare(b.name);
+                      } else {
+                        return b.name.localeCompare(a.name);
+                      }
+                    })
+                    .map(p => (
+                      <tr
+                        key={p.id}
+                        style={{
+                          opacity: p.active ? 1 : 0.6,
+                          backgroundColor: p.active ? 'transparent' : '#f8f9fa'
+                        }}
+                      >
+                        <td>
+                          <Image src={p.imageUrl || 'https://via.placeholder.com/50'} rounded width={50} height={50} style={{ objectFit: 'cover' }} />
+                        </td>
+                        <td className="fw-bold">{p.name}</td>
+                        <td><span className="px-3 py-1 rounded-pill" style={{ backgroundColor: '#fef3c7', color: '#92400e', fontSize: '0.75rem', fontWeight: '600' }}>{p.category}</span></td>
+                        <td>{p.address}</td>
+                        <td>
+                          <Form.Check
+                            type="switch"
+                            id={`switch-place-${p.id}`}
+                            label={p.active ? "Activo" : "Inactivo"}
+                            checked={p.active}
+                            onChange={() => handleTogglePlaceStatus(p)}
+                          />
+                        </td>
+                        <td>
+                          {p.active && (
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              className="me-2"
+                              onClick={() => {
+                                setQrTown({
+                                  name: p.name,
+                                  slug: selectedTown.slug,
+                                  exactUrl: `${window.location.origin}/p/${selectedTown.slug}/places?destino=${p.id}`
+                                });
+                                setShowQRModal(true);
+                              }}
+                            >
+                              <QrCode size={16} className="me-1" /> QR
+                            </Button>
+                          )}
+                          <Button variant="outline-secondary" size="sm" className="me-2" onClick={() => {
+                            setPlace({ ...p, townId: selectedTown.id });
+                            setShowPlaceModal(true);
+                          }}><Pencil size={14} /></Button>
+                          <Button variant="outline-danger" size="sm" onClick={() => handleDeletePlace(p.id)}><Trash2 size={14} /></Button>
+                        </td>
+                      </tr>
+                    ))}
                   {places.length === 0 && <tr><td colSpan="6" className="text-center text-muted">No hay lugares en este pueblo</td></tr>}
                 </tbody>
               </Table>
@@ -834,12 +836,12 @@ const [totalPages, setTotalPages] = useState(1);
               <Form.Control type="url" value={place.imageUrl} onChange={e => setPlace({ ...place, imageUrl: e.target.value })} />
             </Form.Group>
             <Form.Group className="mb-4">
-              <Form.Check 
+              <Form.Check
                 type="switch"
                 id="modal-place-active"
                 label={place.active ? "Lugar Activo (Visible para turistas)" : "Lugar Inactivo (Oculto)"}
                 checked={place.active}
-                onChange={e => setPlace({...place, active: e.target.checked})}
+                onChange={e => setPlace({ ...place, active: e.target.checked })}
               />
             </Form.Group>
             <Button type="submit" variant="primary" className="w-100">Guardar Lugar Turístico</Button>
