@@ -89,4 +89,12 @@ public class TownServiceTest {
         townService.deleteTown(1L);
         verify(townRepository).deleteById(1L);
     }
+
+    @Test
+    void testCountTowns() {
+        when(townRepository.count()).thenReturn(5L);
+        long count = townService.countTowns();
+        assertEquals(5L, count);
+        verify(townRepository).count();
+    }
 }

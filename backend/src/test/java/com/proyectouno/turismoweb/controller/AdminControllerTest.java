@@ -142,6 +142,47 @@ public class AdminControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void testUpdateUserStatusNull() throws Exception {
+        mockMvc.perform(put("/api/admin/users/1/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of())))
+                .andExpect(status().isBadRequest()); // O lo que lance tu GlobalExceptionHandler (IllegalArgumentException a menudo da 400 o 500)
+    }
+
+    @Test
+    void testUpdateUserRole() throws Exception {
+        User user = new User();
+        user.setRole("ADMIN");
+        when(userService.updateRole(eq(1L), eq("ADMIN"))).thenReturn(user);
+
+        mockMvc.perform(put("/api/admin/users/1/role")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of("role", "ADMIN"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.role").value("ADMIN"));
+    }
+
+    @Test
+    void testUpdateUserRoleNull() throws Exception {
+        mockMvc.perform(put("/api/admin/users/1/role")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").exists());
+    }
+
+    @Test
+    void testUpdateUserRoleException() throws Exception {
+        when(userService.updateRole(eq(1L), eq("INVALID"))).thenThrow(new RuntimeException("Rol invalido"));
+
+        mockMvc.perform(put("/api/admin/users/1/role")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of("role", "INVALID"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Rol invalido"));
+    }
+
     /**
      * Test para verificar las estadísticas.
      * Valida la integración con el repositorio mockeado.
