@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+@SuppressWarnings("squid:S4684") // Allow using entities directly in REST controllers for simplicity
 public class AdminController {
     private final TownService townService;
     private final PlaceService placeService;
@@ -70,7 +71,9 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}/role")
-    public ResponseEntity<?> updateUserRole(@NonNull @PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<Object> updateUserRole(
+            @NonNull @PathVariable Long id, 
+            @RequestBody Map<String, String> body) {
         String role = body.get("role");
         if (role == null) {
             Map<String, String> error = new HashMap<>();
@@ -88,7 +91,9 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}/status")
-    public ResponseEntity<?> updateUserStatus(@NonNull @PathVariable Long id, @RequestBody Map<String, Boolean> body) {
+    public ResponseEntity<Object> updateUserStatus(
+            @NonNull @PathVariable Long id, 
+            @RequestBody Map<String, Boolean> body) {
         Boolean active = body.get("active");
         if (active == null) {
             Map<String, String> error = new HashMap<>();
