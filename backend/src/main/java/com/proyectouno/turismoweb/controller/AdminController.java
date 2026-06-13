@@ -88,12 +88,21 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}/status")
-    public User updateUserStatus(@NonNull @PathVariable Long id, @RequestBody Map<String, Boolean> body) {
+    public ResponseEntity<?> updateUserStatus(@NonNull @PathVariable Long id, @RequestBody Map<String, Boolean> body) {
         Boolean active = body.get("active");
         if (active == null) {
-            throw new IllegalArgumentException("El campo 'active' no puede ser nulo.");
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "El campo 'active' no puede ser nulo.");
+            return ResponseEntity.badRequest().body(error);
         }
-        return userService.updateStatus(id, active);
+        try {
+            User updatedUser = userService.updateStatus(id, active);
+            return ResponseEntity.ok(updatedUser);
+        } catch (RuntimeException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
     }
 
     // -- STATS --
