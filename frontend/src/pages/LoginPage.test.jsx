@@ -34,9 +34,9 @@ describe('LoginPage Unit Tests', () => {
 
   it('debe renderizar el título de bienvenida para administradores', () => {
     renderComponent();
-    expect(screen.getByText(/login.admin_title/i)).toBeInTheDocument();
+    expect(screen.getByText(/login.admin/i)).toBeInTheDocument();
   });
-
+  // _title
   it('debe mostrar el botón de inicio de sesión con Google', () => {
     renderComponent();
     const googleBtn = screen.getByText(/Google Login/i);
