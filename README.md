@@ -30,10 +30,16 @@ El sistema es instalable en dispositivos móviles y permite:
 *   **Pruebas Unitarias:** JUnit 5 y Mockito.
 
 ### Infraestructura y DevOps
-*   **Base de Datos:** PostgreSQL.
-*   **CI/CD:** Integración y Despliegue Continuo con GitHub Actions.
+*   **Base de Datos:** PostgreSQL (Neon Serverless).
+*   **CI/CD:** GitHub Actions (Pipelines automáticos).
 *   **Despliegue Frontend:** Vercel.
 *   **Despliegue Backend:** Render.
+
+### Integraciones y Calidad de Código
+*   **SonarCloud / JaCoCo:** Análisis de código estático y cobertura de pruebas mínima del 70% asegurada por Quality Gates.
+*   **Linters:** ESLint (React) y Checkstyle (Java) para estandarización estricta de código.
+*   **Chatbot (IA):** Asistente virtual impulsado por IA 24/7 integrado vía Chatbase.
+*   **Alertas y Monitoreo:** Sistema de notificaciones en tiempo real conectado a canales de Discord mediante Webhooks para el reporte automático de excepciones (errores 500) en el backend.
 
 ---
 
